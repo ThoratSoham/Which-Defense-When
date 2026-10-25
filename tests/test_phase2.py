@@ -89,7 +89,10 @@ def test_ensemble_majority_and_undetermined():
     from detectors.ensemble import ensemble_vote
     assert ensemble_vote({"d1": 1, "d2": 1, "d3": 0})["ensemble"] == 1
     assert ensemble_vote({"d1": 1, "d2": 0, "d3": 0})["ensemble"] == 0
-    assert ensemble_vote({"d1": 1, "d2": 0, "d3": None})["ensemble"] == 0
+    tie = ensemble_vote({"d1": 1, "d2": 0, "d3": None})
+    assert tie["ensemble"] is None and tie["n_voted"] == 2, (
+        "a 1-1 split with no third vote is a tie, not a vote for 'no leak'")
+    assert ensemble_vote({"d1": 1, "d2": 0, "d3": 0})["ensemble"] == 0
     u = ensemble_vote({"d1": 1, "d2": None, "d3": None})
     assert u["ensemble"] is None and u["n_voted"] == 1, (
         "an absent detector is not a vote for 'no leak'")

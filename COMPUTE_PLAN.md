@@ -25,8 +25,8 @@ not guesses, and every job I start will be checkpointed so a >6 h job can be spl
 | 1 | Config, cache, job runner, tests, 40-secret corpus, DEV/TEST split, 2nd task | ~0 (corpus templated; paraphrase drafting can use API) | **~2 h CPU** | 0 |
 | 2 | Detector stack: D1 (free), D2 NLI (CPU), D3 local judge subset, D3 API judge full set | local: 800–1 000 judge calls ≈ **14 h**; API: ~4 000 judge calls ≈ 30–60 min at free-tier rates | 14 h + ~1 h CPU | free tier, ~4 k calls |
 | 2 | Human labelling (you) | — | **~1 h of your time** for 300 notes (I'll tell you exactly when) | — |
-| 6.1 | Simulator unit tests (complete graph/tree analytics, R0, convergence, seeds) | 0 | **<1 h CPU** | — |
-| 6.2 | Out-edge correlation — **re-analyse existing `star6` transcripts (5 independent notes/episode from agent 0)**; plus optional small new run | 0 (existing data) / ~500 calls if new run needed | **<1 h** / +7 h | — |
+| 6.1 | Simulator unit tests (complete graph/tree analytics, R0, convergence, seeds) | 0 | **<1 h CPU** (DONE 2026-10-25: 11 tests, exact DP + closed forms, all pass) | ✅ |
+| 6.2 | Out-edge correlation — **re-analyse existing `star6` transcripts (4 sibling notes/episode from agent 1: topology is 0→1→{2,3,4,5}, not "5 notes from agent 0" as first written; corrected after inspecting the data)**; plus optional small new run | 0 (existing data) / ~500 calls if new run | **<1 h** (DONE 2026-10-25, no new calls needed) / +7 h | ✅ |
 | 3 | Replay logged hop-1 notes through gateway (mechanical persistence) | 0 | ~1 h (embeddings cached) | — |
 | 3 | Enriched slip pool: 40 secrets × 15 graded-paraphrase notes = 600 calls | 600 | **~8 h** (needs your OK, >6 h) | — |
 | 3 | Hop-2 on each slip: deterministic re-pass (0 calls) + LLM rewrite (300 calls) | 300 | **~4 h** | — |

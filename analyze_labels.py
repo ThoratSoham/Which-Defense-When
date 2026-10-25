@@ -113,12 +113,19 @@ def main():
     d3o = load_d3("results/d3_openrouter.jsonl")
     d3l = load_d3("results/d3_local.jsonl")
 
-    detectors = {
+    # D2/D3 implement Outcome 1 (content leak) ONLY — see docs/LEAK_DEFINITION.md.
+    # Outcome 2 (identifier exposure) is implemented by D1 alone (d1_identifier),
+    # so the identifier table evaluates only D1; scoring D2/D3 against identifier
+    # labels would compare a content-leak verdict to a different question.
+    content_detectors = {
         "D1 (keyword)": lambda p: pool[p]["verdicts"]["d1"],
         "D2 (NLI)": lambda p: pool[p]["verdicts"]["d2"],
         "D3 (google)": lambda p: d3g.get(p),
         "D3 (openrouter)": lambda p: d3o.get(p),
         "D3 (local)": lambda p: d3l.get(p),
+    }
+    ident_detectors = {
+        "D1 (keyword/ID)": lambda p: pool[p].get("d1_identifier"),
     }
     # ensemble needs >=2 votes
     def ensemble(p):
@@ -126,14 +133,19 @@ def main():
         v = {"d1": pool[p]["verdicts"]["d1"], "d2": pool[p]["verdicts"]["d2"],
              "d3": d3g.get(p, d3o.get(p, d3l.get(p)))}
         return ensemble_vote(v)["ensemble"]
-    detectors["Ensemble"] = ensemble
+    content_detectors["Ensemble"] = ensemble
 
     report = {"n_labelled": len(ids)}
     for outcome, hkey in (("content_leak", "content"), ("identifier_exposure", "ident")):
         report[outcome] = {}
+        detectors = (content_detectors if outcome == "content_leak"
+                     else ident_detectors)
         human_v = [human[int(key[p]["sample_id"])][hkey] for p in ids]
         print(f"=== {outcome}  (human positive rate "
               f"{sum(human_v)/len(human_v):.3f}) ===")
+        if outcome == "identifier_exposure":
+            print("  (only detectors implementing Outcome 2 are scored here; "
+                  "D2/D3/ensemble answer Outcome 1 only)")
         print(f"{'detector':18s}{'n':>5s}{'prec':>14s}{'recall':>14s}"
               f"{'kappa':>8s}{'AC1':>8s}{'TP/FP/FN':>12s}")
         for name, fn in detectors.items():
@@ -144,6 +156,7 @@ def main():
                     pred.append(v); hv.append(human[int(key[p]["sample_id"])][hkey])
             if not pred:
                 print(f"{name:18s}  no verdicts yet")
+                report[outcome][name] = {"n": 0, "note": "not measured"}
                 continue
             m = metrics(hv, pred)
             report[outcome][name] = m
@@ -184,7 +197,7 @@ def main():
         verdicts = {"d1": pool[p]["verdicts"]["d1"], "d2": pool[p]["verdicts"]["d2"],
                     "d3": d3g.get(p, d3o.get(p, d3l.get(p)))}
         vals = [v for v in verdicts.values() if v in (0, 1)]
-        if hv not in vals or len(set(vals + [hv])) > 1:
+        if not vals or hv not in vals or len(set(vals + [hv])) > 1:
             dis.append({"sample_id": sid, "human": hv, "detectors": verdicts,
                         "note": pool[p]["note"][:400], "secret": pool[p]["secret"]})
     report["disagreements"] = dis

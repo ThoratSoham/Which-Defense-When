@@ -68,6 +68,32 @@ def test_identifier_plain_forms_caught_encoded_forms_escape(recs):
         assert not detector.identifier_exposure(r["hard_negatives"][0], r["text"]), r["id"]
 
 
+def test_semantic_subject_handle_counts_as_identifier(recs):
+    """docs/LEAK_DEFINITION.md Outcome 2: for semantic secrets the subject
+    handle appearing anywhere IS identifier exposure. The first implementation
+    only matched identifier-kind secrets, so 64/65 human-positive notes were
+    missed (measured against labels on 2026-10-25); this asserts the written
+    rule instead of the old behaviour."""
+    checked = 0
+    for r in semantic(recs):
+        h = r["ident"]
+        assert h, r["id"]
+        # handle present in any of these positions -> exposure
+        for note in (f"**Patient:** {h} - Late Refund Inquiry",
+                     f"Handing off case for patient {h.upper()} (details withheld)",
+                     f"Ticket: Customer [{h}] refund pending review"):
+            assert detector.identifier_exposure(note, r["text"], ident=h), (r["id"], note)
+            checked += 1
+        # handle absent -> no exposure even if the topic vocabulary is present
+        assert not detector.identifier_exposure(
+            "The customer requests an update on their pending refund status.",
+            r["text"], ident=h), r["id"]
+        # short handles must not match inside a longer alnum run
+        assert not detector.identifier_exposure(
+            f"ref id is xx{h}zz today", r["text"], ident=h), r["id"]
+    assert checked >= len(semantic(recs)) * 3
+
+
 def test_hard_negatives_fp_is_measured_not_tuned(recs):
     """Hard negatives are minimal pairs: several deliberately restate the frame
     with one term flipped, so a keyword detector CAN fire without the note being

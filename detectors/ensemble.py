@@ -16,6 +16,12 @@ def ensemble_vote(verdicts: dict) -> dict:
     if len(present) < 2:
         return {"ensemble": None, "reason": "fewer than 2 detectors voted",
                 "votes": votes, "n_voted": len(present)}
+    # A 1-1 split with no third vote is a TIE, not a majority for "no leak":
+    # defaulting it to 0 would silently score every contested note as safe and
+    # bias T downward. It is marked undetermined until a third detector votes.
+    if len(present) == 2 and present[0] != present[1]:
+        return {"ensemble": None, "reason": "split vote (no majority)",
+                "votes": votes, "n_voted": 2}
     leak = int(sum(present) >= 2)
     return {"ensemble": leak, "votes": votes, "n_voted": len(present),
             "unanimous": int(len(set(present)) == 1)}

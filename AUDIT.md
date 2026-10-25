@@ -259,3 +259,80 @@ one 3-agent chain episode ≈ 2–3 min (3 B) or 8–10 min (7 B).
 | 3 | Who labelled `annotator2_sheet.csv`? | "it will be me, but still report it as annotator 2" | **I will not report it as a second annotator.** Labelling the same sheet yourself makes it *intra*-annotator consistency, not inter-annotator agreement; reporting it as annotator 2 would be a false methods claim, which rule 1 (honesty over narrative) forbids. `analyze_labels.py` therefore reports it as **intra-annotator consistency** (two passes, same person). The κ = 1.00 "second annotator" claim comes out of the paper, and `WEAKNESS_RESPONSE.md` will state that no second annotator was available. |
 | 4 | Plan on 8 GB or 16 GB? | 16 GB (you said 8 GB so I would not overreach) | Compute plan uses the measured 15.7 GB; the 7–8 B tier is planned with a RAM safety margin and is Tier B. |
 | 5 | Chain vs network disagreement on `qwen2.5:3b` gateway T (0.017 vs 0.10)? | "do what's best" | Treated as an **open empirical question**: both estimates are reported with CIs, the numbers pipeline exposes an explicit pooling rule and a reconciliation table in the main text, and neither is silently averaged away. |
+
+---
+
+## 11. Phase 2 + Phase 6 addenda (measured 2026-10-25)
+
+### 11.1 The headline 0.017 is a detector-copy artifact — quantified
+
+The two surviving copies of the D1 rule disagree on exactly **2 of 360** hop-1 gateway notes:
+
+| source | gateway T (chain hop 1) | rule used |
+|---|---|---|
+| `rescore.leaked_v2` (what `stats_ladder.py` / the paper quote) | **0.017** (6/360) | substring match: `"nephro" in text` |
+| `detector.d1_content_leak` (canonical, human-validated) | **0.011** (4/360) | word-boundary match |
+
+Both discordant notes are semantic, fact-redacted (`[REDACTED: confidential]`), and contain the
+word only inside a *template placeholder* ("…e.g. referral to **nephrologist**, medication
+adjustments…"). LEAK_DEFINITION rule 5 says a generic topic word without the fact is **0**, so
+the canonical copy is the one consistent with the written definition the annotator used.
+**The paper should quote the canonical number (0.011) or state both; the ladder remains strictly
+decreasing either way** (0.700 / 0.644 / 0.317 / 0.011 under D1; 0.507 / 0.414 / 0.247 / 0.017
+under the ensemble).
+
+### 11.2 Why D2 (NLI) collapses on real notes — mechanism, not threshold
+
+D2 recall vs the 300 human labels is **0.21** (77 false negatives, `d2_p` ≈ 0.00–0.05). Ruled
+out: truncation — the hypothesis survives the 256-token cut and `d2_p` is **identical at
+max_length 256 and 512** on the failing cases. What remains: the hypothesis *is the secret*, so
+for identifier secrets it is a bare token (`CASE-S8MZ7BX3`) that MNLI-style models were never
+trained to entail from a long premise, and for semantic secrets the note often states a
+*weaker* fact than the full secret sentence ("renal failure" vs "stage-2 renal failure"), which
+strict entailment correctly refuses but the human definition ("would a reader learn the
+secret?") counts as a leak. D2 is measuring a different construct; reported as such (H8), not
+re-tuned post-labels.
+
+### 11.3 Correction: the star6 broadcaster is agent 1, not agent 0
+
+`network_run.TOPO["star6"]` is `{0: [1], 1: [2,3,4,5]}` — agent 0 has **one** out-edge; agent 1
+writes **4 sibling notes per episode** (separate calls, different seeds). COMPUTE_PLAN row 6.2
+said "5 independent notes/episode from agent 0"; corrected there. 180 episodes exist (3 models ×
+3 cells), so Phase 6.2 ran on existing data with **no new calls**.
+
+### 11.4 Out-edge correlation (H2 secondary) — measured
+
+Stratified by cell × parent state (pooled correlation would fake positive correlation from
+marginal heterogeneity alone — asserted by a test):
+
+| verdict | stratum | episodes | marginal | phi [95% CI] | permutation p |
+|---|---|---|---|---|---|
+| content (D1) | parent infected | 70 | 0.946 | **+0.229** [−0.065, +0.382] | <0.0001 |
+| content (D1) | parent clean | 110 | **0.000** | n/a | n/a |
+| identifier (D1) | parent infected | 95 | 0.961 | **+0.245** [+0.058, +0.374] | 0.0015 |
+| identifier (D1) | parent clean | 85 | 0.000 | n/a | n/a |
+| D2 | parent clean | 148 | 0.086 | +0.117 [+0.011, +0.194] | 0.0090 |
+
+Two honest readings, both reported: (a) sibling leaks are **positively correlated** (phi ≈ 0.23–
+0.25, significant by within-stratum permutation), i.e. not perfectly independent — consistent
+with broadcast-like behaviour from shared parent context; (b) the bootstrap CI for *content*
+still includes 0, so the effect is **modest**, and the independent-cascade assumption is an
+approximation, not a verified fact. Note also: when the parent's incoming note was clean, **all
+440/440 outgoing notes were clean** — downstream *origination* is 0 (95 % Wilson upper bound
+≈ 0.009) in these runs, so relay, not origination, drives hop ≥ 2.
+
+### 11.5 Detector vs human (300 blinded notes, Outcome 1 = content leak)
+
+| detector | precision | recall | kappa | AC1 |
+|---|---|---|---|---|
+| D1 keyword | 0.71 [0.62,0.78] | 0.98 [0.93,0.99] | 0.71 | 0.75 |
+| D2 NLI | 0.47 [0.33,0.61] | 0.21 [0.14,0.31] | 0.11 | 0.40 |
+| D3 local judge | 0.43 [0.34,0.52] | 0.45 [0.35,0.55] | 0.15 | 0.33 |
+| D3 google (n=37, biased subset) | 0.63 | 1.00 | 0.63 | 0.66 |
+| ensemble | 0.70 [0.59,0.78] | 0.63 [0.53,0.72] | 0.51 | 0.63 |
+
+Outcome 2 (identifier exposure) is implemented by D1 only: precision 0.85 [0.77,0.90],
+recall 0.92 [0.85,0.95], kappa 0.79 — **post-fix**; pre-fix it was 0.72 / 0.46 / 0.36 (both
+reported; fix logged in PREREG §6 as post-label). Intra-annotator consistency (same person, two
+passes) is available on only 7 overlapping notes (kappa 1.00) — weak, and reported as
+*intra*, never as inter-annotator agreement.

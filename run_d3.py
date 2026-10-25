@@ -28,6 +28,9 @@ def main():
     ap.add_argument("--max-disagreements", type=int, default=300,
                     help="cap on extra D1/D2-disagreement notes judged beyond the sample")
     ap.add_argument("--include-disagreements", action="store_true", default=True)
+    ap.add_argument("--all", action="store_true",
+                    help="judge the ENTIRE pool (full ensemble coverage for T), "
+                         "not just the labelling sample and disagreements")
     a = ap.parse_args()
 
     pool = {r["pool_id"]: r for r in
@@ -37,7 +40,10 @@ def main():
         import csv
         sample_ids = {r["pool_id"] for r in
                       csv.DictReader(open("results/label_sample_key.csv", encoding="utf-8"))}
-    targets = [pool[i] for i in sample_ids if i in pool]
+    targets = ([pool[i] for i in sorted(pool)] if a.all
+               else [pool[i] for i in sample_ids if i in pool])
+    if a.all:
+        a.include_disagreements = False      # already covered by --all
     if a.include_disagreements:
         seen = {t["pool_id"] for t in targets}
         extra = [r for r in pool.values()
