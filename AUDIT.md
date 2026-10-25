@@ -250,16 +250,12 @@ one 3-agent chain episode ≈ 2–3 min (3 B) or 8–10 min (7 B).
 
 ---
 
-## 10. Questions this audit raises for you (beyond the §3a list)
+## 10. Questions this audit raises for you (beyond the §3a list) — ASKED AND ANSWERED
 
-1. **Where is the LaTeX source?** Not in the repo. Please drop it in (e.g. `paper/`) or tell me
-   the Overleaf project to export.
-2. **May I run `git init`** locally so `PREREG.md` and every later change can be committed as
-   the rules require? (No remote, no pushes without asking.)
-3. **Who labelled `annotator2_sheet.csv`?** If it was you (or a copy of your labels), it cannot
-   be reported as a second annotator and `interannotator.py`'s κ = 1.00 must come out of the paper.
-4. The brief says 8 GB RAM; this machine has 15.7 GB. Should I plan on 16 GB (allows the 7 B tier
-   with care) — and is anything else heavy running that I should know about?
-5. The chain and the network experiments disagree about gateway leak rate for `qwen2.5:3b`
-   (0.017 pooled vs 0.10 measured in-network). Unless you say otherwise I will treat this as an
-   open empirical question and report both, not average them away.
+| # | question | your answer (2026-10-25) | what I did / what still stands |
+|---|---|---|---|
+| 1 | Where is the LaTeX source? | "there is not latex source" | **`main.tex` (603 lines) is present in the repo** — I am treating it as the source (inline `thebibliography`, two `Anon.` entries at lines 512–515 to be verified in Phase 8). If you meant something else, say so before Phase 7. |
+| 2 | May I `git init`? | yes | done; 3 commits at audit time, no remote, no pushes. |
+| 3 | Who labelled `annotator2_sheet.csv`? | "it will be me, but still report it as annotator 2" | **I will not report it as a second annotator.** Labelling the same sheet yourself makes it *intra*-annotator consistency, not inter-annotator agreement; reporting it as annotator 2 would be a false methods claim, which rule 1 (honesty over narrative) forbids. `analyze_labels.py` therefore reports it as **intra-annotator consistency** (two passes, same person). The κ = 1.00 "second annotator" claim comes out of the paper, and `WEAKNESS_RESPONSE.md` will state that no second annotator was available. |
+| 4 | Plan on 8 GB or 16 GB? | 16 GB (you said 8 GB so I would not overreach) | Compute plan uses the measured 15.7 GB; the 7–8 B tier is planned with a RAM safety margin and is Tier B. |
+| 5 | Chain vs network disagreement on `qwen2.5:3b` gateway T (0.017 vs 0.10)? | "do what's best" | Treated as an **open empirical question**: both estimates are reported with CIs, the numbers pipeline exposes an explicit pooling rule and a reconciliation table in the main text, and neither is silently averaged away. |

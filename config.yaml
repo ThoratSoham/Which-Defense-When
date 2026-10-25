@@ -53,14 +53,16 @@ providers:
   google:
     base_url: https://generativelanguage.googleapis.com/v1beta/openai
     key_env: GOOGLE_API_KEY
+    supports_seed: false        # measured: the endpoint returns 400 if `seed` is sent
     rpm: null                   # MUST-FILL: read https://aistudio.google.com/rate-limit
     rpd: null                   # MUST-FILL: same page; resets 00:00 Pacific
     model: null                 # MUST-FILL: pick from today's free list, e.g. gemini-3.8-flash
 
 rate_limit:
   backoff_base_s: 2.0
+  backoff_base_429_s: 15.0    # rate limits: start at 15s and double (measured need)
   backoff_max_s: 300.0
-  backoff_tries: 6
+  backoff_tries: 10
   sleep_past_quota: false       # false = checkpoint and stop; resume next run
 
 gateway:

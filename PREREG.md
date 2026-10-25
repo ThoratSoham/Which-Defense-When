@@ -156,3 +156,4 @@ and a null result will be reported as a null result, with the CI, not as absence
 | date | what changed | why |
 |---|---|---|
 | 2026-10-25 | v1.0 created | before any new experiment |
+| 2026-10-25 | D2 model fixed to `cross-encoder/nli-deberta-v3-small` (was MiniLM2-L6-H768 in the first draft of `d2_nli.py`) | chosen on a **construct-validity sanity set** (exact / near / medium / abbreviation positives, hard-negative / harmless / unrelated negatives) *before any human label existed*: MiniLM and distilroberta both miss near-paraphrases at the pre-declared 0.5 boundary, deberta-v3-small scores all positives >= 0.97 and all negatives <= 0.000. **The 0.5 threshold was not changed** and no label data was used — sanity behaviour on synthetic positives/negatives was the only criterion. Recorded here because the model choice was made after seeing model outputs. |

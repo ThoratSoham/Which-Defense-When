@@ -191,19 +191,27 @@ class LLMClient:
     def _sleep_backoff(self, attempt, err, status):
         base = float(self.rl_cfg.get("backoff_base_s", 2.0))
         cap = float(self.rl_cfg.get("backoff_max_s", 300.0))
-        delay = min(cap, base * (2 ** attempt)) * (0.5 + random.random())
         if status == 429:
-            hdr = ""
+            # Rate limit: honour the provider's reset hint, else back off hard.
+            # Free tiers throttle aggressively; short retries just burn the budget.
+            base = max(base, float(self.rl_cfg.get("backoff_base_429_s", 15.0)))
+            hdr = None
             try:
-                hdr = err.response.headers.get("X-RateLimit-Reset", "")
+                hdr = (err.response.headers.get("Retry-After")
+                       or err.response.headers.get("X-RateLimit-Reset"))
             except Exception:
                 pass
-            delay = max(delay, 5.0)
+            delay = None
             if hdr:
                 try:
-                    delay = max(delay, float(hdr) - time.time() + 1.0)
+                    v = float(hdr)
+                    delay = v if v < 1000 else max(0.0, v - time.time())
                 except ValueError:
-                    pass
+                    delay = None
+            delay = max(delay or 0.0, min(cap, base * (2 ** attempt)))
+            print(f"    [429] sleeping {delay:.0f}s (attempt {attempt + 1})", flush=True)
+        else:
+            delay = min(cap, base * (2 ** attempt)) * (0.5 + random.random())
         time.sleep(delay)
 
     def _dispatch(self, provider, model, system, user, temperature, seed, max_tokens):
@@ -238,10 +246,12 @@ class LLMClient:
         if not key:
             raise RuntimeError(f"{key_var} missing from .env (see docs/FREE_API_SETUP.md)")
         url = p["base_url"] + "/chat/completions"
+        supports_seed = p.get("supports_seed", True)
         body = {"model": model, "temperature": temperature, "max_tokens": max_tokens,
-                "seed": seed,
                 "messages": [{"role": "system", "content": system},
                              {"role": "user", "content": user}]}
+        if supports_seed:
+            body["seed"] = seed
         r = requests.post(url, headers={"Authorization": "Bearer " + key,
                                         "Content-Type": "application/json"},
                           json=body, timeout=180)
@@ -252,8 +262,9 @@ class LLMClient:
         if "choices" not in j:
             raise ValueError(str(j)[:300])
         u = j.get("usage", {}) or {}
-        # The parameter was sent; whether the model honoured it is provider-specific.
-        seed_ok = bool(seed) and j.get("seed") is not None
+        # The parameter was sent only when the provider accepts it (config
+        # supports_seed); even then determinism is not guaranteed.
+        seed_ok = bool(seed) and supports_seed and j.get("seed") is not None
         return (j["choices"][0]["message"].get("content") or "",
                 {"prompt": u.get("prompt_tokens"), "completion": u.get("completion_tokens")},
                 seed_ok)
