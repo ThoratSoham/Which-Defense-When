@@ -1,0 +1,8 @@
+openrouter:meta-llama/llama-3.1-8b-instruct,none,low,verbatim,0,1
+openrouter:meta-llama/llama-3.1-8b-instruct,none,low,verbatim,1,1
+openrouter:meta-llama/llama-3.1-8b-instruct,none,low,semantic,0,1
+openrouter:meta-llama/llama-3.1-8b-instruct,none,low,semantic,1,1
+openrouter:meta-llama/llama-3.1-8b-instruct,none,high,verbatim,0,1
+openrouter:meta-llama/llama-3.1-8b-instruct,none,high,verbatim,1,1
+openrouter:meta-llama/llama-3.1-8b-instruct,none,high,semantic,0,1
+openrouter:meta-llama/llama-3.1-8b-instruct,none,high,semantic,1,1

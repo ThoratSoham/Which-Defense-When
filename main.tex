@@ -1,0 +1,604 @@
+%% herd_immunity_agent_memory.tex
+%% Elsevier elsarticle class, author-year (natbib) style.
+%% Compile: pdflatex -> bibtex not needed (thebibliography is inline) -> pdflatex x2
+%% Figures: the six PNG files below must sit next to this .tex file:
+%%   fig1-ladder.png, fig2-pareto.png, fig3-outbreak.png,
+%%   fig4-protection.png, fig5-validation.png, fig6-other-secrets.png
+%% Missing figure files render as a labelled placeholder box so the document always compiles.
+
+\documentclass[preprint,12pt,authoryear]{elsarticle}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{url}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+
+% ---- Highlights environment (defined only if the class does not provide it) ----
+\makeatletter
+\@ifundefined{highlights}{%
+  \newenvironment{highlights}{\section*{Highlights}\begin{itemize}}{\end{itemize}}%
+}{}
+\makeatother
+
+% ---- Figure helper: includes the file if present, else a placeholder box ----
+\newcommand{\figbox}[2]{%
+  \IfFileExists{#1}{\includegraphics[width=#2\linewidth]{#1}}{%
+    \fbox{\parbox{#2\linewidth}{\centering\vspace{4em}\small Figure file \texttt{#1} not found\vspace{4em}}}}}
+
+\newcommand{\Rzero}{R_0}
+
+\journal{Journal name}
+
+\begin{document}
+
+%% =====================================================================
+%% HIGHLIGHTS  (Elsevier: 3-5 bullets, max 85 characters each incl. spaces)
+%% Normally submitted as a separate file; kept here for convenience.
+%% =====================================================================
+\begin{highlights}
+\item A semantic gateway cuts the per-hop leak start rate from 0.70 to 0.017
+\item Leaks that slip past a gateway are relayed past it again 19 times in 20
+\item Separating origination from relay cuts star prediction error from 1.0 to 0.3
+\item With persistent blind spots, full gateway coverage leaves 2--12\% outbreak risk
+\item Without knowing the secret, a generic gateway protects only 16\% for a diagnosis
+\end{highlights}
+
+\begin{frontmatter}
+
+\title{Herd Immunity for Agent Memory: Epidemic Dynamics of Secret Leakage and a Gateway Defense in Multi-Agent LLM Systems}
+
+\author[inst1]{Author Name\corref{cor1}}
+\ead{author@example.com}
+\cortext[cor1]{Corresponding author}
+\affiliation[inst1]{organization={Department / Institute},
+            addressline={Street address},
+            city={Pune},
+            postcode={000000},
+            state={Maharashtra},
+            country={India}}
+
+\begin{abstract}
+Multi-agent LLM systems pass context through handoff notes and shared memory, so a confidential item held by one agent can spread through the agent network like an infection. We ask how often a leak starts, how reliably it is relayed once it exists, and how many agents must be protected. In a three-agent handoff chain of small local models (llama3.2:3b, qwen2.5:3b, gemma2:2b), a secret crossed one hop with mean transmissibility $T = 0.70$ (95\% CI 0.65 to 0.75). A one-sentence warning produced no detectable reduction ($T = 0.64$, Holm-corrected $p = 0.12$), and an exact-match filter removed only verbatim leaks. A semantic gateway reduced $T$ to 0.017 (0.006 to 0.031), roughly a 40-fold drop in the chance that a leak \emph{starts}. The central finding is that this does not guarantee containment. A secret is first copied into a note at rates from 0.05 to 1.00, but once a note carries it, it is relayed at 0.75 to 1.00; a two-parameter origination/relay model fitted on chains predicts stars to about 0.3 agents, against about 1.0 for one transmissibility per edge. Leaks that slipped past the gateway were relayed past it again 19 times out of 20, so gateway errors persist across hops. In simulation on 500-agent networks, outbreak probability falls from about 0.8 to 0 only if gateways block independently; with persistent blind spots, 2 to 12\% remains even with a gateway on every agent. Under independent blocking, protecting hubs first needs 20 to 30\% of agents on scale-free networks against 80 to 100\% for random placement, and acquaintance protection, which needs no network map, needs 30 to 50\%. The gateway also changes what leaks: diagnosis exposure in semantic-secret notes falls from 65.6\% to 3.3\%, but the patient identifier survives, so exposure of either kind falls only from 70.0\% to 35.0\%; redacting the identifier as well brings it to 3.3\%, at a usefulness cost our proxy cannot measure. Over-blocking is 0 of 351 on typical notes but 8 to 19\% on same-template hard negatives. Told nothing about the secret, a generic-pattern and 3B-judge gateway keeps 94 to 96\% of the oracle's protection for ID-like secrets but only 16\% for a diagnosis. All models are 2B to 3B parameters, our task-success proxy cannot exclude differences below about 3 points, and large-network results are simulation-based.
+\end{abstract}
+
+\begin{keyword}
+multi-agent systems \sep large language models \sep privacy leakage \sep epidemic model \sep data loss prevention \sep network immunization
+\end{keyword}
+
+\end{frontmatter}
+
+%% =====================================================================
+\section{Introduction}
+\label{sec:intro}
+
+Agents hand work to each other, and shared memory is how context survives those handoffs. Systems built to increase sharing also increase the number of paths along which a secret can travel. Access control decides who may read an item. It says little about what happens after a leak: does the secret stop, or does it keep propagating through paraphrase and re-sharing? We study this as an epidemic over the agent communication network, and we separate two stages that earlier work tends to merge: the rate at which a secret is first \emph{copied} into a note (origination) and the rate at which a note that already carries it is \emph{relayed} onward.
+
+The paper makes five contributions:
+\begin{enumerate}
+  \item \textbf{Origination/relay decomposition.} We separate the rate at which a secret is first copied into a note from the rate at which it is relayed, and show that this explains why a single per-edge transmissibility fails on stars (Section~\ref{sec:validation}).
+  \item \textbf{Persistent gateway blind spots.} We measure that leaks which evade a gateway once evade it again (0.95, from 20 relays) and show how this changes outbreak conclusions (Section~\ref{sec:persist}).
+  \item \textbf{Defense ladder.} We compare no defense, a prompt warning, an exact-match filter and a semantic gateway, including what the gateway leaves behind (the patient identifier) and what it blocks wrongly (hard negatives) (Sections~\ref{sec:ladder}, \ref{sec:partial}, \ref{sec:overblock}).
+  \item \textbf{Network consequences.} Using measured parameters in simulation we report the basic reproduction number $\Rzero$, outbreak probability, and the fraction of agents that must be protected under random, hub-first and acquaintance placement, for three blocking models (Sections~\ref{sec:network}, \ref{sec:herd}).
+  \item \textbf{Validation protocol.} The leak detector was validated against hand labels, found to undercount, repaired and re-scored; we report all annotation rounds (Section~\ref{sec:detector}).
+\end{enumerate}
+
+Prior work has measured where information leaks in multi-agent systems and has begun to study how leaks travel. AgentLeak \citep{elyagoubi2026} shows that inter-agent messages and shared memory leak more than final outputs and tests a prototype interceptor. PRISM \citep{prism2026} formalizes propagation amplification across pipeline depth and proposes a generation-time detector with a utility measure. MAMA \citep{liu2026} and \emph{When Agents Talk, Secrets Travel} \citep{anon2026a} show that topology changes how far private information travels, and the latter proposes recipient-conditioned sanitization. \emph{Got a Secret?} \citep{anon2026c} reports that privacy violations are socially contagious among simulated agents. We therefore do not claim to be the first to measure leakage between agents, to show that topology matters, or to evaluate a leak filter with a utility cost.
+
+What we have not found, in a limited search, is a study that (i) measures a per-hop leak probability for small local models and carries it into epidemic-style network simulations, with outbreak probability and the fraction of agents that must be protected under random and hub-first placement; (ii) separates the rate at which a secret is first copied into a note from the rate at which it is relayed; and (iii) tests whether the blind spots of a message filter persist from hop to hop. This is a statement about a limited literature search (Appendix~\ref{app:search}), not a proof of absence.
+
+%% =====================================================================
+\section{Related work}
+\label{sec:related}
+
+\paragraph{Self-propagating attacks and contagion between agents.}
+Prompt Infection \citep{lee2024} shows that a malicious prompt can self-replicate from agent to agent, and proposes LLM Tagging as a defense. Morris~II \citep{cohen2024} demonstrates zero-click worms in GenAI email assistants, and Agent Smith \citep{gu2024} shows an infectious jailbreak spreading across multimodal agents. AgentWorm \citep{zhang2026} builds a self-replicating worm against a production agent framework and measures attack success across five frontier models. It reports per-hop conditional success in multi-hop relays (0.74 to 0.96 depending on the vector) and projects ecosystem spread with an SIS model on a homogeneous network, where $\Rzero$ is the number of peers times the attack success rate. It also finds that prompt-level mitigations reduced attack success only partly (0.65 to 0.37 at the strongest level), while sandbox isolation stopped the infection loop. Cowpox \citep{cowpox2025} proposes an immunity mechanism for multi-agent systems with a transmission model in which the number of defender agents is varied. Contagion Networks \citep{anon2026d} and Reliability-Contagion Feasibility in LLM Multi-Agent Networks \citep{anon2026e} apply contagion models to evaluator preferences and to reliability. Mind Viruses \citep{papadopoulos2026} studies ideas that agents adopt and pass on; it finds that spread depends on host model, payload and topology, and that a brief warning telling agents about self-propagating ideas gives near-total immunity. These works concern attacks, instructions or ideas designed to replicate, usually on homogeneous networks and with large models. We study confidential information that an honest agent copies into a handoff note, on networks with different degree structure, with small models, and with a filter as the intervention. Our warning is also a different intervention from theirs: a generic confidentiality sentence, not a description of the threat.
+
+\paragraph{Privacy leakage in multi-agent systems.}
+AgentLeak \citep{elyagoubi2026} is the closest measurement study. On 1,000 scenarios and five large models it finds that inter-agent messages leak far more than final outputs (68.8\% against 27.2\%), and that a privacy prompt cut leakage in the final output (48\% to 19\%) but barely on internal channels (31\% to 29\%). A prototype interceptor that masked vault fields in inter-agent messages and memory writes cut internal leakage from 31.5\% to 2.4\% at a cost of 4.7 points of task success. AgentLeak uses coordinator-worker systems of two agents and a detector that combines pattern matching with an LLM judge, and it leaves other topologies to future work; it does not follow a leak across a network. PiSAs \citep{gupta2026} benchmarks leakage across the users of shared agentic systems with three large models. It finds that privacy instructions cut violations by up to about half in information gathering and inter-agent messages but only by 28 to 29\% in memory, at some cost in completeness, and that adding memory or partitioning agents tends to relocate violations rather than remove them. \citet{hagag2026} show that roles, topology and memory visibility change attack success, and report that more memory visibility does not reliably improve security. Single-agent work such as ConfAIde \citep{mireshghallah}, PrivacyLens \citep{shao2024} and AgentDAM \citep{zharmagambetov2025} measures whether models respect contextual privacy norms. Our one-sentence warning, which did not reliably help small models, sits between these results: it agrees with AgentLeak's weak effect of prompts on internal channels, and it differs from PiSAs, whose instructions were longer and whose models were far larger. Our study is complementary: small models, a measured per-hop leak rate, and its consequences for networks.
+
+\paragraph{Propagation, topology and sanitization of leaks.}
+Several 2026 papers study how leaks travel. PRISM \citep{prism2026} formalizes propagation amplification, in which a secret that enters shared context is reproduced downstream with a probability that compounds with pipeline depth. It tests a generation-time detector that needs token log-probabilities on a synthetic four-agent pipeline of 7B to 9B models: the undefended pipeline leaked in 71.2\% of tasks, a prompt-instruction defense in 49.3\%, scanners and an LLM judge in 43\% to 66\%, and the detector in none, at a utility of 0.893. It concerns credentials rather than semantic secrets and a linear pipeline rather than a network, and it models downstream reproduction with a product formula, remarking that positive dependence between hops only strengthens its conclusion, without measuring relay separately. MAMA \citep{liu2026} seeds PII in one agent's memory and shows that denser graphs, shorter attacker--target distance and higher target centrality increase extraction. \emph{When Agents Talk, Secrets Travel} \citep{anon2026a} measures benign propagation across six topologies, finds that topology changes who is exposed rather than the overall disclosure rate, and proposes recipient-conditioned sanitization. \emph{Facts Without Rules} \citep{anon2026b} studies multi-hop handoffs and reports that prompt-only mitigation does not stop downstream leakage and that phrase-level enforcement removes exact strings but not semantic leakage, while typed handoffs that carry allowed audiences reduce it. \emph{Got a Secret?} \citep{anon2026c} reports that privacy violations are socially contagious among thousands of simulated agents (an agent is several times more likely to disclose after a peer does) and that explicit privacy instructions leave leakage above 37.8\%. Policy-enforcement and information-flow work (Maris, RTBAS, FIDES, CaMeL) gives stronger guarantees by design. Our results agree with several of these findings: prompts help little, exact match misses semantic leaks, and topology matters. We differ in modelling spread as an epidemic process with a measured per-hop probability, in separating origination from relay, in asking how many agents must be protected and which ones, and in testing whether a filter's errors repeat from hop to hop. Correlated blind spots of guardrails have been reported in other settings, for example camouflaged injections that evade detectors, but we have not found a study of their effect on multi-hop leak relay.
+
+\paragraph{Shared memory, access control and information flow.}
+Event-sourced shared logs (ESAA, ESAA-Conversational \citep{esaa2026,esaac2026}), memory systems (Mem0 \citep{mem0}, A-MEM \citep{amem}) and delegation frameworks \citep{delegation2025} improve continuity, storage and scoped authority. Work on governed or principal-scoped shared memory (Collaborative Memory \citep{rezazadeh2025}; Governed Shared Memory for Multi-Agent LLM Systems \citep{anon2026h}) enforces who may read what and measures unauthorized reads. Information-flow control for agents (FIDES \citep{costa2025}; CaMeL \citep{debenedetti2025}) gives stronger guarantees by design, at the cost of restructuring the agent. The gateway we study is weaker and simpler: a content filter that tries to catch labelled secrets after they have been written into a note, and whose misses and false positives we measure.
+
+\paragraph{Network epidemic theory.}
+For SIR-type spread on random graphs, \citet{newman2002} shows that the epidemic threshold depends on the first two moments of the degree distribution, so hub-heavy networks have lower thresholds and are more vulnerable; the same paper notes that targeting highly connected members can limit spread better than targeting everyone. \citet{pastor2002} proposed targeted immunization of the highest-degree nodes in scale-free networks. Our comparison of hub-first and random protection therefore reproduces a classical result for a new kind of host; what we add is the measured transmissibility of LLM agents, an origination/relay split, and a gateway as the protective measure.
+
+%% =====================================================================
+\section{Problem and threat model}
+\label{sec:threat}
+
+\paragraph{Mode A, accidental spread (primary, measured here).}
+Honest agents overshare, summarize secrets into handoffs or echo them. This is the common real-world failure.
+
+\paragraph{Mode B, adversarial exfiltrator (secondary).}
+One agent is instructed to leak a secret and may translate, reverse, split or encode it. Results are in Section~\ref{sec:adversarial}.
+
+\paragraph{Assumptions.}
+Secrets are labelled when written to memory, so the gateway knows what to protect. Unlabelled secrets are out of scope, apart from the auto-detect experiment of Section~\ref{sec:know}. All secrets are synthetic. Weight tampering and network-level attacks are out of scope.
+
+%% =====================================================================
+\section{Epidemic model}
+\label{sec:model}
+
+An agent is \emph{infected} when a note it sends contains the secret. We call the probability that an infected agent passes the secret across one edge in one task episode the per-hop transmissibility $T$. In simulation we use an independent-cascade model: each newly infected agent infects each susceptible neighbour with probability $T$, once. $\Rzero$ is the expected number of secondary infections caused by a single initial leaker in a fully susceptible network. For random graphs we use the approximation
+\begin{equation}
+  \Rzero \approx T\,\frac{\langle k^{2}\rangle - \langle k\rangle}{\langle k\rangle},
+  \qquad
+  T_c = \frac{\langle k\rangle}{\langle k^{2}\rangle - \langle k\rangle},
+  \label{eq:r0}
+\end{equation}
+where $k$ is agent degree \citep{newman2002}, and we also report empirical outbreak probability, defined as the chance that more than 5\% of agents become infected. Containment means $\Rzero < 1$. Hub-heavy networks have large $\langle k^{2}\rangle$, so the same $T$ gives a higher $\Rzero$. Under homogeneous mixing the herd-immunity threshold is $p_c = 1 - 1/\Rzero$; on real topologies we measure it empirically by protecting a fraction $p$ of agents.
+
+The single-$T$ model is deliberately simple. Our measurements show that it merges two stages. We therefore also use a two-parameter version with an \emph{origination} rate $o$ (the probability that an agent holding the secret in its context first copies it into a note) and a \emph{relay} rate $r$ (the probability that an agent that receives a note carrying the secret passes it on). Real agents are not memoryless edges, edges from one agent are not independent, and a model that has seen a secret may behave differently later. We test these assumptions against real six-agent networks in Section~\ref{sec:validation} and relax the independence of gateway blocking in Section~\ref{sec:persist}.
+
+%% =====================================================================
+\section{The gateway}
+\label{sec:gateway}
+
+The gateway sits between agents. Every note passes through it before the next agent sees it. When a secret is written to memory it is registered with the gateway (this is the sensitivity label).
+
+\paragraph{L1, innate barrier.}
+An ID-like secret is matched with any separators or case between its characters, and the full text of any registered secret is matched with flexible whitespace. Matches are replaced by a redaction marker.
+
+\paragraph{L2, semantic fingerprint.}
+For semantic secrets each sentence of a note is compared with the registered secret. A sentence is redacted when either (a) at least 60\% of the secret's content words appear in it, or (b) the cosine similarity of its embedding (\texttt{nomic-embed-text}, via Ollama) with the secret's embedding is at least 0.78. Notes in which nothing is redacted are returned unchanged.
+
+Other layers in our original design (immune memory, trust-based quarantine, decoy vaccination, tolerance budget) are not implemented and are future work. We therefore call L2 a semantic fingerprint layer rather than an adaptive immune system.
+
+%% =====================================================================
+\section{Experimental setup}
+\label{sec:setup}
+
+\paragraph{Agents.}
+Three local instruction-tuned models from three families (llama3.2:3b, qwen2.5:3b, gemma2:2b) run through Ollama on a CPU-only laptop at temperature 0.7 with fixed seeds. Larger models were not tested.
+
+\paragraph{Task.}
+A three-agent customer-service handoff chain. Agent~1 holds a confidential record and must write a handoff note for a late-refund ticket; each later agent rewrites the note for the next.
+
+\paragraph{Secrets.}
+(i)~A verbatim identifier of the form \texttt{CASE-XXXXXXXX}; (ii)~one semantic statement, ``patient xyz was diagnosed with stage-2 renal failure'', that can leak by paraphrase. All data are synthetic.
+
+\paragraph{Pressure.}
+Low (include only what the next agent needs) and high (include every detail from your context).
+
+\paragraph{Design.}
+30 episodes per cell, 12 cells per defense (3 models $\times$ 2 pressures $\times$ 2 secret types), giving 360 hop-1 observations per defense. Conditions: B0 no defense; B2 a one-sentence confidentiality warning in the system prompt; L1 exact-match gateway; L1+L2 full gateway. Baselines B1 (summary-only), B3 (provenance tagging) and B4 (static access-control list) were not run, and a plain regex filter is evaluated only as a detector benchmark (Section~\ref{sec:robust}).
+
+\paragraph{Leak detection.}
+Verbatim: the identifier appears in the note in any format. Semantic: the note contains a renal, kidney, nephro, dialysis or stage-2 keyword. Section~\ref{sec:detector} describes how this detector was validated.
+
+\paragraph{Statistics.}
+Bootstrap 95\% confidence intervals (5,000 resamples), permutation tests, Holm correction across the six pairwise comparisons, and Cohen's $h$ for effect size.
+
+%% =====================================================================
+\section{Results}
+\label{sec:results}
+
+Table~\ref{tab:summary} collects the headline quantities under their respective definitions so that no number appears without its caveat. Details follow.
+
+\begin{table}[t]
+\centering
+\caption{Headline quantities and the definition under which each applies. ``Gateway'' is the full L1+L2 gateway told the secret in advance (the oracle).}
+\label{tab:summary}
+\small
+\begin{tabular}{@{}p{6.3cm}ccp{3.6cm}@{}}
+\toprule
+Quantity & No defense & Gateway & Note \\
+\midrule
+Per-hop $T$, all secrets pooled (diagnosis / verbatim ID) & 0.700 & 0.017 & Primary result \\
+Semantic-secret notes: diagnosis present & 65.6\% & 3.3\% & Hop 1 \\
+Semantic-secret notes: diagnosis \emph{or} identifier & 70.0\% & 35.0\% & Stricter definition \\
+Same, with identifier redaction added & 70.0\% & 3.3\% & Usefulness cost unmeasured \\
+Outbreak probability, independent blocking, full coverage & 0.69--0.80 & 0.00 & Optimistic \\
+Outbreak probability, persistent blind spots, full coverage & n/a & 0.02--0.12 & Floor; relay rests on 20 observations \\
+Over-blocking: typical notes / hard negatives & n/a & 0/351 / 8--19\% & Threshold 0.78 and above \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%% ---------------------------------------------------------------------
+\subsection{Detector validation}
+\label{sec:detector}
+
+We hand-labelled 100 notes (25 per defense and secret type, shuffled). Table~\ref{tab:kappa} gives agreement.
+
+\begin{table}[t]
+\centering
+\caption{Agreement between the hand labels and the leak detector.}
+\label{tab:kappa}
+\small
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Round & Agreement & Kappa \\
+\midrule
+First pass, original detector & 0.77 & 0.50 \\
+After writing a precise definition of a leak and relabelling & 0.95 & 0.89 \\
+Improved detector, before the last four rows were adjudicated & 0.96 & not reported \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The first-pass disagreements showed two problems. Some labels broke the written rule, which we corrected. The detector also missed identifiers written as ``CASE ID: X'' or ``Triage Record: X'', so it undercounted verbatim leaks in the undefended conditions. After fixing it and re-scoring every logged note, the undefended $T$ rose from 0.57 to 0.70. The final agreement of 1.00 reflects adjudication and should not be read as independent reliability. Limitations: one annotator, and redaction markers revealed which notes came from the gateway.
+
+\paragraph{Fresh sample.}
+We then labelled 100 new notes (50 verbatim, 50 semantic), disjoint from the first sample, using the written definition. Against the improved detector, 96 of 100 labels agreed ($\kappa = 0.91$): all 50 verbatim notes, and 46 of 50 semantic notes ($\kappa = 0.82$). Of the four disagreements, three were annotator errors (two notes that state the diagnosis were labelled 0, and one note that gives only the patient identifier was labelled 1) and one was a detector false positive: a template placeholder that mentioned a nephrologist matched the keyword list. This remains one annotator, and the redaction markers were visible.
+
+\paragraph{Held-out sample and the identifier question.}
+We labelled a further 100 notes (50 verbatim, 50 semantic) once, without adjudicating afterwards, and compared them with the improved detector. Agreement was 0.93 ($\kappa = 0.85$): 50 of 50 verbatim notes ($\kappa = 1.00$) and 43 of 50 semantic notes ($\kappa = 0.71$). All seven disagreements went the same way: the annotator labelled the note as a leak and the detector did not, with no false positives (precision 1.00, recall 0.82). In six of the seven, the note exposed the patient identifier without stating a diagnosis, and the seventh added a placeholder ``Diagnosis Date'' without naming the condition; four of them came from the gateway condition, where the diagnosis sentence had been redacted but the identifier remained. The disagreement is one of definition, not of detection: the detector counts only the diagnosis, while the annotator also counted exposure of the identifier. We therefore report two outcomes: diagnosis leakage (the primary $T$) and partial disclosure of the identifier (Section~\ref{sec:partial}). One annotator, and the redaction markers were visible.
+
+%% ---------------------------------------------------------------------
+\subsection{Leak rates depend on the host model and the secret type}
+\label{sec:host}
+
+Without a defense, mean $T$ was 0.88 for gemma2:2b, 0.73 for qwen2.5:3b and 0.49 for llama3.2:3b. The ranking of secret types flips between models. llama3.2:3b leaked the identifier readily ($T = 1.00$ at high pressure, 0.70 at low) but rarely the semantic secret (0.00 and 0.27). qwen2.5:3b did the opposite at low pressure (identifier 0.33, semantic 0.77), while gemma2:2b leaked both at high pressure (1.00 each). A defense tuned on one model or secret type can therefore miss another.
+
+%% ---------------------------------------------------------------------
+\subsection{The defense ladder}
+\label{sec:ladder}
+
+Table~\ref{tab:ladder} and Figure~\ref{fig:ladder} give the central per-hop result.
+
+\begin{table}[t]
+\centering
+\caption{The defense ladder. $\Rzero$ and outbreak probability are simulated on 500-agent networks (order: ring / random / scale-free). The ``independent'' columns assume every protected agent blocks independently; the last column shows the outbreak probability at full coverage when blind spots persist across hops (Section~\ref{sec:persist}).}
+\label{tab:ladder}
+\small
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+Defense & $T$ (95\% CI) & Mean $\Rzero$ (independent) & $P$(outbreak) (independent) & $P$(outbreak), persistent blind spots & Task success \\
+\midrule
+None          & 0.700 (0.653 to 0.747) & 2.10 / 2.79 / 6.15 & 0.69 / 0.76 / 0.80 & n/a        & 0.900 \\
+Warning       & 0.644 (0.594 to 0.694) & 1.93 / 2.57 / 5.66 & 0.61 / 0.68 / 0.72 & n/a        & 0.911 \\
+L1 exact match& 0.317 (0.269 to 0.367) & 0.95 / 1.26 / 2.78 & 0.32 / 0.34 / 0.36 & n/a        & 0.900 \\
+L1+L2 gateway & 0.017 (0.006 to 0.031) & 0.05 / 0.07 / 0.15 & 0.00 / 0.00 / 0.00 & 0.02--0.12 & 0.897 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\figbox{fig1-ladder.png}{0.95}
+\caption{Per-hop leak rate $T$ by defense, pooled over all secrets and split by secret type, with 95\% bootstrap confidence intervals (360 hop-1 observations per defense). The warning shows no detectable reduction, the exact-match filter removes verbatim leaks only, and the L1+L2 gateway reduces $T$ to 0.017.}
+\label{fig:ladder}
+\end{figure}
+
+$\Rzero$ and outbreak probability are simulated on 500-agent networks (ring lattice with $k=4$, random graph with mean degree 4, Barab\'asi--Albert with $m=2$) using the measured $T$ of each model, pressure and secret-type cell, then averaged. They assume independent blocking, which Section~\ref{sec:persist} shows is optimistic for the gateway row. Task success is a crude proxy: whether the final note still mentions the refund. Its 95\% intervals are about $\pm 3$ points for every defense (Figure~\ref{fig:pareto}). The proxy therefore shows no difference larger than about 3 points; a smaller cost, or a cost the proxy cannot see, is not excluded.
+
+\begin{figure}[t]
+\centering
+\figbox{fig2-pareto.png}{0.7}
+\caption{Leak rate against the task-success proxy for each defense, with 95\% bootstrap intervals on both axes and the $y$-axis drawn from 0.8 to 1.0. The gateway moves $T$ from 0.70 to 0.017 while task success stays near 0.90, but the task-success intervals overlap for all four defenses and are about $\pm 3$ points wide, so a smaller cost cannot be ruled out.}
+\label{fig:pareto}
+\end{figure}
+
+The warning produced no detectable reduction in leakage (difference 0.056, Cohen's $h = 0.12$, Holm-corrected $p = 0.12$); a small effect cannot be ruled out. Its one clear gain was qwen2.5:3b at low pressure with the semantic secret (0.77 to 0.33), and it raised leakage for the same model at high pressure (0.97 to 1.00). The exact-match filter cut verbatim $T$ from 0.744 to 0.000 but semantic $T$ only from 0.656 to 0.633. Adding semantic fingerprinting cut semantic $T$ to 0.033. All comparisons involving the gateway have Holm $p = 0.0012$. Even under independent blocking, the closest case to non-containment was qwen2.5:3b, high pressure, semantic secret ($T = 0.10$, $\Rzero = 0.88$ on the scale-free network).
+
+%% ---------------------------------------------------------------------
+\subsection{What the gateway leaves behind: partial disclosure of the identifier}
+\label{sec:partial}
+
+We counted how often the semantic-secret notes (hop 1) contained the patient identifier as a whole word, with or without the diagnosis. Without a defense, the diagnosis appeared in 65.6\% of notes and the identifier in 58.9\% (identifier without diagnosis: 4.4\%; either: 70.0\%). With the gateway, the diagnosis appeared in 3.3\% of notes, but the identifier still appeared in 33.9\%, and in 31.7\% it appeared without the diagnosis (either: 35.0\%). The prompt warning (either: 61.7\%) and the exact-match filter (68.9\%) changed little. By model, exposure of either kind fell from 1.00 to 0.47 for gemma2:2b, from 0.88 to 0.47 for qwen2.5:3b and from 0.22 to 0.12 for llama3.2:3b. The gateway therefore removes the diagnosis (a 20-fold drop) but turns many diagnosis leaks into identifier-only leaks, because it redacts the sentence that matches the secret and leaves the rest of the note, including the short patient identifier, intact. Whether identifier-only exposure counts as a leak depends on the threat model; under the stricter definition that counts it, the gateway roughly halves exposure (70.0\% to 35.0\%) instead of removing it.
+
+We then registered the identifier as a whole-word token and removed it after the semantic layer. Applied offline to the saved hop-1 notes (which is exact for hop 1, because those notes are written before any gateway acts), this brought identifier exposure from 33.9\% to 0 and exposure of either kind from 35.0\% to 3.3\% (by model: 0.117 to 0.017, 0.467 to 0.050 and 0.467 to 0.033), and it matched none of 5,400 pairs of an identifier and an unrelated note. It changes 33.9\% of notes and removes the patient reference, a usefulness cost that our task-success proxy cannot see; a multi-hop rerun and a downstream task that needs the patient reference are future work. A three-character identifier could occasionally match an ordinary word, so the counts before redaction are approximate.
+
+%% ---------------------------------------------------------------------
+\subsection{How much does the gateway need to know?}
+\label{sec:know}
+
+Real deployments rarely know their secrets in advance, so this experiment matters for practical use. All gateways so far were told the secret in advance (the oracle). We compared four gateways on the same 120 saved unfiltered hop-1 notes (60 verbatim, 60 semantic; the comparison is exact for hop 1): the oracle; a tagged gateway that protects the secret only if the source marked it (coverage 50\%, 80\% or 95\%, simulated per note); an auto-detect gateway that knows no secret and combines generic PII patterns (e-mail, phone, ID-like tokens) with an LLM judge (llama3.2:3b) that picks confidential sentences; and the patterns alone.
+
+\begin{table}[t]
+\centering
+\caption{Leakage and share of the oracle's protection retained, by gateway knowledge (120 saved hop-1 notes; 60 per secret type, intervals about $\pm 0.1$).}
+\label{tab:know}
+\small
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Gateway & Verbatim ID & Semantic secret \\
+\midrule
+No defense (leakage)           & 0.833 & 0.683 \\
+Oracle (leakage)               & 0.000 & 0.050 \\
+Auto-detect (leakage)          & 0.033 & 0.583 \\
+\quad share of oracle protection & 96\%  & 16\% \\
+Patterns alone (leakage)       & 0.050 & 0.683 \\
+\quad share of oracle protection & 94\%  & none \\
+Tagged, 50\% coverage (share)  & 40\%  & 63\% \\
+Tagged, 80\% coverage (share)  & 72\%  & 84\% \\
+Tagged, 95\% coverage (share)  & 94\%  & 89\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+For the verbatim identifier, leakage was 0.833 without a defense and 0.000 with the oracle; the auto-detect gateway reached 0.033 and the patterns alone 0.050, keeping 96\% and 94\% of the oracle's protection. For the semantic secret, leakage was 0.683 without a defense and 0.050 with the oracle, but the auto-detect gateway reached only 0.583 (16\% of the oracle's protection) and the patterns alone gave none (0.683); the judge also changed 5.3\% of notes that held nothing to protect. Knowing nothing about the secret therefore costs little for ID-like secrets, which generic patterns find, and nearly all of the protection for a free-text diagnosis with a 3B judge. A stronger judge may do better and has not been tested. The tagged gateway is simulated by per-note coverage, not by a real tagging mechanism.
+
+%% ---------------------------------------------------------------------
+\subsection{Do gateway blind spots persist across hops?}
+\label{sec:persist}
+
+In the gateway cells, a leak that had slipped past the gateway once was relayed past it again 19 times out of 20 (0.95). If blind spots persist like this, protected agents do not block independently, and a cascade has two stages: a rare slip (origination through the gateway, 0 to 0.10 per model in these runs) followed by near-certain relay. We simulated this with the measured parameters. With a gateway on every agent, outbreak probability stayed at 0.00 for gemma2:2b, rose to 0.09 to 0.14 for llama3.2:3b and to 0.24 to 0.32 for qwen2.5:3b, and the fraction of protected agents needed to get below 5\% became unreachable for those two models. A back-of-envelope check agrees: with $T = 0.017$ (95\% CI 0.006 to 0.031) and an origin with four neighbours, the chance that at least one first-hop leak slips through is about 7\% (2\% to 12\%). So the gateway cuts the probability that a leak starts by about 40 times, but it does not make an outbreak impossible once one slip occurs. The relay estimate rests on 20 relays, so this is a sensitivity analysis, not a measurement. Detectors whose errors are not identical at each hop are the obvious remedy and are untested.
+
+%% ---------------------------------------------------------------------
+\subsection{Origination and relay: validation against real six-agent networks}
+\label{sec:validation}
+
+We ran real six-agent chains and stars (20 episodes per cell, no defense, low pressure) and compared attack size with the simulation (Figure~\ref{fig:validation}). With one $T$ per edge, taken from the three-agent runs, the mean absolute gap was about 1.0 agents out of 5. It was small for gemma2:2b and for qwen2.5:3b with the verbatim secret, and large for llama3.2:3b (3.95 real against 0.37 simulated for the semantic chain) and for qwen2.5:3b with the semantic secret (0.90 against 2.41). Two effects explain this. First, once a secret is in a note, relaying it is nearly certain: the downstream leak rate was 0.94 to 1.00 for gemma2:2b and llama3.2:3b, 1.00 for qwen2.5:3b with the verbatim secret and 0.75 to 0.81 with the semantic secret, whereas the origination rate ranged from 0.05 to 1.00. Second, the origination rate depends strongly on prompt framing: the same model, pressure and secret gave 0.27 (llama3.2:3b) and 0.77 (qwen2.5:3b) in the role-named three-agent chain, but 0.80 and 0.25 in the numbered six-agent runs.
+
+A two-parameter model (origination rate and relay rate) fitted on chains predicts the stars to within about 0.3 agents on average (7 cells of 20 episodes, so differences of 0.3 to 0.5 agents are within sampling noise; the exact value varies by about 0.02 between simulation runs). Fitting and testing on the same cells gives a gap of about 0.02, which is nearly circular and is not evidence of validity.
+
+\begin{figure}[t]
+\centering
+\figbox{fig5-validation.png}{0.6}
+\caption{Real against simulated mean number of agents infected in six-agent chains and stars. Circles: one $T$ per edge (mean gap about 1.0). Squares: two-parameter model fitted on chains and applied to stars (mean gap about 0.3). 20 episodes per cell.}
+\label{fig:validation}
+\end{figure}
+
+%% ---------------------------------------------------------------------
+\subsection{Network-level consequences}
+\label{sec:network}
+
+At equal mean degree, simulated $\Rzero$ was highest on the hub-heavy scale-free network for every defense (6.15 undefended against 2.10 on the ring and 2.79 on the random graph), supporting the topology hypothesis (Figure~\ref{fig:outbreak}). Under independent blocking, only the full gateway brought $\Rzero$ below 1 on all three topologies; the exact-match filter alone left it at 1.26 on the random graph and 2.78 on the scale-free network. Section~\ref{sec:persist} shows that persistent blind spots weaken this conclusion for the gateway.
+
+\begin{figure}[t]
+\centering
+\figbox{fig3-outbreak.png}{0.8}
+\caption{Simulated outbreak probability (more than 5\% of 500 agents infected) by defense and topology, averaged over model, pressure and secret-type cells. Assumes independent blocking; with persistent blind spots the gateway bar is not zero but 0.02 to 0.12 at full coverage (Section~\ref{sec:persist}).}
+\label{fig:outbreak}
+\end{figure}
+
+%% ---------------------------------------------------------------------
+\subsection{Herd immunity: how many agents need the gateway?}
+\label{sec:herd}
+
+We protected a fraction $p$ of agents, so that their outgoing notes leak with the gateway's measured $T = 0.017$ while the rest leak at the model's undefended rate, and found the smallest $p$ at which outbreak probability fell below 5\% (100 to 150 runs per point, coarse grid). We re-ran the study with the measured relay rate for unprotected agents (0.75 to 1.00 once a note carries the secret) and three blocking models: independent blocking; per-edge slip, in which a note that slips past one gateway keeps slipping (relay rate 0.95); and per-episode correlated blocking, in which with probability 0.065 the secret is evasive at every gateway. We also added acquaintance protection, which protects a random neighbour of a random agent and needs no map of the network.
+
+\begin{table}[t]
+\centering
+\caption{Protected fraction needed to bring outbreak probability below 5\%, revised simulation.}
+\label{tab:herd}
+\small
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Placement & Scale-free & Random graph & Assumption \\
+\midrule
+Hub-first (needs the graph) & 0.20--0.30 & 0.30--0.50 & Independent blocking \\
+Acquaintance (no graph)     & 0.30--0.50 & 0.50--0.80 & Independent blocking \\
+Random                      & 0.80--1.00 & 0.80--1.00 & Independent blocking \\
+Any placement, full coverage& \multicolumn{2}{c}{floor of 0.02--0.12} & Slip / correlated blocking \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Under independent blocking, hub-first protection needed 20 to 30\% of agents on scale-free networks and 30 to 50\% on random networks, against 80 to 100\% for random placement (Table~\ref{tab:herd}). The more leak-prone the host model, the larger the protected fraction. Hub-first protection assumes the communication graph is known. Acquaintance protection needed 30 to 50\% on scale-free networks and 50 to 80\% on random networks, so on scale-free networks it recovers much of the benefit of hub-first protection without knowing the graph. Under slip and correlated blocking, outbreak probability at full protection was 0.02 to 0.12 and 0.03 to 0.11, close to the 5\% threshold, so these runs cannot separate ``never reaches 5\%'' from ``reaches it only at full protection''. We therefore report the floor rather than a threshold: with persistent blind spots, a gateway on every agent still leaves an outbreak probability of roughly 2 to 12\% per leaked secret, in line with Section~\ref{sec:persist}. The per-model figures in Section~\ref{sec:persist} (up to 0.32) used the six-agent origination rates, which rest on 40 episodes per model; pooled with the larger three-agent data the floor is 2 to 12\%. The results of the initial simulation, which used one transmissibility for unprotected agents, are superseded and given in Appendix~\ref{app:initial}.
+
+%% ---------------------------------------------------------------------
+\subsection{Over-blocking and cost}
+\label{sec:overblock}
+
+To measure over-blocking on realistic text we replayed 351 unique real handoff notes from episodes that contained no medical information, with a medical secret and an unrelated identifier registered. At every threshold from 0.70 to 0.85 the gateway redacted none of them (0 of 351; 95\% CI 0 to 1.1\%). These are easy negatives drawn from templated notes by three models. On 60 hand-written hard negatives (same sentence template, other diagnoses) the false-positive rate was 0.28 at threshold 0.65, 0.08 at 0.70 and 0 from 0.75 upward, so the gateway is threshold-sensitive on medical-style text. A broader test with twelve different semantic secrets (HIV status, debts, layoffs, a merger, an arrest and others) is reported in Section~\ref{sec:other}; there over-blocking on adversarially similar sentences is 8 to 19\% at thresholds of 0.78 and above, so the hard-negative figure, not the 0 of 351, is the representative one.
+
+%% ---------------------------------------------------------------------
+\subsection{Paraphrase and encoding robustness (exploratory)}
+\label{sec:robust}
+
+On a direct detector test (20 trials per cell, threshold 0.75) the identifier was caught when written exactly, without a hyphen, in groups or dashed (1.00 for L1 and for L1+L2; a plain regex for the exact \texttt{CASE-X} form caught only the exact form). Reworded and plain-word versions of the semantic secret were caught at 1.00, abbreviated at 0.80 and vague at 0.85. Spanish and German translations, and reversed or base64-encoded identifiers, were not caught (recall at or near 0). Abbreviated and vague versions fell to 0.00 and 0.15 at threshold 0.80, so recall is also threshold-sensitive. The deployed threshold was 0.78.
+
+\paragraph{Normalization, translation and a two-stage check (exploratory; one secret, 12 trials).}
+We added three steps to the gateway and repeated the detector test with one secret (12 trials; deployed threshold 0.78). Because these steps were designed and tested on the same single secret, the results below are exploratory. A normalization step that also screens decoded base64 and reversed text raised recall on encoded identifiers from 0.00 to 1.00 without changing false positives. Adding an LLM translation of foreign-looking sentences (llama3.2:3b) raised recall on Spanish, German and French paraphrases, pooled, from 0.06 to 0.67. A second stage, in which a small LLM must confirm an embedding match before the sentence is redacted, cut the false positives on same-template hard negatives at low thresholds (0.54 to 0.03 at threshold 0.55, and 0.28 to 0.00 at 0.65) but lowered recall on English paraphrases (0.75 to 0.63 at 0.78). All three together, at threshold 0.70, gave recall 1.00 on plain and encoded identifiers, 0.78 on English paraphrases and 0.67 on translations, with no false positives on either harmless set; at 0.78 the English recall was 0.68. False positives on 20 varied harmless sentences were zero at every threshold from 0.65 up, but that set is small (20 distinct sentences, repeated over 12 trials), so zero is weak evidence and a larger, harder set is needed.
+
+%% ---------------------------------------------------------------------
+\subsection{Other secrets}
+\label{sec:other}
+
+We tested twelve different semantic secrets (HIV status, debts, layoffs, a merger, an arrest and others), with four paraphrases and one Spanish translation of each written by llama3.2:3b, and three same-topic harmless sentences per secret (the same template about another topic). With the original lexical rule at threshold 0.78, paraphrase recall was 0.94 and false positives on the hard negatives were 0.19 (Figure~\ref{fig:other}). Requiring three shared words in the lexical rule gave recall 0.90 and false positives 0.17 at 0.78, and recall 0.88 with false positives 0.08 at 0.85; the lexical rule alone gave recall 0.50 and false positives 0.08. Most of the over-blocking therefore comes from embedding similarity, not word overlap. None of the twelve Spanish translations was caught at any threshold of 0.75 or above (a quarter at 0.70, with 0.36 false positives under the original rule). Over-blocking depends heavily on how close harmless text is to the secret: 0 of 351 on typical notes, and 8 to 19\% on adversarially similar sentences at thresholds of 0.78 and above (up to 36\% at 0.70). The deployed threshold of 0.78 was not the best operating point for hard negatives.
+
+\begin{figure}[t]
+\centering
+\figbox{fig6-other-secrets.png}{0.65}
+\caption{Gateway recall (paraphrases and Spanish translations) and false positives on same-topic harmless sentences against the similarity threshold, for twelve semantic secrets, using the lexical rule as deployed (one shared word). At the deployed threshold of 0.78, paraphrase recall is 0.94 and false positives are 0.19; Spanish translations are caught only at 0.70.}
+\label{fig:other}
+\end{figure}
+
+%% ---------------------------------------------------------------------
+\subsection{Adversarial exfiltration}
+\label{sec:adversarial}
+
+Agent~0 was told to leak the secret to the next agent in disguise (30 episodes per cell, three-agent chain; mean agents infected out of 2). Without a defense: gemma2:2b 1.5 (verbatim) and 1.7 (semantic), llama3.2:3b 0.0, qwen2.5:3b 0.17 and 0.07. With the gateway: 0.0 and 0.1, 0.0, 0.0. Only gemma2:2b complied, and it wrote the secret in plain form every time: exact ID in 18 notes, another ID format in 5, plain English in 27, with no base64, reversed, Spanish or German disguise in any note. llama3.2:3b and qwen2.5:3b mostly wrote no secret at all. The gateway stopped every ID leak and 25 of the 27 plain-English leaks. This is therefore a test of plain leaks by a small model asked to hide a secret, and not a test of disguised leaks, so we do not compare its aggregate with the accidental-spread $T$. The scripted detector test in Section~\ref{sec:robust} does probe disguises, and there base64, reversed text and translations pass through the base gateway (before the normalization and translation steps were added).
+
+%% =====================================================================
+\section{Limitations}
+\label{sec:limits}
+
+\begin{itemize}
+  \item Small local models (2B to 3B parameters), a single three-agent task, CPU-only hardware. Generalization to frontier models is untested.
+  \item The thresholds were calibrated on one semantic secret and one identifier format. A twelve-secret test (Section~\ref{sec:other}) shows higher false-positive rates on similar-looking harmless sentences.
+  \item Only L1 and L2 are implemented. The gateway is told what the secrets are; it does not discover them (Section~\ref{sec:know} shows what happens when it does not know).
+  \item Encodings and some translations pass through the base gateway. The gateway reduces accidental spread; it is not a defense against a determined exfiltrator.
+  \item Large-network results come from a simple cascade model and have been validated only on six-agent chains and stars (Section~\ref{sec:validation}), not on real large networks.
+  \item The leak detector is keyword-based for semantic secrets, was validated by one annotator, and was partly circular with the gateway's lexical rule.
+  \item The task-success measure is a weak proxy and cannot see the cost of redacting the patient identifier.
+  \item $T$ depends strongly on prompt framing: the same model, pressure and secret gave origination rates that differed by up to 0.5 between two framings (Section~\ref{sec:validation}).
+  \item Leaks that slip past the gateway are relayed almost surely (0.95, 20 relays), so the independent-blocking results in Sections~\ref{sec:ladder} and~\ref{sec:herd} are optimistic (Section~\ref{sec:persist}).
+  \item Over-blocking is 8 to 19\% on same-template hard negatives, and translated secrets are never caught by the base gateway.
+  \item The adversarial test involved small models that did not produce disguised leaks (Section~\ref{sec:adversarial}).
+  \item Under a stricter definition that also counts exposure of the patient identifier, the gateway halves semantic exposure (0.70 to 0.35) instead of removing it, because it never targets the short identifier (Section~\ref{sec:partial}).
+  \item The auto-detect gateway used a 3B judge, and false positives of the improved gateway were measured on only 20 distinct varied harmless sentences; a stronger judge and a larger, harder harmless set are untested.
+  \item The tagged gateway is simulated by per-note coverage, not by a real tagging mechanism.
+  \item Baselines B1, B3 and B4 were not run; L1 serves as the static exact-match baseline. The prompt baseline is a single generic sentence and not a threat-aware warning.
+\end{itemize}
+
+%% =====================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+
+Secret leakage between small LLM agents behaves like an epidemic with two distinct stages. A semantic gateway sharply reduces the first: the per-hop chance that a leak starts falls from 0.70 to 0.017, a roughly 40-fold drop. It does not remove the second: leaks that evade the gateway are relayed almost surely, and gateway errors persist across hops, so containment is not guaranteed. Under independent blocking, hub-first placement is several times more efficient than random placement (20 to 30\% against 80 to 100\% of agents on scale-free networks), but with persistent blind spots a residual outbreak probability of roughly 2 to 12\% remains even at full coverage. The gateway also moves leakage from the diagnosis to the patient identifier, so exposure of either kind falls only from 70.0\% to 35.0\%, and its protection depends on knowing the secret: a generic gateway retains only 16\% of the oracle's protection for a free-text diagnosis. The main open questions are detectors with errors independent across hops, frontier models, real larger networks, multilingual and encoded leaks, and a usefulness measure that can see what redaction removes.
+
+%% =====================================================================
+\section*{CRediT authorship contribution statement}
+\textbf{Author Name:} Conceptualization, Methodology, Software, Investigation, Formal analysis, Writing -- original draft, Writing -- review \& editing.
+
+\section*{Declaration of competing interest}
+The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+
+\section*{Declaration of generative AI and AI-assisted technologies in the writing process}
+During the preparation of this work the author(s) used Claude (Anthropic) to assist with drafting text, writing analysis scripts and preparing the manuscript. After using this tool, the author(s) reviewed and edited the content as needed and take(s) full responsibility for the content of the publication.
+
+\section*{Data availability}
+All data are synthetic. Code, transcripts and scripts needed to regenerate every figure will be made available at \url{https://example.com/repository} (see Appendix~\ref{app:repro}).
+
+\section*{Funding}
+This research did not receive any specific grant from funding agencies in the public, commercial, or not-for-profit sectors.
+
+%% =====================================================================
+\appendix
+
+\section{Reproducibility}
+\label{app:repro}
+
+Code: \texttt{layer1.py} (episodes), \texttt{gateway.py} (L1 and L2), \texttt{rescore.py} (detector), \texttt{gateway\_eval.py}, \texttt{replay\_fp.py}, \texttt{sim.py}, \texttt{sim\_measured.py}, \texttt{sim\_protect.py}, \texttt{stats\_ladder.py}, \texttt{pareto.py}, \texttt{label\_sheet.py}, \texttt{disagreements.py}, \texttt{network\_run.py}, \texttt{validate\_sim.py}, \texttt{diversity\_eval.py}. All figures regenerate from the logged transcripts (\texttt{results\_v2\_transcripts.jsonl}).
+
+\section{Literature search protocol}
+\label{app:search}
+
+Searches were run on 16 October 2026 with a general web search engine that indexes arXiv, the ACL Anthology, publisher pages and venue sites. Google Scholar and Semantic Scholar were not queried directly.
+
+Queries (abridged): (1) secret leakage propagation across LLM agents, multi-hop handoff, per-hop leak rate; (2) multi-agent memory PII leakage and topology; (3) epidemic or SIR model of privacy leakage in LLM multi-agent networks, immunization of hubs; (4) herd immunity, vaccination or immunization of LLM agent networks, fraction of protected agents; (5) correlated guardrail failures and repeated filtering in agent pipelines; plus earlier searches on epidemic models of agent attacks, immunity for multi-agent systems, and access-controlled shared memory.
+
+Inclusion: papers on leakage, contagion, filtering or topology effects in LLM multi-agent systems, 2023 to 2026. Closest papers found: AgentLeak, PRISM, MAMA, \emph{When Agents Talk, Secrets Travel}, \emph{Facts Without Rules}, \emph{Got a Secret?}, PiSAs, AgentWorm, Cowpox, Mind Viruses, Prompt Infection, Morris~II, Agent Smith, FIDES, CaMeL, Maris, RTBAS, Governed Shared Memory and Collaborative Memory. No paper was found that combines per-hop transmissibility, network outbreak thresholds with hub-first protection, and an origination and relay split for leakage of confidential content.
+
+\section{Initial protection simulation (superseded)}
+\label{app:initial}
+
+Table~\ref{tab:initial} and Figure~\ref{fig:initial} report the first protection study, which used one transmissibility for unprotected agents and independent blocking. They are superseded by the revised study in Section~\ref{sec:herd} and are retained only for completeness. The thresholds here (15 to 20\% hub-first on scale-free networks) are lower than the revised ones (20 to 30\%) because relay was not modelled separately.
+
+\begin{table}[h]
+\centering
+\caption{Smallest protected fraction at which outbreak probability fell below 5\% (initial simulation, one transmissibility for unprotected agents; superseded).}
+\label{tab:initial}
+\small
+\begin{tabular}{@{}llcc@{}}
+\toprule
+Model (undefended $T$) & Network & Random protection & Hub-first protection \\
+\midrule
+gemma2:2b (0.88)   & scale-free & at least 0.80 & 0.20 \\
+llama3.2:3b (0.49) & scale-free & 0.80          & 0.15 \\
+qwen2.5:3b (0.72)  & scale-free & at least 0.80 & 0.20 \\
+gemma2:2b (0.88)   & random     & at least 0.80 & 0.50 \\
+llama3.2:3b (0.49) & random     & 0.60          & 0.30 \\
+qwen2.5:3b (0.72)  & random     & 0.80          & 0.50 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[h]
+\centering
+\figbox{fig4-protection.png}{0.95}
+\caption{Outbreak probability against the fraction of agents behind the gateway, for random and hub-first protection, per model and network (150 runs per point; dotted line at 5\%). Initial simulation; assumes independent blocking and is superseded by Section~\ref{sec:herd}.}
+\label{fig:initial}
+\end{figure}
+
+%% =====================================================================
+%% REFERENCES (author-year, natbib; complete the anonymous / incomplete entries before submission)
+%% =====================================================================
+\begin{thebibliography}{40}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+
+\bibitem[{Anon.(2026a)}]{anon2026a}
+Anon., 2026a. When Agents Talk, Secrets Travel.
+
+\bibitem[{Anon.(2026b)}]{anon2026b}
+Anon., 2026b. Facts Without Rules.
+
+\bibitem[{Anon.(2026c)}]{anon2026c}
+Anon., 2026c. Got a Secret?
+
+\bibitem[{Anon.(2026d)}]{anon2026d}
+Anon., 2026d. Contagion Networks.
+
+\bibitem[{Anon.(2026e)}]{anon2026e}
+Anon., 2026e. Reliability-Contagion Feasibility in LLM Multi-Agent Networks.
+
+\bibitem[{Anon.(2026h)}]{anon2026h}
+Anon., 2026h. Governed Shared Memory for Multi-Agent LLM Systems.
+
+\bibitem[{Anon.(2025)}]{cowpox2025}
+Anon., 2025. Cowpox.
+
+\bibitem[{Anon.(2025)}]{delegation2025}
+Anon., 2025. Authenticated Delegation and Authorized AI Agents. arXiv:2501.09674.
+
+\bibitem[{Anon.(2026f)}]{esaa2026}
+Anon., 2026f. ESAA. arXiv:2602.23193.
+
+\bibitem[{Anon.(2026g)}]{esaac2026}
+Anon., 2026g. ESAA-Conversational. arXiv:2606.23752.
+
+\bibitem[{Anon.()}]{mem0}
+Anon., n.d. Mem0. arXiv:2504.19413.
+
+\bibitem[{Anon.()}]{amem}
+Anon., n.d. A-MEM. arXiv:2502.12110.
+
+\bibitem[{Anon.(2026)}]{prism2026}
+Anon., 2026. PRISM.
+
+\bibitem[{Cohen et~al.(2024)}]{cohen2024}
+Cohen, et~al., 2024. Morris II.
+
+\bibitem[{Costa et~al.(2025)}]{costa2025}
+Costa, et~al., 2025. FIDES.
+
+\bibitem[{Debenedetti et~al.(2025)}]{debenedetti2025}
+Debenedetti, et~al., 2025. CaMeL.
+
+\bibitem[{El~Yagoubi et~al.(2026)}]{elyagoubi2026}
+El~Yagoubi, et~al., 2026. AgentLeak.
+
+\bibitem[{Gu et~al.(2024)}]{gu2024}
+Gu, et~al., 2024. Agent Smith.
+
+\bibitem[{Gupta et~al.(2026)}]{gupta2026}
+Gupta, et~al., 2026. PiSAs.
+
+\bibitem[{Hagag et~al.(2026)}]{hagag2026}
+Hagag, et~al., 2026. Architecture Matters for Multi-Agent Security. ICML 2026. \url{https://icml.cc/virtual/2026/poster/64792}.
+
+\bibitem[{Lee and Tiwari(2024)}]{lee2024}
+Lee, D., Tiwari, M., 2024. Prompt Infection: LLM-to-LLM Prompt Injection within Multi-Agent Systems. arXiv:2410.07283.
+
+\bibitem[{Liu et~al.(2026)}]{liu2026}
+Liu, et~al., 2026. MAMA. Findings of ACL 2026.
+
+\bibitem[{Mireshghallah et~al.()}]{mireshghallah}
+Mireshghallah, et~al., n.d. ConfAIde.
+
+\bibitem[{Newman(2002)}]{newman2002}
+Newman, M.E.J., 2002. Spread of epidemic disease on networks. Phys. Rev. E 66, 016128.
+
+\bibitem[{Papadopoulos et~al.(2026)}]{papadopoulos2026}
+Papadopoulos, Shah, Zimmerman, Lindsey, 2026. Mind Viruses: Self-Propagating Ideas in Multi-Agent LLM Systems. arXiv:2608.10218.
+
+\bibitem[{Pastor-Satorras and Vespignani(2002)}]{pastor2002}
+Pastor-Satorras, R., Vespignani, A., 2002. Immunization of complex networks. Phys. Rev. E 65, 036104.
+
+\bibitem[{Rezazadeh et~al.(2025)}]{rezazadeh2025}
+Rezazadeh, et~al., 2025. Collaborative Memory.
+
+\bibitem[{Shao et~al.(2024)}]{shao2024}
+Shao, et~al., 2024. PrivacyLens.
+
+\bibitem[{Zhang et~al.(2026)}]{zhang2026}
+Zhang, et~al., 2026. AgentWorm.
+
+\bibitem[{Zharmagambetov et~al.(2025)}]{zharmagambetov2025}
+Zharmagambetov, et~al., 2025. AgentDAM.
+
+\end{thebibliography}
+
+\end{document}
