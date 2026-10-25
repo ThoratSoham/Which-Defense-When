@@ -66,5 +66,5 @@
     ]
   },
   "tuning_rule": "gateway thresholds and all analysis choices are tuned on DEV only; TEST is evaluated once, after freezing.",
-  "corpus_sha256": "5fca9e940b34a33ca6e61f315adaa5d7e29c010125b9b2378183c5840c5fec0f"
+  "corpus_sha256": "a8281bac8773579e7dd93218f1d3d5d29fbbb44bbcb95efc9968b7f34ece06e7"
 }
