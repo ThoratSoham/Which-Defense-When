@@ -11,12 +11,24 @@ def ci(x, n=3000): b = [rng.choice(x, len(x)).mean() for _ in range(n)]; return 
 # ---- fig 1
 if os.path.exists("results_v2r.csv"):
     d = pd.read_csv("results_v2r.csv", names=["model","defense","pressure","kind","hop","leaked"]); d = d[(d.hop == 1) & (d.model != "qwen2.5:7b")]
-    fig, ax = plt.subplots(1, 3, figsize=(11, 3.6), sharey=True)
-    for a, (title, sub) in zip(ax, [("all secrets", d), ("verbatim ID", d[d.kind == "verbatim"]), ("semantic secret", d[d.kind == "semantic"])]):
+    fig, ax = plt.subplots(1, 4, figsize=(13.5, 3.6), sharey=True)
+    # Panel 0: Confirmatory TEST (3-detector ensemble, n=192/def) if results/numbers.json exists
+    if os.path.exists("results/numbers.json"):
+        nj = json.load(open("results/numbers.json", encoding="utf-8"))
+        ens = nj.get("ladder", {}).get("t_by_detector", {}).get("ensemble", {})
+        for i, o in enumerate(ORDER):
+            cell = ens.get(o, {})
+            m = cell.get("T", 0.0)
+            lo, hi = cell.get("cluster_ci", [m, m])
+            ax[0].bar(i, m, yerr=[[max(0, m - lo)], [max(0, hi - m)]], capsize=3, color="#2b5c8f" if o != "gateway" else "#2ca02c")
+            ax[0].text(i, hi + 0.02, f"{m:.3f}", ha="center", fontsize=8)
+        ax[0].set_xticks(range(len(ORDER))); ax[0].set_xticklabels([LAB[o] for o in ORDER], rotation=25, ha="right", fontsize=8)
+        ax[0].set_title("TEST ensemble (n=192/def)", fontsize=9.5, fontweight="bold")
+    for a, (title, sub) in zip(ax[1:], [("Exploratory: all (n=360)", d), ("Exploratory: verbatim ID", d[d.kind == "verbatim"]), ("Exploratory: semantic", d[d.kind == "semantic"])]):
         for i, o in enumerate([x for x in ORDER if x in set(d.defense)]):
             x = sub[sub.defense == o].leaked.values; lo, hi = ci(x); a.bar(i, x.mean(), yerr=[[x.mean() - lo], [hi - x.mean()]], capsize=3, color="#4c72b0" if o != "gateway" else "#55a868")
             a.text(i, hi + 0.02, f"{x.mean():.2f}", ha="center", fontsize=8)
-        a.set_xticks(range(len(ORDER))); a.set_xticklabels([LAB[o] for o in ORDER], rotation=25, ha="right", fontsize=8); a.set_title(title, fontsize=10)
+        a.set_xticks(range(len(ORDER))); a.set_xticklabels([LAB[o] for o in ORDER], rotation=25, ha="right", fontsize=8); a.set_title(title, fontsize=9.5)
     for a in ax: a.set_ylim(0, 0.95)          # headroom so value labels are not clipped
     ax[0].set_ylabel("per-hop leak rate T (95% CI)"); plt.tight_layout(); plt.savefig("fig1_ladder.png", dpi=220); plt.close(); print("wrote fig1_ladder.png")
 # ---- fig 2
@@ -53,7 +65,24 @@ if os.path.exists(F) and os.path.exists("results_v2r.csv"):
         if (m, df, p, k) in T1.index: pts1.append((real, sim(t, T1[(m, df, p, k)], T1[(m, df, p, k)])))
         if t == "star6" and (m, df, p, k, "chain6") in st and st[(m, df, p, k, "chain6")]["down"]:
             ch = st[(m, df, p, k, "chain6")]; pts2.append((real, sim("star6", np.mean(ch["src"]), np.mean(ch["down"]))))
-    plt.figure(figsize=(4.8, 4.4)); plt.plot([0, 5], [0, 5], "k:", lw=1)
-    if pts1: a = np.array(pts1); plt.scatter(a[:, 0], a[:, 1], c="#c44e52", label=f"one T per edge (mean gap {np.mean(abs(a[:,0]-a[:,1])):.2f})")
-    if pts2: b = np.array(pts2); plt.scatter(b[:, 0], b[:, 1], c="#4c72b0", marker="s", label=f"two-parameter, chain to star (mean gap {np.mean(abs(b[:,0]-b[:,1])):.2f})")
-    plt.xlabel("real mean agents infected"); plt.ylabel("simulated"); plt.legend(fontsize=7, loc="upper left"); plt.tight_layout(); plt.savefig("fig3_validation.png", dpi=220); plt.close(); print("wrote fig3_validation.png")
+    fig, axes = plt.subplots(1, 2, figsize=(9.6, 4.2))
+    ax = axes[0]
+    ax.plot([0, 5], [0, 5], "k:", lw=1)
+    if pts1: a = np.array(pts1); ax.scatter(a[:, 0], a[:, 1], c="#c44e52", label=f"one T per edge (MAE {np.mean(abs(a[:,0]-a[:,1])):.2f})")
+    if pts2: b = np.array(pts2); ax.scatter(b[:, 0], b[:, 1], c="#4c72b0", marker="s", label=f"two-param, chain->star (MAE {np.mean(abs(b[:,0]-b[:,1])):.2f})")
+    ax.set_xlabel("real mean agents infected (6-agent)"); ax.set_ylabel("simulated"); ax.set_title("6-agent chains & stars (24 cells)", fontsize=9.5)
+    ax.legend(fontsize=7.5, loc="upper left")
+    ax2 = axes[1]
+    ax2.plot([0, 8], [0, 8], "k:", lw=1)
+    if os.path.exists("results/numbers.json"):
+        nj = json.load(open("results/numbers.json", encoding="utf-8"))
+        cells = nj.get("network", {}).get("calibration", {}).get("ensemble", {}).get("cells", {})
+        for key, cv in cells.items():
+            rm = cv["real_mean"]; lo, hi = cv["real_ci"]; pr = cv["pred_o_r"]
+            col = "#c44e52" if "none" in key else "#2ca02c"
+            ax2.errorbar(rm, pr, xerr=[[max(0, rm - lo)], [max(0, hi - rm)]], fmt="o", color=col, capsize=3)
+            ax2.text(rm + 0.12, pr + 0.08, key, fontsize=7)
+    ax2.set_xlabel("real mean infected (12-agent, 95% CI)"); ax2.set_ylabel("predicted from 3-agent chains")
+    ax2.set_title("12-agent held-out (6/6 CI covered, MAE 0.48)", fontsize=9.5, fontweight="bold")
+    ax2.set_xlim(0.5, 8.2); ax2.set_ylim(0.5, 6.0)
+    plt.tight_layout(); plt.savefig("fig3_validation.png", dpi=220); plt.close(); print("wrote fig3_validation.png")

@@ -5,7 +5,7 @@ Compares protecting hub agents first vs random agents.  Outputs fig_partial_prot
 import sys, numpy as np, pandas as pd, networkx as nx, matplotlib
 matplotlib.use("Agg"); import matplotlib.pyplot as plt
 from sim import topologies, theory_R0
-F = sys.argv[1] if len(sys.argv) > 1 else "results_v2.csv"
+F = sys.argv[1] if len(sys.argv) > 1 else "results_v2r.csv"
 N, RUNS, rng = 500, 150, np.random.default_rng(5)
 d = pd.read_csv(F, names=["model","defense","pressure","kind","hop","leaked"]); d = d[(d.hop == 1) & (d.model != "qwen2.5:7b")]
 T_gw = d[d.defense == "gateway"].leaked.mean(); T_none = d[d.defense == "none"].groupby("model").leaked.mean()

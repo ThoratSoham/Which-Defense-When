@@ -8,6 +8,10 @@ Stratified by defense x secret kind x model, with:
   * notes already labelled in label_sheet*.csv excluded (fresh labels),
   * redaction markers stripped so the annotator cannot see the condition.
 
+The Phase-2 protocol asks the annotator TWO questions for each note
+(content leak + identifier exposure), saved as two columns in
+results/human_labels.csv. See label_app.py and docs/LEAK_DEFINITION.md.
+
 Writes:
   results/label_sample.csv      BLIND: sample_id, secret, note   <- what you label
   results/label_sample_key.csv  metadata + detector verdicts     <- do not open

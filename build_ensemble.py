@@ -14,9 +14,11 @@ def main():
     pool = [json.loads(l) for l in open("results/detector_pool.jsonl", encoding="utf-8")]
     d3 = {}
     for path in sorted(glob.glob("results/d3_*.jsonl")):
-        provider = os.path.basename(path)[4:-6]
+        provider = os.path.basename(path)[3:-6]
         for l in open(path, encoding="utf-8"):
             r = json.loads(l)
+            if r.get("leak") not in (0, 1):
+                continue
             # prefer an API judge over a local one if both exist for the note
             if r["pool_id"] not in d3 or provider.startswith(("google", "openrouter")):
                 d3[r["pool_id"]] = {"leak": r.get("leak"), "provider": provider,

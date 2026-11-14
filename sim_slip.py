@@ -7,7 +7,7 @@ Two models are compared on 500-agent networks:
   independent : every protected edge leaks with T_src_gw, every unprotected edge with T_src_none (what sim_protect.py assumed)
   slip        : a note that slipped past one gateway keeps slipping (relay rate T_slip); clear notes are re-caught at T_src_gw."""
 import sys, json, collections, numpy as np
-from sim import topologies
+from sim import topologies, phase3_rho
 rows = [json.loads(l) for l in open(sys.argv[1] if len(sys.argv) > 1 else "network_results_transcripts.jsonl", encoding="utf-8")]
 eps = collections.defaultdict(list)
 for r in rows: eps[(r["model"], r["defense"], r["pressure"], r["kind"], r["topology"], r["episode"])].append(r)
@@ -18,8 +18,13 @@ for k, notes in eps.items():
         if n["from"] == 0: src[(k[0], k[1])].append(n["auto_leaked"])
         elif inc.get(n["from"]) == 1: down[(k[0], k[1])].append(n["auto_leaked"])
 slip_obs = [x for (m, d), v in down.items() if d == "gateway" for x in v]
-T_slip = float(np.mean(slip_obs)) if slip_obs else 0.9
-print(f"T_slip (relay of a note that already slipped past a gateway) = {T_slip:.2f}  from n = {len(slip_obs)} relays  <- small sample\n")
+RHO3 = phase3_rho()                                  # Phase 3 rho (n >= 100) replaces the n=20 relay estimate
+if RHO3:
+    T_slip = RHO3[0]
+    print(f"T_slip = {T_slip:.3f}  <- Phase 3 rewrite persistence, n = {RHO3[1]}, 95% CI [{RHO3[2][0]:.3f}, {RHO3[2][1]:.3f}]")
+else:
+    T_slip = float(np.mean(slip_obs)) if slip_obs else 0.9
+    print(f"T_slip (relay of a note that already slipped past a gateway) = {T_slip:.2f}  from n = {len(slip_obs)} relays  <- small sample; Phase 3 rho not available\n")
 N, RUNS, rng = 500, 200, np.random.default_rng(8)
 topo = {k: v for k, v in topologies().items() if k in ("random (ER)", "scale-free (BA)")}
 PS = [0, .05, .1, .2, .3, .5, .8, 1.0]

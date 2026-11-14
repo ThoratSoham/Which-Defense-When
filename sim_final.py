@@ -7,7 +7,7 @@ Three protection strategies:  random  |  hub-first (needs the whole graph)  |  a
 Reports P(outbreak) at full protection (the floor) and the smallest protected fraction p_c with P(outbreak) < 5%.   Writes fig_herd_models.png."""
 import sys, json, collections, numpy as np, pandas as pd, matplotlib
 matplotlib.use("Agg"); import matplotlib.pyplot as plt
-from sim import topologies
+from sim import topologies, phase3_rho
 N = 500
 RUNS = int(sys.argv[sys.argv.index('--runs') + 1]) if '--runs' in sys.argv else 100
 sys.argv = [x for i, x in enumerate(sys.argv) if x != '--runs' and (i == 0 or sys.argv[i - 1] != '--runs')]
@@ -24,8 +24,14 @@ for k, notes in eps.items():
         if n["from"] != 0 and inc.get(n["from"]) == 1:
             if k[1] == "none": down[k[0]].append(n["auto_leaked"])
             elif k[1] == "gateway": slip.append(n["auto_leaked"])
-T_slip = float(np.mean(slip)) if len(slip) >= 5 else 0.95; Q_EV = 1 - (1 - T_gw) ** 4          # chance that at least one of ~4 origin notes slips
-print(f"T_gw = {T_gw:.3f} (hop 1, all models)   T_slip = {T_slip:.2f} (n = {len(slip)} relays)   q_ev = {Q_EV:.3f}\n")
+RHO3 = phase3_rho()                                  # Phase 3 rho (n >= 100) replaces the n=20 relay estimate
+T_slip = RHO3[0] if RHO3 else (float(np.mean(slip)) if len(slip) >= 5 else 0.95)
+Q_EV = 1 - (1 - T_gw) ** 4                           # chance that at least one of ~4 origin notes slips
+if RHO3:
+    print(f"T_slip = {T_slip:.3f}  <- Phase 3 rewrite persistence, n = {RHO3[1]}, 95% CI [{RHO3[2][0]:.3f}, {RHO3[2][1]:.3f}]")
+else:
+    print(f"T_slip = {T_slip:.2f} (n = {len(slip)} relays)  <- LEGACY n=20 estimate: Phase 3 rho not available in results/numbers.json")
+print(f"T_gw = {T_gw:.3f} (hop 1, all models)   q_ev = {Q_EV:.3f}\n")
 topo = {k: v for k, v in topologies().items() if k in ("random (ER)", "scale-free (BA)")}
 import random as _random
 RND = _random.Random(21)
@@ -67,14 +73,14 @@ def curve(G, strat, ts, td, bm):
 pc = lambda c: next((p for p, v in zip(PS, c) if v < 0.05), None)
 fmt = lambda x: "never" if x is None else f"{x:.2f}"
 fig, axes = plt.subplots(len(topo), len(T_src), figsize=(4 * len(T_src), 3.3 * len(topo)), squeeze=False); res = {}
-print(f"{'model':13s}{'network':16s}{'strategy':14s}" + "".join(f"{m + ' (floor / p_c)':>26s}" for m in MODELS))
+print(f"{'model':13s}{'network':16s}{'strategy':14s}" + "".join(f"{m + ' (p=0 / floor / p_c)':>32s}" for m in MODELS))
 for j, (model, ts) in enumerate(T_src.items()):
     td = float(np.mean(down[model])) if down[model] else ts
     for i, (name, G) in enumerate(topo.items()):
         for strat in STRATS:
             line = f"{model:13s}{name:16s}{strat:14s}"
             for bm in MODELS:
-                c = curve(G, strat, ts, td, bm); res[(model, name, strat, bm)] = c; line += f"{c[-1]:14.2f} /{fmt(pc(c)):>8s}  "
+                c = curve(G, strat, ts, td, bm); res[(model, name, strat, bm)] = c; line += f"{c[0]:12.2f} /{c[-1]:6.2f} /{fmt(pc(c)):>8s}  "
                 axes[i][j].plot(PS, c, ls={"independent": "--", "slip": "-", "correlated": ":"}[bm], c={"random": "C0", "hub-first": "C1", "acquaintance": "C2"}[strat], lw=1.4)
             print(line)
         axes[i][j].axhline(0.05, c="gray", lw=0.6); axes[i][j].set_title(f"{model} | {name}", fontsize=8); axes[i][j].set_xlabel("fraction of agents behind gateway"); axes[i][j].set_ylabel("P(outbreak)")

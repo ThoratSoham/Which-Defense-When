@@ -27,3 +27,17 @@ Thumbs.db
 *.synctex.gz
 *.bbl
 *.blg
+*.fdb_latexmk
+*.fls
+*.spl
+
+# Local scratch, backups, and oversized caches
+*.bak
+.cloud-attachments/
+google_smoke.json
+google_smoke_probe.py
+results/embed_cache.sqlite3
+results/embed_cache_ladder.pickle
+results/embed_cache_slipgen.jsonl
+results/human_labels.bak.csv
+results/stale_gatefix_*/

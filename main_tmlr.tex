@@ -1,0 +1,601 @@
+%% main_tmlr.tex
+%% Transactions on Machine Learning Research (TMLR) format.
+%% Double-blind submission: main text <= 12 pages, unlimited appendix.
+\documentclass{article}
+
+\usepackage{tmlr}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+
+\input{macros.tex}
+
+\sloppy
+
+\newcommand{\figbox}[2]{%
+  \IfFileExists{#1}{\includegraphics[width=#2\linewidth]{#1}}{%
+    \fbox{\parbox{#2\linewidth}{\centering\vspace{3em}\small Figure file \texttt{\detokenize{#1}} not found\vspace{3em}}}}}
+
+\newcommand{\Rzero}{R_0}
+
+\title{Which Defense, When? Origination, Relay and Blind Spots in Secret Leakage Between LLM Agents}
+
+\author{\name Anonymous Authors \email anonymous@domain.org \\
+\addr Anonymous Institution}
+
+\def\month{11}
+\def\year{2026}
+\def\openreview{\url{https://openreview.net/forum?id=XXXX}}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+% [KL-001] [KL-003] [KL-012] [KL-014] [KL-015] [KL-043] [KL-046] [KL-048] [KL-032] [KL-033] [KL-038] [KL-055] [KL-064] [KL-069]
+In multi-agent LLM workflows, defending against accidental secret leakage requires matching the defense to where the secret lives, model size, and workflow depth. Across a pre-registered evaluation spanning twenty-six held-out secrets, two tasks, three 2B--3B local models, and an API model (\texttt{gemini-3.5-flash-lite}), we show that no single defense dominates all regimes. On segregated database columns, static access control eliminates leakage without utility loss. However, when secrets are entangled inside unstructured free-text emails alongside required task facts, static stripping either leaks or destroys task utility, whereas our two-layer semantic gateway cuts leakage with no detectable utility loss ($\Delta U = \DeltaUFreeGateway$, 90\% CI $\DeltaUFreeGatewayCI$; post hoc, $n=\NEpisodesFreeText$). On 2B--3B models, prompt warnings fail, but the gateway reduces hop-1 origination over eleven-fold under our Gemini-adjudicated ensemble and threefold under lexical detector $D_1$. On the API model, a one-sentence warning alone cuts leakage near zero. Crucially, downstream relay is near-certain once a secret enters handoff notes. In boundary pools, gateway slips persist across next-agent rewrites at high rates, producing a positive outbreak floor in 500-agent simulations across all detectors. While rotating to a secret-blind LLM judge reduces slip survival, it severely degrades task usefulness. Both the entangled free-text evaluation (post hoc, $n=\NEpisodesFreeText$) and the rewrite-persistence pools (exploratory DEV boundary prompts) are preliminary. We provide an empirical decision map and practitioner checklist for multi-agent confidentiality.
+\end{abstract}
+
+%% =====================================================================
+\section{Introduction}
+\label{sec:intro}
+
+% [KL-001] [KL-003]
+Multi-agent language model workflows distribute complex processes across collaborative agents communicating through natural-language handoff notes and shared memory. While traditional access control governs initial database reads, it cannot track what occurs once an honest agent summarizes a confidential detail into a shared task note: does the leak decay across successive handoffs, or does it cascade through paraphrase and re-sharing?
+
+We model secret leakage across agent networks as an epidemic process over communication graphs. Unlike single-parameter cascade models, we explicitly separate two distinct mechanisms: \emph{origination} $o$ (the probability that an agent holding private context inadvertently introduces a secret into an outgoing note) and \emph{relay} $r$ (the probability that a downstream agent receiving an already-contaminated note forwards or paraphrases the secret). 
+
+% [KL-012] [KL-014] [KL-015] [KL-016] [KL-018]
+Following an initial exploratory investigation on a single refund task, we pre-registered and executed a confirmatory multi-domain evaluation spanning \NSecretsTotal\ synthetic secrets across \NDomains\ domains, two multi-agent workflows, three local 2B--3B model families (\texttt{llama3.2:3b}, \texttt{qwen2.5:3b}, \texttt{gemma2:2b}), an API model tier (\texttt{gemini-3.5-flash-lite}), a blinded three-detector majority-vote ensemble with 100\% of test ties adjudicated by Google Gemini, and six baseline defenses. All LLM calls pass through a deterministic SQLite cache keyed by provider, model, temperature, seed, and prompt, ensuring exact paired comparisons.
+
+Our central thesis is that \textbf{no single defense wins across all operating regimes: prompt warnings suffice for capable API models; static schema-level access control dominates when confidential attributes reside in separate database fields; a two-layer semantic gateway is essential for small 2B--3B models when secrets are entangled in unstructured free text; and multi-hop networks require addressing persistent filter blind spots.} We structure our contributions as follows:
+\begin{enumerate}
+  \item \textbf{An empirical decision map for agent confidentiality:} We show that Static ACL (\texttt{B4}) strictly dominates when secrets occupy dedicated schema columns, but collapses when secrets are woven into free text. In that post hoc free-text regime ($n=\NEpisodesFreeText$), our lightweight two-layer gateway (L1+L2) excises confidential spans with no detectable utility loss ($\Delta U = \DeltaUFreeGateway$, 90\% CI $\DeltaUFreeGatewayCI$; Sections~\ref{sec:setup}--\ref{sec:results}).
+  \item \textbf{Origination vs.\ relay decomposition ($o \neq r$):} We show that prompt framing shifts hop-1 origination $o$ substantially on the same model and secret, whereas downstream relay $r$ once contaminated is near-certain (\RelayRateRange). Parameterizing network cascades with $(o,r)$ reduces out-of-sample prediction error on held-out star topologies by over threefold compared to single-parameter models (Section~\ref{sec:network}).
+  \item \textbf{Persistent blind spots and the outbreak floor:} Across \NNotesBoundaryTotal\ boundary-probing notes, slips that evade a gateway once survive next-agent rewrites at $87$--$91\%$. Consequently, 500-agent simulations demonstrate that full single-family gateway coverage leaves a substantial outbreak floor across all detectors. While cross-family filter rotation breaks these blind spots, deploying secret-blind LLM judges at runtime severely degrades task utility (Sections~\ref{sec:network}--\ref{sec:checklist}).
+\end{enumerate}
+
+%% =====================================================================
+\section{Related work}
+\label{sec:related}
+
+% [KL-075]
+Table~\ref{tab:related_cmp} positions our work relative to recent studies in multi-agent privacy, contagion, and architectural isolation.
+
+\begin{table}[!htbp]
+\centering
+\caption{Comparison with closely related multi-agent leakage and contagion studies.}
+\label{tab:related_cmp}
+\footnotesize
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}lllll@{}}
+\toprule
+Study & Threat / Secret & Scope & Defense Evaluated & Key Distinction of Present Work \\
+\midrule
+AgentLeak \citep{elyagoubi2026} & Benign PII / vault fields & 2-agent coordinator & Prompt, vault mask & Multi-hop $(o,r)$ split, free-text vs.\ schema ACL, blind spots \\
+PRISM \citep{prism2026} & Credentials / API keys & 4-agent linear chain & Log-prob filter, prompts & Semantic secrets, branching graphs, measured relay $r \neq o$ \\
+MAMA \citep{liu2026} & Prompt-extracted PII & Network topologies & Measurement only & Epidemic $\Rzero$/outbreak model, gateway vs.\ 6 baselines \\
+\citet{ogundoyin2026} & Benign secret travel & 6 topologies & Recipient sanitization & Separates origination vs.\ relay; tests filter correlation \\
+\citet{wang2026} & Boundary metadata loss & Multi-hop handoffs & Phrase filter, typed slots & Quantifies rewrite persistence ($\rho_{\text{rewrite}}$) and filter rotation \\
+AgentWorm \citep{zhang2026} & Adversarial AI worm & Homogeneous SIS & Prompts, sandboxing & Benign oversharing on heterogeneous graphs; semantic gateway \\
+\textbf{This paper} & \textbf{52 verbatim \& semantic} & \textbf{3-, 6-, 12-agent, 500 sim.} & \textbf{L1+L2 + 6 baselines} & \textbf{Decision map, free text vs.\ schema, TOST utility, $\rho_{\text{rewrite}}$} \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\paragraph{Multi-agent privacy and leakage propagation}
+AgentLeak \citep{elyagoubi2026} benchmarked internal-channel leakage in two-agent coordinator--worker configurations, observing that prompt instructions minimally reduced internal leakage while vault-field interceptors incurred task-success costs. PRISM \citep{prism2026} analyzed token log-probabilities in four-agent linear chains for structured credentials, assuming uniform cascade dynamics without measuring downstream relay or non-linear topologies. MAMA \citep{liu2026} and \citet{ogundoyin2026} demonstrated that network density and centrality influence exposure, while \citet{wang2026} showed that phrase filters fail against multi-hop paraphrases. Complementary single-agent benchmarks include ConfAIde \citep{mireshghallah}, PrivacyLens \citep{shao2024}, and AgentDAM \citep{zharmagambetov2025}.
+
+\paragraph{Adversarial contagion and architectural memory governance}
+Adversarial worm propagation has been demonstrated in Prompt Infection \citep{lee2024}, Morris~II \citep{cohen2024}, Agent Smith \citep{gu2024}, Cowpox \citep{cowpox2025}, and AgentWorm \citep{zhang2026}, alongside contagion studies of agent beliefs \citep{liu2026contagion,niu2026,papadopoulos2026}. Architectural approaches—including event-sourced logs \citep{esaa2026,esaac2026}, scoped memory frameworks \citep{mem0,amem,delegation2025,rezazadeh2025,margalit2026}, and information-flow control \citep{costa2025,debenedetti2025}—enforce isolation by restructuring execution runtimes. Our work complements these by evaluating content-level inspection when confidential text is entangled in unstructured inputs, measuring how semantic correlation across hops breaks classical herd-immunity assumptions \citep{newman2002,pastor2002}.
+
+%% =====================================================================
+\section{Threat model, epidemic formulation, and gateway architecture}
+\label{sec:model}
+
+\paragraph{Threat model}
+% [KL-001] [KL-002]
+We examine \textbf{Mode A (accidental oversharing)}: benign, cooperative agents receive task records containing both necessary operational facts and confidential context, inadvertently incorporating confidential details into outgoing handoff notes. \textbf{Mode B (adversarial exfiltration)}, where prompts instruct agents to deliberately disguise secrets, is analyzed as an exploratory stress test. In our primary threat model, secrets carry write-time sensitivity registration (the oracle assumption); unregistered heuristics and auto-detect models are evaluated as baselines.
+
+\paragraph{Two-stage epidemic model: origination $o$ vs.\ relay $r$}
+% [KL-003] [KL-004] [KL-005] [KL-006] [KL-007]
+An agent is deemed \emph{infected} when an outgoing message it authors contains the secret. Standard independent-cascade models assign a constant transmissibility $T$ per edge, yielding basic reproduction number
+\begin{equation}
+  \Rzero \approx T\,\frac{\langle k^{2}\rangle - \langle k\rangle}{\langle k\rangle},
+  \qquad
+  T_c = \frac{\langle k\rangle}{\langle k^{2}\rangle - \langle k\rangle},
+  \label{eq:r0}
+\end{equation}
+where $k$ represents node degree \citep{newman2002}, defining an outbreak as $>5\%$ network infection. However, empirical handoffs exhibit distinct stages:
+\begin{itemize}
+  \item \textbf{Origination rate $o$ (hop 1):} The probability that a source agent holding a confidential record introduces the secret into an outgoing handoff note.
+  \item \textbf{Relay rate $r$ (hop $\ge 2$):} The probability that an agent receiving an already-contaminated note forwards or paraphrases the secret downstream.
+\end{itemize}
+When message gateways filter edges, independent cascade models assume independent blocking across hops. We relax this assumption by measuring rewrite persistence $\rho_{\text{rewrite}}$, showing that for degree $k$, first-hop slip probability implies a non-zero outbreak floor:
+\begin{equation}
+  P_{\text{floor}} \approx \OutbreakFloorFormula.
+  \label{eq:floor}
+\end{equation}
+
+\paragraph{Two-layer semantic gateway (L1+L2)}
+% [KL-008] [KL-009] [KL-010] [KL-011]
+The gateway inspects outgoing notes prior to peer delivery:
+\begin{itemize}
+  \item \textbf{L1 (lexical/token barrier):} Structured identifiers are matched across separator/casing variants, and registered secret strings/tokens are replaced by \texttt{[REDACTED]}.
+  \item \textbf{L2 (semantic sentence filter):} Candidate sentences are evaluated against registered secrets, triggering redaction if either (a) $\ge \ThreshLexical$ content words match, or (b) \texttt{nomic-embed-text} cosine similarity reaches $\ge \ThreshCosine$.
+\end{itemize}
+Both thresholds were calibrated on the DEV split and cryptographically locked in \texttt{results/freeze.ok}. We did not benchmark runtime latency.
+
+%% =====================================================================
+\section{Experimental setup and pre-registration protocol}
+\label{sec:setup}
+
+\paragraph{Corpus, splits, and pre-registered hypotheses}
+% [KL-012] [KL-013] [KL-014] [KL-015] [KL-016] [KL-017] [KL-018] [KL-019] [KL-020]
+Our confirmatory evaluation uses a \NSecretsTotal-secret corpus across \NDomains\ domains (\NSecretsDEV\ DEV, \NSecretsSanity\ sanity, and \NSecretsTEST\ held-out TEST secrets locked via SHA-256). The evaluation comprises:
+(1)~\textbf{Confirmatory TEST ladder} ($n=\NNotesTESTLadder$ hop-1 notes, \NNotesPerDefTEST/defense pooled across customer service and HR onboarding) on local 2B--3B models (\texttt{llama3.2:3b}, \texttt{qwen2.5:3b}, \texttt{gemma2:2b});
+(2)~\textbf{API tier evaluation} ($n=\NNotesAPI$ notes) on \texttt{gemini-3.5-flash-lite};
+(3)~\textbf{Six baselines (\texttt{B1}--\texttt{B7})} ($n=\NNotesBaselines$ notes on 96 matched customer service TEST episodes);
+(4)~\textbf{Entangled free-text email study} ($n=\NEpisodesFreeText$ paired TEST episodes = \NNotesFreeText\ notes across all three local models); and
+(5)~\textbf{Boundary pools} (\NNotesBoundaryTotal\ notes) evaluating persistence.
+
+All executions used deterministic SQLite caching (\texttt{LLMClient}), guaranteeing identical prompts and seeds across matched conditions. Task utility $U \in [0,1]$ was measured via a 5-item checklist of non-secret facts, evaluated using Two-One-Sided Tests (TOST) within margin $\MarginTOST$ via \NBootstrapResamples\ bootstrap resamples. Protocol deviations followed their recorded timestamps (\texttt{PREREG.md} Section~6): before the TEST freeze (\texttt{results/freeze.ok}), we fixed $D_2$ to DeBERTa-v3 prior to human labeling, corrected $D_1$ subject-handle matching after inspecting the 300-note labels, and made the 1--1 tie rule explicit; prior to TEST ladder completion, we reduced the primary grid from 30 to 8~episodes/cell due to runtime constraints; after TEST generation and initial local $D_3$ runs, all confirmatory ties were re-adjudicated 100\% via Gemini once API quota reset; and the entangled free-text email study ($n=\NEpisodesFreeText$) was added post hoc after schema-segregated \texttt{B4} eliminated leakage.
+
+\paragraph{Detector validation and execution of $D_3$}
+% [KL-021] [KL-022] [KL-023] [KL-024] [KL-025] [KL-026] [KL-027] [KL-028] [KL-029] [KL-030] [KL-031]
+To prevent circularity between the gateway and lexical detection, notes were scored by a three-detector majority-vote ensemble: $D_1$ (lexical/ID matching), $D_2$ (DeBERTa-v3 NLI entailment), and $D_3$ (LLM judge). Across all \NTiesTESTLadder\ TEST ladder ties, all baseline ties, and all \NNotesHumanBenchmark\ blinded human-benchmark notes, $D_3$ was executed via the Google Gemini API (\NUniqueGeminiVerdicts\ verdicts total: \NGeminiFlashLiteVerdicts\ via \texttt{gemini-3.5-flash-lite} and \NGeminiFlashVerdicts\ via \texttt{gemini-2.5-flash}; zero confirmatory hop-1 ties used local fallbacks). Local fallback rotation (\texttt{llama3.2:3b}, \texttt{gemma2:2b}, \texttt{qwen2.5:3b}; $\kappa=\KappaDThreeLocalContent$) was restricted to secondary non-confirmatory transcripts. We disclose that \texttt{gemini-3.5-flash-lite} served both as the tested API model and remote $D_3$ judge (where rotation assigned \texttt{llama3.2:3b} to prevent self-judging).
+
+On the \NNotesHumanBenchmark-note blinded human benchmark (Table~\ref{tab:kappa}), stripping redaction markers yielded non-adjudicated agreement of $\kappa = \KappaEnsContent$ for the Gemini-adjudicated Ensemble (recall $\RecEnsContent$, precision $\PrecEnsContent$). Notably, $D_1$ alone achieved $\kappa = \KappaDOneContent$ (recall $\RecDOneContent$) because it captures residual subject-handle mentions. $D_1$ was adjusted after we inspected these 300 labels (subject-handle matching), so its agreement is in-sample and optimistic. We co-report $D_1$ alongside the Ensemble throughout.
+
+\begin{table}[!htbp]
+\centering
+\caption{Non-adjudicated detector validation against blinded human labels on \NNotesHumanBenchmark\ stratified TEST notes (95\% Wilson CIs; single human annotator).}
+\label{tab:kappa}
+\footnotesize
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}llccccc@{}}
+\toprule
+Outcome (Human Base Rate) & Detector & Precision (95\% CI) & Recall (95\% CI) & Agreement & Cohen's $\kappa$ & Gwet's AC1 \\
+\midrule
+Outcome 1: Content leak (\BaseRateContent) & \textbf{$D_1$ (lexical + ID)} & \textbf{\PrecDOneContent\ \PrecDOneContentCI} & \textbf{\RecDOneContent\ \RecDOneContentCI} & \textbf{\AgreeDOneContent} & \textbf{\KappaDOneContent} & \textbf{\ACDOneContent} \\
+                                           & $D_2$ (DeBERTa NLI)  & \PrecDTwoContent & \RecDTwoContent & \AgreeDTwoContent & \KappaDTwoContent & \ACDTwoContent \\
+                                           & $D_3$ (Google Gemini API) & \PrecDThreeGeminiContent & \RecDThreeGeminiContent & \AgreeDThreeGeminiContent & \KappaDThreeGeminiContent & \ACDThreeGeminiContent \\
+                                           & $D_3$ (Local fallback, comparison) & \PrecDThreeLocalContent & \RecDThreeLocalContent & \AgreeDThreeLocalContent & \KappaDThreeLocalContent & \ACDThreeLocalContent \\
+                                           & \textbf{Ensemble (Gemini $D_3$)} & \textbf{\PrecEnsContent\ \PrecEnsContentCI} & \textbf{\RecEnsContent\ \RecEnsContentCI} & \textbf{\AgreeEnsContent} & \textbf{\KappaEnsContent} & \textbf{\ACEnsContent} \\
+\midrule
+Outcome 2: ID exposure (\BaseRateID) & $D_1$ (ID / token matcher) & \PrecDOneID & \RecDOneID & \AgreeDOneID & \KappaDOneID & \ACDOneID \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+%% =====================================================================
+\section{Results: Which defense, when?}
+\label{sec:results}
+
+\subsection{Decision map and summary of empirical claims}
+
+Table~\ref{tab:decision_map} synthesizes our findings into an operational decision map, and Table~\ref{tab:claims} summarizes core empirical claims and caveats.
+
+\begin{table}[!htbp]
+\centering
+\caption{Decision map: Recommended defense by operating regime based on empirical trade-offs.}
+\label{tab:decision_map}
+\footnotesize
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}llll@{}}
+\toprule
+Operating Regime & Recommended Defense & Primary Evidence & Practical Caveats \\
+\midrule
+1. Schema-segregated fields & Static field ACL (\texttt{B4}) & Eliminates leaks ($T=\TBaseBFourEns$); retains $U=\UBaseBFourAll$ & Requires strict database segregation; blind to free text \\
+2. Entangled free-text (2B--3B) & Two-layer gateway (L1+L2) & Cuts $T$ to \TFreeGatewayEns\ (\TFreeGatewayDOne\ $D_1$); $U=\UFreeGatewayAll$ & Requires write-time registration; post-hoc $n=24$ test \\
+3. Capable API models & Prompt privacy warning (\texttt{B2}) & Cuts $T$ from \TTestAPIBZero\ to \TTestAPIBTwo\ without overhead & Ineffective on small models ($T=\TTestBTwoEns$); prompt injection risk \\
+4. Multi-hop cascades & Cross-family filter rotation (hypothesis) & Cuts hop-2 slip survival from \RhoRepass\ to \RhoRotateLLM & Hypothesis from offline $n=\NNotesOfflineRotation$ test; runtime judge over-redacts ($U=\UBaseBSixAll$) \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\caption{Core empirical claims, supporting evidence, and limiting caveats.}
+\label{tab:claims}
+\footnotesize
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}lp{6.2cm}p{5.8cm}@{}}
+\toprule
+Claim & Supporting Empirical Evidence & Limitations and Caveats \\
+\midrule
+\textbf{1. Regime dependency} & Static ACL wins on schema (\TBaseBFourEns); gateway wins on free text (\TFreeGatewayEns); warning wins on API (\TTestAPIBTwo) & Free text tested on $n=\NEpisodesFreeText$; API model evaluated at hop 1 only \\
+\textbf{2. Gateway effectiveness} & Pooled 2B--3B $T$ cut from \TTestBZeroEns\ to \TTestGatewayEns\ ($p=\TPValPooled$); TOST equivalent on CS ($\Delta U=\DeltaUTestCSGateway$) & $D_1$ detects residual handles ($T=\TTestGatewayDOne$); HR task exhibits floor effect \\
+\textbf{3. Relay dominates origination} & Relay $r = \RelayRateRange$; prompt framing shifts $o$ by up to \PromptFramingShift; star MAE reduced to \NetSixMAETwoParam & Multi-hop networks evaluated primarily on 20 episodes/cell \\
+\textbf{4. Persistent blind spots} & Slips persist at $\rho = \RhoRewriteLlama$ (Llama) and \RhoRewriteQwen\ (Qwen); 500-agent outbreak floor \OutbreakFloorFullRange & Boundary pools use DEV secrets and probing prompts; 500-agent results are simulated \\
+\textbf{5. Rotation trade-off} & Rotating to LLM judge cuts slip survival to \RhoRotateLLM; but judge slashes utility ($\Delta U=\DeltaUBaseBSix$) & Rotation tested offline ($n=\NNotesOfflineRotation$); judge over-redacts benign text \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\subsection{Defense ladder on TEST split and API model comparison}
+% [KL-032] [KL-033] [KL-034] [KL-035] [KL-036] [KL-037] [KL-038] [KL-039] [KL-040] [KL-041] [KL-042]
+Table~\ref{tab:ladder} and Figure~\ref{fig:ladder} detail hop-1 leak origination $T$ and checklist usefulness $U$.
+
+\begin{table}[!htbp]
+\centering
+\caption{Hop-1 leak origination rate $T$ and usefulness $U$ across the defense ladder on the pre-registered TEST split ($n=\NNotesPerDefTEST$/defense pooled; $n=\NNotesPerDefTask$/defense on customer service and HR onboarding), the API tier (\texttt{gemini-3.5-flash-lite}, $n=80$--$85$/defense), and exploratory runs ($n=360$/defense). 95\% bootstrap CIs in brackets; paired TOST $\Delta U$ vs.\ \texttt{B0} shows 90\% CIs.}
+\label{tab:ladder}
+\footnotesize
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}llccccccc@{}}
+\toprule
+Cohort / Task & Defense & TEST Ensemble $T$ & TEST $D_1$ / $D_2$ & $D_3$ on ties & Unanimous$^{\dagger}$ & API Model $T^{\ddagger}$ & Usefulness $U$ & Paired $\Delta U$ vs.\ B0 (90\% CI) \\
+\midrule
+\textbf{Pooled TEST} & B0 No defense     & \TTestBZeroEns\ \TTestBZeroEnsCI & \TTestBZeroDOne\ / \TTestBZeroDTwo & \TiesBZeroDThree & \UnanimousBZeroRate & \TTestAPIBZero & \UTestBZeroPooled & Reference \\
+($n=\NNotesPerDefTEST$/def, & B2 Prompt warning & \TTestBTwoEns\ \TTestBTwoEnsCI & \TTestBTwoDOne\ / \TTestBTwoDTwo & \TiesBTwoDThree & \UnanimousBTwoRate & \textbf{\TTestAPIBTwo} & \UTestBTwoPooled & \DeltaUTestBTwoPooled\ \DeltaUTestBTwoPooledCI \\
+2 tasks)             & L1 Exact match    & \TTestLOneEns\ \TTestLOneEnsCI & \TTestLOneDOne\ / \TTestLOneDTwo & \TiesLOneDThree & \UnanimousLOneRate & \TTestAPILOne & \UTestLOnePooled & \DeltaUTestLOnePooled\ \DeltaUTestLOnePooledCI \\
+                     & \textbf{L1+L2 Gateway} & \textbf{\TTestGatewayEns\ \TTestGatewayEnsCI} & \textbf{\TTestGatewayDOne\ / \TTestGatewayDTwo} & \textbf{\TiesGatewayDThree} & \textbf{\UnanimousGatewayRate} & \textbf{\TTestAPIGateway} & \textbf{\UTestGatewayPooled} & \textbf{\DeltaUTestGatewayPooled\ \DeltaUTestGatewayPooledCI} \\
+\midrule
+\textbf{Customer Service} & B0 No defense     & \TTestCSBZeroEns\ \TTestCSBZeroEnsCI & \TTestCSBZeroDOne\ / \TTestCSBZeroDTwo & \TiesCSBZeroDThree & \UnanimousCSBZeroRate & (same) & \textbf{\UTestCSBZero} & Reference \\
+($n=\NNotesPerDefTask$/def, primary & B2 Prompt warning & \TTestCSBTwoEns\ \TTestCSBTwoEnsCI & \TTestCSBTwoDOne\ / \TTestCSBTwoDTwo & \TiesCSBTwoDThree & \UnanimousCSBTwoRate & & \UTestCSBTwo & \DeltaUTestCSBTwo\ \DeltaUTestCSBTwoCI \\
+utility benchmark)   & L1 Exact match    & \TTestCSLOneEns\ \TTestCSLOneEnsCI & \TTestCSLOneDOne\ / \TTestCSLOneDTwo & \TiesCSLOneDThree & \UnanimousCSLOneRate & & \UTestCSLOne & \DeltaUTestCSLOne\ \DeltaUTestCSLOneCI \\
+                     & \textbf{L1+L2 Gateway} & \textbf{\TTestCSGatewayEns\ \TTestCSGatewayEnsCI} & \textbf{\TTestCSGatewayDOne\ / \TTestCSGatewayDTwo} & \textbf{\TiesCSGatewayDThree} & \textbf{\UnanimousCSGatewayRate} & & \textbf{\UTestCSGateway} & \textbf{\DeltaUTestCSGateway\ \DeltaUTestCSGatewayCI} \\
+\midrule
+\textbf{HR Onboarding} & B0 No defense     & \TTestHRBZeroEns\ \TTestHRBZeroEnsCI & \TTestHRBZeroDOne\ / \TTestHRBZeroDTwo & \TiesHRBZeroDThree & \UnanimousHRBZeroRate & not run & \UTestHRBZero & Reference \\
+($n=\NNotesPerDefTask$/def, lower & B2 Prompt warning & \TTestHRBTwoEns\ \TTestHRBTwoEnsCI & \TTestHRBTwoDOne\ / \TTestHRBTwoDTwo & \TiesHRBTwoDThree & \UnanimousHRBTwoRate & & \UTestHRBTwo & \DeltaUTestHRBTwo\ \DeltaUTestHRBTwoCI \\
+baseline utility)    & L1 Exact match    & \TTestHRLOneEns\ \TTestHRLOneEnsCI & \TTestHRLOneDOne\ / \TTestHRLOneDTwo & \TiesHRLOneDThree & \UnanimousHRLOneRate & & \UTestHRLOne & \DeltaUTestHRLOne\ \DeltaUTestHRLOneCI \\
+                     & \textbf{L1+L2 Gateway} & \textbf{\TTestHRGatewayEns\ \TTestHRGatewayEnsCI} & \textbf{\TTestHRGatewayDOne\ / \TTestHRGatewayDTwo} & \textbf{\TiesHRGatewayDThree} & \textbf{\UnanimousHRGatewayRate} & & \textbf{\UTestHRGateway} & \textbf{\DeltaUTestHRGateway\ \DeltaUTestHRGatewayCI} \\
+\bottomrule
+\end{tabular}}
+\vspace{2pt}
+\parbox{\linewidth}{\scriptsize $^{\dagger}$Unanimous ($D_1=D_2$) sample expands under redaction ($n=92 \to 142$), introducing selection bias; non-comparable across defenses. $^{\ddagger}$API ladder evaluated on \texttt{gemini-3.5-flash-lite} (customer service). Exploratory single-secret ($n=360$/def, $D_1$): \texttt{B0} \TExploratoryBZero, \texttt{B2} \TExploratoryBTwo, \texttt{L1} \TExploratoryLOne, \texttt{L1+L2} \TExploratoryGateway.}
+\end{table}
+
+\begin{figure}[!htbp]
+\centering
+\figbox{fig1_ladder_v2.pdf}{0.95}
+\caption{Hop-1 leak origination rate $T$ by defense with 95\% CIs across TEST split (Ensemble and $D_1$), free-text emails, and exploratory single-secret runs.}
+\label{fig:ladder}
+\end{figure}
+
+On 2B--3B models, the L1+L2 gateway achieves an \TFoldReductionPooled-fold reduction in hop-1 origination on pooled TEST ($T = \TTestBZeroEns \to \TTestGatewayEns$, Cohen's $h=\TCohenHPooled$, $p=\TPValPooled$; $\TFoldReductionCS\times$ on customer service; $\TFoldReductionHR\times$ on HR). Under $D_1$, leakage drops from \TTestBZeroDOne\ to \TTestGatewayDOne\ (a threefold reduction, limited by residual subject handles). Reductions are consistent across individual architectures (\texttt{gemma2:2b}: $\TTestGemmaBZero \to \TTestGemmaGateway$; \texttt{llama3.2:3b}: $\TTestLlamaBZero \to \TTestLlamaGateway$; \texttt{qwen2.5:3b}: $\TTestQwenBZero \to \TTestQwenGateway$).
+
+Conversely, prompt warnings (\texttt{B2}) fail completely on 2B--3B models ($T = \TTestBTwoEns$). \textbf{On the API model (\texttt{gemini-3.5-flash-lite}), however, a one-sentence warning alone slashes leakage from \TTestAPIBZero\ to \TTestAPIBTwo}, demonstrating that prompt non-compliance at hop 1 is primarily a small-model vulnerability. Task usefulness $U$ on customer service confirms TOST equivalence for the gateway ($U = \UTestCSBZero \to \UTestCSGateway$, $\Delta U = \DeltaUTestCSGateway$, 90\% CI $\DeltaUTestCSGatewayCI$), whereas warnings degrade utility ($\Delta U = \DeltaUTestCSBTwo$). On HR onboarding, lower baseline retention ($U=\UTestHRBZero$) reflects small-model difficulty with multi-step checklists.
+
+\subsection{Free-text entanglement vs.\ schema segregation}
+% [KL-043] [KL-044] [KL-045] [KL-046] [KL-047] [KL-048] [KL-049]
+Table~\ref{tab:baselines} and Figure~\ref{fig:pareto} resolve when a gateway is warranted versus simpler baselines.
+
+\begin{table}[!htbp]
+\centering
+\caption{Comparison of the defense ladder and six baselines across Part A (Schema-segregated records, $n=96$) and Part B (Entangled free-text emails, $n=24$ paired episodes = 96 notes).}
+\label{tab:baselines}
+\footnotesize
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}llcccccc@{}}
+\toprule
+Defense / Baseline & Mechanism & Llama $T_{\text{ens}}$ & Qwen/Gemma $T_{\text{ens}}$ & Pooled $T_{\text{ens}}$ & Pooled $T_{D_1}$ & Usefulness $U$ (All / Llama) & Paired $\Delta U$ vs.\ B0 (90\% CI) \\
+\midrule
+\multicolumn{8}{@{}l}{\textbf{Part A: Schema-Segregated Secret Field ($n=96$ matched TEST episodes; Static ACL \texttt{B4} wins)}} \\
+B0 No defense & Unfiltered handoffs & \TBZeroLlamaRate & \TBZeroQwenRate & \TTestCSBZeroEns & \TTestCSBZeroDOne & \UTestCSBZero\ / \UBaseBZeroLlama & Reference \\
+B1 Summary-only & 3-bullet summary prompt & \TBOneLlamaRate & \TBOneQwenRate & \TBaseBOneEns & \TBaseBOneDOne & \UBaseBOneAll\ / \UBaseBOneLlama & \DeltaUBaseBOne\ \DeltaUBaseBOneCI \\
+B2 Generic warning & 1-sentence privacy prompt & \TBTwoLlamaRate & \TBTwoQwenRate & \TTestCSBTwoEns & \TTestCSBTwoDOne & \UTestCSBTwo\ / \UBaseBTwoLlama & \DeltaUTestCSBTwo\ \DeltaUTestCSBTwoCI \\
+B5 Threat-aware warning & Explicit paraphrase warning & \TBFiveLlamaRate & \TBFiveQwenRate & \TBaseBFiveEns & \TBaseBFiveDOne & \UBaseBFiveAll\ / \UBaseBFiveLlama & \DeltaUBaseBFive\ \DeltaUBaseBFiveCI \\
+B7 Secret-blind regex & Generic PII/ID regexes & \TBSevenLlamaRate & \TBSevenQwenRate & \TBaseBSevenEns & \TBaseBSevenDOne & \UBaseBSevenAll\ / \UBaseBSevenLlama & \DeltaUBaseBSeven\ \DeltaUBaseBSevenCI \\
+B3 Provenance tagging & \texttt{<CONFIDENTIAL>} tag + strip & \TBThreeLlamaRate & \TBThreeQwenRate & \TBaseBThreeEns & \TBaseBThreeDOne & \UBaseBThreeAll\ / \UBaseBThreeLlama & \DeltaUBaseBThree\ \DeltaUBaseBThreeCI \\
+L1 Exact match & String + ID token match & \TLOneLlamaRate & \TLOneQwenRate & \TTestCSLOneEns & \TTestCSLOneDOne & \UTestCSLOne\ / \UBaseLOneLlama & \DeltaUTestCSLOne\ \DeltaUTestCSLOneCI \\
+B6 Secret-blind LLM judge & Zero-secret LLM redactor & \TBSixLlamaRate & \TBSixQwenRate & \TBaseBSixEns & \TBaseBSixDOne & \UBaseBSixAll\ / \UBaseBSixLlama & \DeltaUBaseBSix\ \DeltaUBaseBSixCI \\
+\textbf{L1+L2 Gateway} & \textbf{Lexical + cosine ($\ThreshLexical/\ThreshCosine$)} & \textbf{\TGatewayLlamaRate} & \textbf{\TGatewayQwenRate} & \textbf{\TTestCSGatewayEns} & \textbf{\TTestCSGatewayDOne} & \textbf{\UTestCSGateway\ / \UBaseGatewayLlama} & \textbf{\DeltaUTestCSGateway\ \DeltaUTestCSGatewayCI} \\
+\textbf{B4 Static ACL (column)} & \textbf{Strips separate secret slot} & \textbf{\TBFourLlamaRate} & \textbf{\TBFourQwenRate} & \textbf{\TBaseBFourEns} & \textbf{\TBaseBFourDOne} & \textbf{\UBaseBFourAll\ / \UBaseBFourLlama} & \textbf{\DeltaUBaseBFour\ \DeltaUBaseBFourCI} \\
+\midrule
+\multicolumn{8}{@{}l}{\textbf{Part B: Entangled Free-Text Email ($n=24$ paired TEST episodes, post hoc; \texttt{L1+L2 Gateway} wins)}} \\
+B0 No defense & Unfiltered email & \TFreeBZeroLlamaRate & \TFreeBZeroQwenRate & \TFreeBZeroEns & \TFreeBZeroDOne & \UFreeBZeroAll\ / \UFreeBZeroLlama & Reference \\
+B4-schema Static ACL & Strips separate columns & \TFreeBFourSchemaLlamaRate & \TFreeBFourSchemaQwenRate & \TFreeBFourSchemaEns & \TFreeBFourSchemaDOne & \UFreeBFourSchemaAll\ / \UFreeBFourSchemaLlama & \DeltaUFreeBFourSchema \\
+B4-taint Static ACL & Withholds tainted email field & \TFreeBFourTaintLlamaRate & \TFreeBFourTaintQwenRate & \TFreeBFourTaintEns & \TFreeBFourTaintDOne & \textbf{\UFreeBFourTaintAll\ / \TFreeBFourTaintLlamaRate} & \textbf{\DeltaUFreeBFourTaint\ \DeltaUFreeBFourTaintCI} \\
+\textbf{L1+L2 Gateway} & \textbf{Sentence-level filter} & \textbf{\TFreeGatewayLlamaRate} & \textbf{\TFreeGatewayQwenRate} & \textbf{\TFreeGatewayEns} & \textbf{\TFreeGatewayDOne} & \textbf{\UFreeGatewayAll\ / \UFreeGatewayLlama} & \textbf{\DeltaUFreeGateway\ \DeltaUFreeGatewayCI} \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{figure}[!htbp]
+\centering
+\figbox{fig2-pareto.png}{0.95}
+\caption{Leakage vs.\ utility trade-off: (a) Schema-segregated records, where Static ACL (\texttt{B4}) dominates; (b) Entangled free text (post hoc, $n=\NEpisodesFreeText$), where \texttt{B4} fails and the Gateway preserves utility.}
+\label{fig:pareto}
+\end{figure}
+
+In Part A (schema-segregated records), Static ACL (\texttt{B4}) strictly dominates: it eliminates leakage ($T = \TBaseBFourEns$) and improves utility ($U = \UTestCSBZero \to \UBaseBFourAll$, $\Delta U = \DeltaUBaseBFour$; $\DeltaUBaseBFourLlama$ on Llama) by removing irrelevant context. Prompt baselines (\texttt{B1}, \texttt{B2}, \texttt{B5}) fail to stop leaks while hurting utility; provenance tagging (\texttt{B3}) loses utility ($\Delta U = \DeltaUBaseBThree$); and the secret-blind LLM judge (\texttt{B6}) over-redacts benign text ($\Delta U = \DeltaUBaseBSix$).
+
+In Part B (entangled free text; post hoc, $n=\NEpisodesFreeText$), Static ACL fails completely: column stripping (\texttt{B4-schema}) is powerless ($T = \TFreeBFourSchemaEns$), while taint stripping (\texttt{B4-taint}) eliminates leaks only by deleting the task ($U = \UFreeBFourTaintAll$). In contrast, the L1+L2 gateway excises the secret sentence, cutting leakage to \TFreeGatewayEns\ (\TFreeGatewayDOne\ under $D_1$) with no detectable utility loss ($U = \UFreeGatewayAll$ vs.\ \UFreeBZeroAll, $\Delta U = \DeltaUFreeGateway$, 90\% CI $\DeltaUFreeGatewayCI$).
+
+\subsection{Residual disclosure, secret registration, and over-blocking}
+% [KL-050] [KL-051] [KL-052] [KL-053] [KL-054]
+Because L2 redacts at sentence granularity, notes stating an identifier and diagnosis in separate sentences retain the bare identifier after diagnosis removal (accounting for the gap between $T_{\text{ens}}=\TTestGatewayEns$ and $T_{D_1}=\TTestGatewayDOne$). In exploratory runs, bare identifiers persisted in \BareIDPersistencePct\ of notes; registering identifiers in L1 reduced combined exposure from \IDExpGatewayOnly\ to \IDExpWithIDFix\ without harming utility ($\Delta U = \DeltaUIDFix$).
+
+Without secret registration, an auto-detect judge retained 96\% of oracle protection on verbatim IDs ($T=\TAutoDetectVerbatim$), but only 16\% on semantic secrets ($T=\TAutoDetectSemantic$), confirming the necessity of sensitivity registration for semantic content. Over-blocking was \OverblockEasyNeg\ on cross-domain negatives, but reached \OverblockHardNegRange\ on same-domain hard negatives due to dense embedding similarity. Exploratory probes showed that gateways catch plain paraphrases (\ParaphraseRecallGateway\ recall) but miss base64 encodings and foreign translations; adversarial compliance testing on 2B--3B models showed that small models refuse or emit plain text rather than executing obfuscations.
+
+%% =====================================================================
+\section{Multi-hop cascades, persistence, and the outbreak floor}
+\label{sec:network}
+
+\subsection{Origination vs.\ relay and star topology validation}
+% [KL-055] [KL-056] [KL-057] [KL-058] [KL-059] [KL-060]
+In six-agent networks (20 episodes/cell, 24 cells; Figure~\ref{fig:validation}), predicting infection using a single $T$ produced MAE = \NetSixMAESingleT\ agents out of 5. Two factors explain this:
+\begin{enumerate}
+  \item \textbf{Relay dominates origination:} Once a secret enters a note at hop 1, downstream agents relay it at $r = \RelayRateRange$.
+  \item \textbf{Prompt framing shifts origination:} Switching between role names and numbers shifted $o$ by up to \PromptFramingShift\ for identical models and secrets.
+\end{enumerate}
+Fitting $(o,r)$ on chains and evaluating on held-out stars cuts MAE from \NetSixMAESingleT\ to \NetSixMAETwoParam\ agents. Sibling out-edges exhibit positive correlation ($\phi = \SiblingCorrelationPhi$, $p < 0.001$ under $D_1$). A 12-agent broadcast-tree probe ($n=8$/cell) yielded suggestive CI coverage (MAE \NetTwelveMAEEns\ ens., \NetTwelveMAEDOne\ $D_1$), but wide CIs and BFS structure render it an inconclusive design check (see Appendix~\ref{app:net12}). Under $D_1$, the single-$T$ baseline had lower error (MAE \NetTwelveMAESingleTDOne) than the two-parameter model (\NetTwelveMAEDOne), so this probe does not support $(o, r)$ over single-$T$ at 12 agents.
+
+\begin{figure}[!htbp]
+\centering
+\figbox{fig5-validation.png}{0.90}
+\caption{Network validation: six-agent stars and chains comparing single-$T$ (MAE \NetSixMAESingleT) against two-parameter $(o,r)$ (MAE \NetSixMAETwoParam), and 12-agent broadcast-tree probe.}
+\label{fig:validation}
+\end{figure}
+
+\subsection{Rewrite persistence and 500-agent outbreak floors}
+% [KL-061] [KL-062] [KL-063] [KL-064] [KL-065] [KL-066] [KL-067] [KL-068] [KL-069]
+In two \NNotesBoundaryPool-note boundary pools (DEV secrets, 4 prompt styles), slips evading the gateway once survived deterministic re-pass at $\rho_{\text{repass}} = \RhoRepass$. When rewritten by an independent downstream agent, slips survived a second gateway pass at $\rho_{\text{rewrite}} = \RhoRewriteLlama$ (Llama) and $\RhoRewriteQwen$ (Qwen), compared to caught-and-redacted controls (\RhoControlLlama\ and \RhoControlQwen). Misses correlate strongly within the embedding filter family ($\phi = \PhiWithinFamily$), but drop with an LLM judge ($\phi = \PhiLLMJudge$). Offline rotation to an LLM judge cuts slip survival to \RhoRotateLLM, but deploying that judge at runtime collapses utility ($\Delta U = \DeltaUBaseBSix$).
+
+\begin{figure}[!htbp]
+\centering
+\figbox{fig3_outbreak_v2.pdf}{0.95}
+\caption{Simulated \NSimAgents-agent outbreak probability ($>5\%$ infected; $\SimJSevenRuns$ Monte Carlo runs per point) on Erd\H{o}s--R\'enyi ($\langle k\rangle=4$) and Barab\'asi--Albert ($m=2$) graphs parameterized by $T_{\mathrm{gw}}=\TTestCSGatewayEns$, unprotected single-$T$ rate $T_{\mathrm{src}}=\SimJSevenTSrc$, and slip relay $T_{\mathrm{slip}}=\SimJSevenTSlip$, compared against the closed-form floor $\OutbreakFloorFormula$ ($k=4$: \OutbreakFloorCSKFour) and the exploratory benchmark (\OutbreakFloorEarlyKFour).}
+\label{fig:outbreak}
+\end{figure}
+
+In \NSimAgents-agent simulations ($\SimJSevenRuns$ runs/point in Figure~\ref{fig:outbreak}), undefended outbreak risk at $p=0$ is $\SimJSevenPZeroRange$ when using a single-$T$ unprotected rate ($T_{\mathrm{src}}=\SimJSevenTSrc$, near the percolation threshold) without separating higher downstream relay, and rises to $\UndefendedOutbreakRange$ under the full two-parameter $(o,r)$ model ($r = \RelayRateRange$ in Table~\ref{tab:app_herd}). While independent blocking models predict zero outbreak risk at high coverage, persistent slips ($\rho_{\text{rewrite}} = \RhoRewriteLlama$) create a substantial outbreak floor across all TEST detectors: \OutbreakFloorPooledSim\ (mean \OutbreakFloorPooledMean) under pooled Ensemble ($T=\TTestGatewayEns$, formula \OutbreakFloorPooledKFour); \OutbreakFloorCSSim\ (mean \OutbreakFloorCSMean) under customer service Ensemble ($T=\TTestCSGatewayEns$, formula \OutbreakFloorCSKFour); and \OutbreakFloorDOneSim\ (mean \OutbreakFloorDOneMean) under $D_1$ ($T=\TTestGatewayDOne$, formula \OutbreakFloorDOneKFour), spanning \OutbreakFloorFullRange\ overall.
+
+%% =====================================================================
+\section{Practitioner checklist and sensitivity of conclusions}
+\label{sec:checklist}
+
+\paragraph{Practitioner checklist}
+\begin{enumerate}
+  \item \textbf{Segregate First:} Isolate sensitive attributes into dedicated schema columns and apply Static ACL (\texttt{B4}) before model ingestion. In our schema-segregated tasks, this eliminates leakage with negligible runtime overhead.
+  \item \textbf{Deploy Semantic Gateways for Free Text on Small Models:} When sensitive text is entangled in unstructured inputs processed by 2B--3B models, deploy an L1+L2 gateway with registered secrets to excise leaks while preserving task utility.
+  \item \textbf{Rely on Prompt Warnings Only for Capable API Models:} Prompt warnings substantially reduced leakage on the one API model we tested (\texttt{gemini-3.5-flash-lite}), but should never be trusted as primary defenses on smaller models.
+  \item \textbf{Assume Near-Certain Relay:} Downstream agents rarely sanitize inherited secrets ($r = \RelayRateRange$). Defensive filtering must focus on the source or first handoff.
+  \item \textbf{Rotate Multi-Hop Filters Carefully:} Chaining identical filters leaves blind spots. When rotating to an LLM judge, apply it selectively to avoid catastrophic utility degradation ($\Delta U = \DeltaUBaseBSix$).
+\end{enumerate}
+
+\paragraph{What would change our conclusions?}
+Our conclusions depend on several empirical boundary conditions. If future small models exhibit API-scale instruction adherence, prompt warnings might suffice across scales. If zero-shot redaction achieves high semantic precision without over-blocking, the need for write-time registration would diminish. If downstream agents are fine-tuned to actively redact inherited confidential data, relay rates would drop, lowering the outbreak floor. Conversely, if API models exhibit prompt drift in long-context multi-hop chains, external gateways would become mandatory even at scale.
+
+%% =====================================================================
+\section{Limitations}
+\label{sec:limits}
+
+% [KL-070] [KL-071] [KL-072] [KL-073]
+\begin{itemize}
+  \item \textbf{Model scale and API evaluation:} Multi-hop cascades, entangled text, persistence, and outbreak simulations were evaluated on 2B--3B models. The API tier was tested at hop 1 only.
+  \item \textbf{Single human annotator and detector duality:} Benchmark labels were scored by a single human annotator. \texttt{gemini-3.5-flash-lite} served both as the API model and $D_3$ judge (with local rotation for self-ties).
+  \item \textbf{Oracle registration and over-blocking:} Gateways require write-time registration, exhibit \OverblockHardNegRange\ false positives on same-domain hard negatives, and miss base64 or foreign encodings.
+  \item \textbf{Exploratory persistence pools and simulated outbreaks:} Boundary pools used DEV secrets and probing prompts; 500-agent floors are Monte Carlo projections from measured $(o,r,\rho)$.
+\end{itemize}
+
+%% =====================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+
+Protecting multi-agent LLM systems against confidential leakage requires tailoring defenses to information structure, model capability, and workflow depth. Static ACL (\texttt{B4}) dominates on schema-segregated records, while prompt warnings suffice on the API model we tested. On small 2B--3B models, our two-layer gateway achieves an \TFoldReductionPooled-fold reduction in hop-1 origination on pooled TEST while preserving customer-service task usefulness within equivalence margins ($\Delta U = \DeltaUTestCSGateway$), and cuts free-text leakage with no detectable utility loss ($\Delta U = \DeltaUFreeGateway$, 90\% CI $\DeltaUFreeGatewayCI$; post hoc, $n=\NEpisodesFreeText$). However, because downstream relay is near-certain and slipped paraphrases persist across rewrites, single-family filters leave a \OutbreakFloorFullRange\ outbreak floor in large networks, highlighting the urgent need for low-correlation multi-hop filters that avoid the heavy utility penalties of runtime LLM judges.
+
+%% =====================================================================
+\subsubsection*{Broader Impact and Ethical Considerations}
+All experiments were conducted on purely synthetic records. Tools and prompts evaluated in this study are intended to prevent accidental data loss in cooperative multi-agent networks, rather than facilitating unauthorized exfiltration.
+
+\subsubsection*{Reproducibility Statement}
+% [KL-074]
+Deterministic SQLite caches, cryptographic seeds, and replication code are provided in the anonymized repository (\url{https://anonymous.4open.science/r/mas-leakage-epidemic}).
+
+%% =====================================================================
+%% REFERENCES (author-year, natbib)
+%% =====================================================================
+\begin{thebibliography}{30}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+
+\bibitem[{Chhikara et~al.(2025)}]{mem0}
+Chhikara, P., Khant, D., Aryan, S., Singh, T., Yadav, D., 2025. Mem0: Building Production-Ready AI Agents with Scalable Long-Term Memory. arXiv:2504.19413.
+
+\bibitem[{Cohen et~al.(2024)}]{cohen2024}
+Cohen, S., Bitton, R., Nassi, B., 2024. Here Comes The AI Worm: Unleashing Zero-click Worms that Target GenAI-Powered Applications. arXiv:2403.02817.
+
+\bibitem[{Costa et~al.(2025)}]{costa2025}
+Costa, M.F.M., K\"opf, B., Kolluri, A., Paverd, A., Russinovich, M., Salem, A., Tople, S., Wutschitz, L., Zanella-B\'eguelin, S., 2025. Securing AI Agents with Information-Flow Control. arXiv:2505.23643.
+
+\bibitem[{Debenedetti et~al.(2025)}]{debenedetti2025}
+Debenedetti, E., Shumailov, I., Fan, T., Hayes, J., Carlini, N., Fabian, D., Kern, C., Shi, C., Terzis, A., Tram\`er, F., 2025. Defeating Prompt Injections by Design. arXiv:2503.18813.
+
+\bibitem[{El~Yagoubi et~al.(2026)}]{elyagoubi2026}
+El~Yagoubi, F., Badu-Marfo, G., Al~Mallah, R., 2026. AgentLeak: A Benchmark for Internal-Channel Privacy Leakage in Multi-Agent LLM Systems. IEEE Access / arXiv:2602.11510.
+
+\bibitem[{Gu et~al.(2024)}]{gu2024}
+Gu, X., Zheng, X., Pang, T., Du, C., Liu, Q., Wang, Y., Jiang, J., Lin, M., 2024. Agent Smith: A Single Image Can Jailbreak One Million Multimodal LLM Agents Exponentially Fast. In: Proc.\ ICML 2024. arXiv:2402.08567.
+
+\bibitem[{Gupta et~al.(2026)}]{gupta2026}
+Gupta, S.K., Sepahvand, N.M., Kumar, A., Subakan, C., Gella, S., No\"el, P.-A., 2026. PiSAs: Benchmarking Contextual Integrity in Multi-User Agentic Systems. arXiv:2607.05318.
+
+\bibitem[{Hagag et~al.(2026)}]{hagag2026}
+Hagag, B., Anderson, W.L., Schroeder~de~Witt, C., Scheffler, S., 2026. Architecture Matters for Multi-Agent Security. In: Proc.\ ICML 2026. arXiv:2604.23459.
+
+\bibitem[{Lee and Tiwari(2024)}]{lee2024}
+Lee, D., Tiwari, M., 2024. Prompt Infection: LLM-to-LLM Prompt Injection within Multi-Agent Systems. arXiv:2410.07283.
+
+\bibitem[{Liu et~al.(2026)}]{liu2026}
+Liu, J., Cao, D., Wei, Y., Su, T., Liang, Y., Dong, Y., Liu, Y., Zhao, Y., 2026. Topology Matters: Measuring Memory Leakage in Multi-Agent LLMs. In: Findings of ACL 2026. arXiv:2512.04668.
+
+\bibitem[{Liu(2026)}]{liu2026contagion}
+Liu, Z., 2026. Contagion Networks: Evaluator Preference Propagation in Multi-Agent LLM Systems. arXiv:2606.20493.
+
+\bibitem[{Margalit et~al.(2026)}]{margalit2026}
+Margalit, Y., Cohen-Inger, N., Avram, E., Taig, R., Margalit, O., 2026. Governed Shared Memory for Multi-Agent LLM Systems. arXiv:2606.24535.
+
+\bibitem[{Mireshghallah et~al.(2024)}]{mireshghallah}
+Mireshghallah, N., Kim, H., Zhou, X., Tsvetkov, Y., Sap, M., Shokri, R., Choi, Y., 2024. Can LLMs Keep a Secret? Testing Privacy Implications of Language Models via Contextual Integrity Theory. In: Proc.\ ICLR 2024. arXiv:2310.17884.
+
+\bibitem[{Newman(2002)}]{newman2002}
+Newman, M.E.J., 2002. Spread of epidemic disease on networks. Phys.\ Rev.\ E 66, 016128.
+
+\bibitem[{Niu et~al.(2026)}]{niu2026}
+Niu, R., Shu, X., Zhao, Y., 2026. Reliability-Contagion Feasibility in LLM Multi-Agent Networks. arXiv:2607.21912.
+
+\bibitem[{Ogundoyin and Ikram(2026)}]{ogundoyin2026}
+Ogundoyin, S.O., Ikram, M., 2026. When Agents Talk, Secrets Travel: Topology-Driven Leakage and Recipient-Conditioned Sanitization in Multi-Agent LLM Systems. arXiv:2610.16039.
+
+\bibitem[{Papadopoulos et~al.(2026)}]{papadopoulos2026}
+Papadopoulos, V., Shah, M., Zimmerman, S., Lindsey, J., 2026. Mind Viruses: Self-Propagating Ideas in Multi-Agent LLM Systems. arXiv:2608.10218.
+
+\bibitem[{Pastor-Satorras and Vespignani(2002)}]{pastor2002}
+Pastor-Satorras, R., Vespignani, A., 2002. Immunization of complex networks. Phys.\ Rev.\ E 65, 036104.
+
+\bibitem[{Priyanshu et~al.(2026)}]{priyanshu2026}
+Priyanshu, A., Vijay, S., Pahwa, E., 2026. Got a Secret? LLM Agents Can't Keep It: Evaluating Privacy in Multi-Agent Systems. arXiv:2605.27766.
+
+\bibitem[{Rezazadeh et~al.(2025)}]{rezazadeh2025}
+Rezazadeh, A., Li, Z., Lou, A., Zhao, Y., Wei, W., Li, Y., 2025. Collaborative Memory: Multi-User Memory Sharing in LLM Agents with Dynamic Access Control. arXiv:2505.18279.
+
+\bibitem[{Santos~Filho(2026{\natexlab{a}})}]{esaa2026}
+Santos~Filho, E.B.d., 2026{\natexlab{a}}. ESAA: Event Sourcing for Autonomous Agents in LLM-Based Software Engineering. arXiv:2602.23193.
+
+\bibitem[{Santos~Filho(2026{\natexlab{b}})}]{esaac2026}
+Santos~Filho, E.B.d., 2026{\natexlab{b}}. ESAA-Conversational: An Event-Sourced Memory Layer for Continuity, Handoff, and Curation Across Heterogeneous LLM Coding Agents. arXiv:2606.23752.
+
+\bibitem[{Shao et~al.(2024)}]{shao2024}
+Shao, Y., Li, T., Shi, W., Liu, Y., Yang, D., 2024. PrivacyLens: Evaluating Privacy Norm Awareness of Language Models in Action. In: Proc.\ NeurIPS 2024. arXiv:2409.00138.
+
+\bibitem[{South et~al.(2025)}]{delegation2025}
+South, T., Marro, S., Hardjono, T., Mahari, R., Deshpande, C., Pentland, A., 2025. Authenticated Delegation and Authorized AI Agents. arXiv:2501.09674.
+
+\bibitem[{Tapwal et~al.(2026)}]{prism2026}
+Tapwal, R., Kumar, A., Maple, C., 2026. PRISM: Generation-Time Detection and Mitigation of Secret Leakage in Multi-Agent LLM Pipelines. arXiv:2605.10614.
+
+\bibitem[{Wang et~al.(2026)}]{wang2026}
+Wang, Y., Goyal, A., Chandrasekharan, E., Sundaram, H., 2026. Facts Without Rules: Boundary Metadata Collapse in Multi-Agent LLM Handoffs. arXiv:2608.29028.
+
+\bibitem[{Wu et~al.(2025)}]{cowpox2025}
+Wu, Y., Zhang, J., Li, Y., Zhang, C., Guo, Q., Liu, Y., 2025. Cowpox: Towards the Immunity of VLM-based Multi-Agent Systems. arXiv:2508.09230.
+
+\bibitem[{Xu et~al.(2025)}]{amem}
+Xu, W., Liang, Z., Mei, K., Gao, H., Tan, J., Zhang, Y., 2025. A-MEM: Agentic Memory for LLM Agents. arXiv:2502.12110.
+
+\bibitem[{Zhang et~al.(2026)}]{zhang2026}
+Zhang, Y., Wei, Z., Luan, X., Wu, C., Zhang, Z., Wang, X., 2026. AgentWorm: Self-Propagating Attacks Across LLM Agent Ecosystems. arXiv:2603.15727.
+
+\bibitem[{Zharmagambetov et~al.(2025)}]{zharmagambetov2025}
+Zharmagambetov, A., Guo, C., Evtimov, I., Pavlova, M., Salakhutdinov, R., Chaudhuri, K., 2025. AgentDAM: Privacy Leakage Evaluation for Autonomous Web Agents. arXiv:2503.09780.
+
+\end{thebibliography}
+
+%% =====================================================================
+\appendix
+
+\section{Detailed 12-agent broadcast-tree calibration and partial protection}
+\label{app:net12}
+
+% [KL-059] [KL-060]
+Tables~\ref{tab:app_net12a} and~\ref{tab:app_net12b} present full cell-level measurements for the 12-agent broadcast-tree probe (\NEpisodesTwelveAgent\ episodes = \NCallsTwelveAgent\ LLM calls).
+
+\begin{table}[!htbp]
+\centering
+\caption{Out-of-sample 12-agent broadcast-tree calibration (48 episodes = 528 LLM calls, $n=8$ episodes/cell; parameters fitted on 3-agent chains).}
+\label{tab:app_net12a}
+\footnotesize
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}lcccccccc@{}}
+\toprule
+ & \multicolumn{4}{c}{\textbf{Ensemble Detector ($o=\OQuarter/\OEighth$, $r=\RhoRepass$)}} & \multicolumn{4}{c}{\textbf{Lexical/ID Detector $D_1$ ($o=\ODOneHalf/\ODOneQuarter$, $r=\RelayRateRange$)}} \\
+\cmidrule(lr){2-5}\cmidrule(lr){6-9}
+Topology / Defense & Real Infected (95\% CI) & Pred.\ $(o,r)$ & Abs.\ Error & CI Covered? & Real Infected (95\% CI) & Pred.\ $(o,r)$ & Abs.\ Error & CI Covered? \\
+\midrule
+\texttt{ring12} / No defense    & \NetTwelveRingBZeroRealEns & \NetTwelveRingBZeroPredEns & \NetTwelveRingBZeroErrEns & Yes & \NetTwelveRingBZeroRealDOne & \NetTwelveRingBZeroPredDOne & \NetTwelveRingBZeroErrDOne & Yes \\
+\texttt{er12} / No defense      & \NetTwelveERBZeroRealEns & \NetTwelveERBZeroPredEns & \NetTwelveERBZeroErrEns & Yes & \NetTwelveERBZeroRealDOne & \NetTwelveERBZeroPredDOne & \NetTwelveERBZeroErrDOne & Yes \\
+\texttt{ba12} / No defense      & \NetTwelveBABZeroRealEns & \NetTwelveBABZeroPredEns & \NetTwelveBABZeroErrEns & Yes & \NetTwelveBABZeroRealDOne & \NetTwelveBABZeroPredDOne & \NetTwelveBABZeroErrDOne & Yes \\
+\texttt{ring12} / L1+L2 Gateway & \NetTwelveRingGatewayRealEns & \NetTwelveRingGatewayPredEns & \NetTwelveRingGatewayErrEns & Yes & \NetTwelveRingGatewayRealDOne & \NetTwelveRingGatewayPredDOne & \NetTwelveRingGatewayErrDOne & Yes \\
+\texttt{er12} / L1+L2 Gateway   & \NetTwelveERGatewayRealEns & \NetTwelveERGatewayPredEns & \NetTwelveERGatewayErrEns & Yes & \NetTwelveERGatewayRealDOne & \NetTwelveERGatewayPredDOne & \NetTwelveERGatewayErrDOne & Yes \\
+\texttt{ba12} / L1+L2 Gateway   & \NetTwelveBAGatewayRealEns & \NetTwelveBAGatewayPredEns & \NetTwelveBAGatewayErrEns & Yes & \NetTwelveBAGatewayRealDOne & \NetTwelveBAGatewayPredDOne & \NetTwelveBAGatewayErrDOne & Yes \\
+\midrule
+\textbf{Overall calibration} & \multicolumn{4}{c}{\textbf{\CoverageSixOfSix\ CIs covered (100\%), MAE = \NetTwelveMAEEns\ agents}} & \multicolumn{4}{c}{\textbf{\CoverageSixOfSix\ CIs covered (100\%), MAE = \NetTwelveMAEDOne\ agents (single-$T$ \NetTwelveMAESingleTDOne)}} \\
+\bottomrule
+\end{tabular}}
+\vspace{2pt}
+\parbox{\linewidth}{\scriptsize Note: Under $D_1$, \texttt{ring12}~/~No defense is \NetTwelveRingBZeroRealDOne\ after subject-handle matching, two-parameter $(o,r)$ MAE is \NetTwelveMAEDOne\ agents, and \textit{single-$T$ \NetTwelveMAESingleTDOne} denotes the single-transmissibility baseline MAE across the six cells (Ensemble \texttt{er12}~/~No defense is \NetTwelveERBZeroRealEns).}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\caption{Paired partial protection on the 12-agent Barab\'asi--Albert broadcast tree \texttt{ba12} (64 episodes = 704 LLM calls, $n=8$ paired episodes per fraction; Ensemble detector).}
+\label{tab:app_net12b}
+\footnotesize
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Protected Fraction $p$ & Active BFS Internal Nodes Gated (Hub-First) & Hub-First Mean (95\% CI) & Random Mean (95\% CI) & Paired Diff.\ (95\% CI) \\
+\midrule
+$p = \PQuarter$ (\NetTwelvePartialHubQuarterNodes\ nodes)  & \NetTwelvePartialEdgesGated\ (\texttt{nodes 1, 5, 0} = 100\% of edges) & \NetTwelvePartialHubQuarter & \NetTwelvePartialRandQuarter & \textbf{\NetTwelveDiffPQuarter\ \NetTwelveDiffPQuarterCI} \\
+$p = \PHalf$ (\NetTwelvePartialHubHalfNodes\ nodes)  & \NetTwelvePartialEdgesGated\ (\texttt{nodes 1, 5, 0} + 3 leaves)       & \NetTwelvePartialHubQuarter & \NetTwelvePartialRandHalf & \NetTwelvePartialDiffHalf \\
+$p = \PThreeQuarter$ (\NetTwelvePartialHubThreeQuarterNodes\ nodes)  & \NetTwelvePartialEdgesGated\ (\texttt{nodes 1, 5, 0} + 6 leaves)       & \NetTwelvePartialHubQuarter & \NetTwelvePartialRandHalf & \NetTwelvePartialDiffHalf \\
+$p = \PFull$ (\NetTwelvePartialHubFullNodes\ nodes) & \NetTwelvePartialEdgesGated\ (all 12 nodes)                            & \NetTwelvePartialHubQuarter & \NetTwelvePartialHubQuarter & \NetTwelvePartialDiffFull \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\section{Detailed 500-agent herd immunity simulation grid}
+\label{app:sim500}
+
+% [KL-068] [KL-069]
+Table~\ref{tab:app_herd} reports the critical protected fraction $p_c$ and residual outbreak floors across 500-agent networks.
+
+\begin{table}[!htbp]
+\centering
+\caption{Critical protected fraction $p_c$ to bring 500-agent outbreak probability below 5\%, and residual outbreak floor at 100\% coverage ($p=\PFull$).}
+\label{tab:app_herd}
+\footnotesize
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Regime / Placement & Pooled Ens.\ ($T_{\text{gw}}=\TTestGatewayEns$) & CS Ens.\ ($T_{\text{gw}}=\TTestCSGatewayEns$) & TEST $D_1$ ($T_{\text{gw}}=\TTestGatewayDOne$) & Exploratory ($T_{\text{gw}}=\TExploratoryGateway$) \\
+\midrule
+\multicolumn{5}{@{}l}{\emph{Critical protected fraction $p_c$ (Scale-Free BA / Random ER) under independent blocking:}} \\
+Hub-first (degree)      & \SimHerdPcHubPooled & \SimHerdPcHubCS & \SimHerdPcDOne & \SimHerdPcHubEarly \\
+Acquaintance            & \SimHerdPcAcqPooled & \SimHerdPcAcqCS & \SimHerdPcDOne & \SimHerdPcAcqEarly \\
+Random                  & \SimHerdPcRandPooled & \SimHerdPcRandCS & \SimHerdPcDOne & \SimHerdPcRandEarly \\
+\midrule
+\multicolumn{5}{@{}l}{\emph{Residual outbreak probability $P(>5\%\text{ infected})$ at 100\% coverage ($p=\PFull$):}} \\
+Independent blocking    & \SimHerdIndepPooled & \SimHerdIndepCS & \SimHerdIndepDOne & \SimHerdIndepEarly \\
+\textbf{Persistent slips ($\rho_{\text{rewrite}} = \RhoRewriteLlama$)} & \textbf{\OutbreakFloorPooledSim\ (mean \OutbreakFloorPooledMean)} & \textbf{\OutbreakFloorCSSim\ (mean \OutbreakFloorCSMean)} & \textbf{\OutbreakFloorDOneSim\ (mean \OutbreakFloorDOneMean)} & \textbf{\OutbreakFloorEarlySim\ (mean \OutbreakFloorEarlyMean)} \\
+Back-of-envelope $\OutbreakFloorFormula$ & \OutbreakFloorPooledKFour & \OutbreakFloorCSKFour & \OutbreakFloorDOneKFour & \OutbreakFloorEarlyKFour \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\section{Exploratory robustness probes}
+\label{app:probes}
+
+% [KL-052] [KL-053] [KL-054]
+\paragraph{Twelve-secret threshold sweep}
+Across 12 diverse semantic secrets (Figure~\ref{fig:app_other}), the deployed threshold of \ThreshCosine\ achieved \ParaphraseRecallGateway\ paraphrase recall with \OverblockHardNegRange\ false positives on same-topic hard negatives. Requiring three shared words in the lexical rule yielded \ProbeLexicalThreeWordRecall\ recall and \ProbeLexicalThreeWordFP\ false positives at \ThreshCosine, confirming that dense embedding similarity drives hard-negative false positives. Spanish translations were missed at all thresholds $\ge \ProbeSpanishCutoffThresh$.
+
+\begin{figure}[!htbp]
+\centering
+\figbox{fig6-other-secrets.png}{0.65}
+\caption{Exploratory 12-secret threshold sweep: paraphrase recall vs.\ hard-negative false-positive rate across cosine thresholds.}
+\label{fig:app_other}
+\end{figure}
+
+\paragraph{Encoding and translation probe (12 trials)}
+In scripted detector tests on the exploratory renal-failure secret (20 trials/format at threshold \ProbeSpanishCutoffThresh), L1+L2 caught exact, unhyphenated, and dashed IDs (\ProbeScriptedRewordedRecall) as well as reworded (\ProbeScriptedRewordedRecall), abbreviated (\ProbeScriptedAbbrevRecall), and vague (\ProbeScriptedVagueRecall) paraphrases, but missed base64, character-reversed, and foreign-translated leaks (recall $\approx 0$). An exploratory patch tuned on that secret restored encoded-ID recall to \ProbeScriptedRewordedRecall\ and raised translation recall from \ProbeTransPreRecall\ to \ProbeTransPostRecall, but reduced English paraphrase recall from \ProbeSpanishCutoffThresh\ to \ProbeEnglishPostRecall.
+
+\paragraph{Adversarial compliance probe on 2B--3B models}
+When Agent~0 in a 3-agent chain was instructed to exfiltrate secrets in disguise (30 episodes/cell), \texttt{llama3.2:3b} ($\AdvInfectLlama$ infected) and \texttt{qwen2.5:3b} ($\AdvInfectQwenVerbatim$ verbatim, $\AdvInfectQwenSemantic$ semantic) largely refused or omitted the secret, and \texttt{gemma2:2b} complied (\AdversarialInfectedVerbatim\ verbatim, \AdversarialInfectedSemantic\ semantic infected) but wrote the secret in plain English in every episode ($0$ encodings). Consequently, the gateway blocked all ID leaks and \AdversarialBlockedEnglish\ plain-English leaks ($\AdvBlockedLlama$ and $\AdvBlockedGemma$ infected). Capable adversarial evaluations require larger models or scripted injections.
+
+\section{Declaration of generative AI in scientific writing}
+\label{app:ai_decl}
+
+During the preparation of this work the author used Claude (Anthropic) and Gemini (Google) to assist with drafting text, scripting analyses, and formatting tables. The author reviewed, verified, and edited all content and takes full responsibility for the publication.
+
+\end{document}

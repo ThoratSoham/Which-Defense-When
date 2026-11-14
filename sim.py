@@ -38,6 +38,25 @@ def theory_R0(G, T):
     k = np.array([d for _, d in G.degree()], float)
     return T * ((k**2).mean() - k.mean()) / k.mean()
 
+
+def phase3_rho(min_n=100):
+    """Phase 3 rewrite persistence (rho) from results/numbers.json — the measured
+    replacement for the old n=20 relay estimate ("0.95").
+
+    Returns (rate, n, ci95) or None when the Phase 3 rewrite arm is absent or
+    incomplete (fewer than min_n observations): callers then fall back to the
+    legacy transcript-derived estimate so an unfinished run never silently
+    replaces a paper number."""
+    try:
+        import json
+        d = json.load(open("results/numbers.json", encoding="utf-8"))
+        rw = d["persistence"]["rewrite"]["llama3.2:3b"]["slip"]
+        if int(rw.get("n") or 0) >= min_n:
+            return float(rw["rate"]), int(rw["n"]), [float(x) for x in rw["ci"]]
+    except Exception:
+        pass
+    return None
+
 def stats(G, T, protected=frozenset(), runs=RUNS):
     sizes = np.array([cascade(G, T, protected)[0] for _ in range(runs)]) / G.number_of_nodes()
     return sizes.mean(), (sizes > 0.05).mean()   # mean attack size, outbreak probability

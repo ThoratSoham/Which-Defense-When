@@ -1,0 +1,42 @@
+{
+  "n_caught": 1391,
+  "d1_only": {
+    "k": 616,
+    "n": 1391,
+    "rate": 0.44284687275341483,
+    "ci": [
+      0.416935806235156,
+      0.4690727555972412
+    ]
+  },
+  "d2_only": {
+    "k": 75,
+    "n": 1391,
+    "rate": 0.05391804457225018,
+    "ci": [
+      0.043230205974911146,
+      0.06706303449052953
+    ]
+  },
+  "d3_only": {
+    "k": 388,
+    "n": 1391,
+    "rate": 0.27893601725377426,
+    "ci": [
+      0.2560009773257788,
+      0.30308874296934274
+    ]
+  },
+  "ensemble": {
+    "k": 275,
+    "n": 1391,
+    "rate": 0.19769949676491733,
+    "ci": [
+      0.17761460312721822,
+      0.2194495509674116
+    ]
+  },
+  "ensemble_undetermined": 0,
+  "text": "post-gateway (redacted) text of notes the study gateway caught; residue = still detectable secret content",
+  "validation_d1_matches_hop2_report": true
+}

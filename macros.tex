@@ -1,0 +1,515 @@
+%% macros.tex - Auto-generated from results/numbers_v2.json
+%% DO NOT EDIT BY HAND. Run make_macros.py to update.
+
+\newcommand{\NSecretsTotal}{52} % total synthetic secrets
+\newcommand{\NDomains}{10} % domains in evaluation
+\newcommand{\NSecretsDEV}{20} % development split secrets
+\newcommand{\NSecretsSanity}{6} % sanity check secrets
+\newcommand{\NSecretsTEST}{26} % held-out test secrets
+\newcommand{\NNotesExploratory}{1{,}440} % exploratory notes total
+\newcommand{\NNotesTESTLadder}{768} % confirmatory test ladder notes
+\newcommand{\NNotesPerDefTEST}{192} % test ladder notes per defense pooled
+\newcommand{\NNotesPerDefTask}{96} % test ladder notes per defense per task
+\newcommand{\NNotesAPI}{325} % frontier API ladder notes
+\newcommand{\NNotesBaselines}{576} % confirmatory baseline notes
+\newcommand{\NNotesFreeText}{96} % free-text entangled notes
+\newcommand{\NEpisodesFreeText}{24} % free-text entangled episodes
+\newcommand{\NNotesHumanBenchmark}{300} % blinded human agreement notes
+\newcommand{\NTiesTotalDisagreements}{2{,}848} % total D1 != D2 disagreements
+\newcommand{\NTiesTESTLadder}{327} % confirmatory TEST ladder ties
+\newcommand{\NUniqueGeminiVerdicts}{1{,}161} % total unique Gemini API verdicts
+\newcommand{\NGeminiFlashLiteVerdicts}{1{,}026} % Gemini 3.5 flash-lite verdicts
+\newcommand{\NGeminiFlashVerdicts}{135} % Gemini 2.5 flash verdicts
+\newcommand{\NNotesBoundaryPool}{1{,}600} % boundary pool notes per model
+\newcommand{\NNotesBoundaryTotal}{3{,}200} % boundary pool notes total
+\newcommand{\NNotesOfflineRotation}{400} % offline rotation sample notes
+\newcommand{\NEpisodesTwelveAgent}{112} % 12-agent probe episodes
+\newcommand{\NCallsTwelveAgent}{1{,}232} % 12-agent probe LLM calls
+\newcommand{\NSimAgents}{500} % simulation agents
+\newcommand{\ThreshLexical}{0.60} % calibrated lexical threshold
+\newcommand{\ThreshCosine}{0.78} % calibrated cosine threshold
+\newcommand{\MarginTOST}{\pm 0.05} % TOST equivalence margin
+\newcommand{\TExploratoryBZero}{0.700} % exploratory B0
+\newcommand{\TExploratoryBZeroCI}{[0.653, 0.747]} % exploratory B0 CI
+\newcommand{\TExploratoryBTwo}{0.644} % exploratory B2
+\newcommand{\TExploratoryBTwoCI}{[0.594, 0.694]} % exploratory B2 CI
+\newcommand{\TExploratoryLOne}{0.317} % exploratory L1
+\newcommand{\TExploratoryLOneCI}{[0.269, 0.367]} % exploratory L1 CI
+\newcommand{\TExploratoryGateway}{0.017} % exploratory L1+L2 gateway
+\newcommand{\TExploratoryGatewayCI}{[0.006, 0.031]} % exploratory L1+L2 gateway CI
+\newcommand{\TTestBZeroEns}{0.641} % TEST pooled B0 Ensemble
+\newcommand{\TTestBZeroEnsCI}{[0.518, 0.746]} % TEST pooled B0 Ensemble CI
+\newcommand{\TTestBZeroDOne}{0.672} % TEST pooled B0 D1
+\newcommand{\TTestBZeroDTwo}{0.161} % TEST pooled B0 D2
+\newcommand{\UTestBZeroPooled}{0.606} % TEST pooled B0 usefulness
+\newcommand{\TTestBTwoEns}{0.667} % TEST pooled B2 Ensemble
+\newcommand{\TTestBTwoEnsCI}{[0.544, 0.760]} % TEST pooled B2 Ensemble CI
+\newcommand{\TTestBTwoDOne}{0.677} % TEST pooled B2 D1
+\newcommand{\TTestBTwoDTwo}{0.109} % TEST pooled B2 D2
+\newcommand{\UTestBTwoPooled}{0.554} % TEST pooled B2 usefulness
+\newcommand{\DeltaUTestBTwoPooled}{-0.052} % TEST pooled B2 delta U
+\newcommand{\DeltaUTestBTwoPooledCI}{[-0.105, +0.003]} % TEST pooled B2 delta U CI
+\newcommand{\TTestLOneEns}{0.214} % TEST pooled L1 Ensemble
+\newcommand{\TTestLOneEnsCI}{[0.104, 0.345]} % TEST pooled L1 Ensemble CI
+\newcommand{\TTestLOneDOne}{0.380} % TEST pooled L1 D1
+\newcommand{\TTestLOneDTwo}{0.109} % TEST pooled L1 D2
+\newcommand{\UTestLOnePooled}{0.619} % TEST pooled L1 usefulness
+\newcommand{\DeltaUTestLOnePooled}{+0.013} % TEST pooled L1 delta U
+\newcommand{\DeltaUTestLOnePooledCI}{[-0.003, +0.027]} % TEST pooled L1 delta U CI
+\newcommand{\TTestGatewayEns}{0.057} % TEST pooled L1+L2 Gateway Ensemble
+\newcommand{\TTestGatewayEnsCI}{[0.013, 0.131]} % TEST pooled L1+L2 Gateway Ensemble CI
+\newcommand{\TTestGatewayDOne}{0.224} % TEST pooled L1+L2 Gateway D1
+\newcommand{\TTestGatewayDTwo}{0.057} % TEST pooled L1+L2 Gateway D2
+\newcommand{\UTestGatewayPooled}{0.615} % TEST pooled L1+L2 Gateway usefulness
+\newcommand{\DeltaUTestGatewayPooled}{+0.009} % TEST pooled L1+L2 Gateway delta U
+\newcommand{\DeltaUTestGatewayPooledCI}{[-0.012, +0.028]} % TEST pooled L1+L2 Gateway delta U CI
+\newcommand{\TFoldReductionPooled}{11.2} % pooled ensemble fold reduction
+\newcommand{\TCohenHPooled}{1.37} % pooled ensemble Cohen h
+\newcommand{\TPValPooled}{0.0024} % pooled ensemble p-value
+\newcommand{\TTestCSBZeroEns}{0.729} % TEST CS B0 Ensemble
+\newcommand{\TTestCSBZeroEnsCI}{[0.571, 0.868]} % TEST CS B0 Ensemble CI
+\newcommand{\TTestCSBZeroDOne}{0.750} % TEST CS B0 D1
+\newcommand{\TTestCSBZeroDTwo}{0.219} % TEST CS B0 D2
+\newcommand{\UTestCSBZero}{0.779} % TEST CS B0 usefulness
+\newcommand{\TTestCSBTwoEns}{0.729} % TEST CS B2 Ensemble
+\newcommand{\TTestCSBTwoEnsCI}{[0.595, 0.850]} % TEST CS B2 Ensemble CI
+\newcommand{\TTestCSBTwoDOne}{0.740} % TEST CS B2 D1
+\newcommand{\TTestCSBTwoDTwo}{0.135} % TEST CS B2 D2
+\newcommand{\UTestCSBTwo}{0.648} % TEST CS B2 usefulness
+\newcommand{\DeltaUTestCSBTwo}{-0.130} % TEST CS B2 delta U
+\newcommand{\DeltaUTestCSBTwoCI}{[-0.199, -0.069]} % TEST CS B2 delta U CI
+\newcommand{\TTestCSLOneEns}{0.260} % TEST CS L1 Ensemble
+\newcommand{\TTestCSLOneEnsCI}{[0.118, 0.433]} % TEST CS L1 Ensemble CI
+\newcommand{\TTestCSLOneDOne}{0.406} % TEST CS L1 D1
+\newcommand{\TTestCSLOneDTwo}{0.167} % TEST CS L1 D2
+\newcommand{\UTestCSLOne}{0.794} % TEST CS L1 usefulness
+\newcommand{\DeltaUTestCSLOne}{+0.016} % TEST CS L1 delta U
+\newcommand{\DeltaUTestCSLOneCI}{[-0.003, +0.030]} % TEST CS L1 delta U CI
+\newcommand{\TTestCSGatewayEns}{0.073} % TEST CS L1+L2 Gateway Ensemble
+\newcommand{\TTestCSGatewayEnsCI}{[0.000, 0.192]} % TEST CS L1+L2 Gateway Ensemble CI
+\newcommand{\TTestCSGatewayDOne}{0.219} % TEST CS L1+L2 Gateway D1
+\newcommand{\TTestCSGatewayDTwo}{0.115} % TEST CS L1+L2 Gateway D2
+\newcommand{\UTestCSGateway}{0.794} % TEST CS L1+L2 Gateway usefulness
+\newcommand{\DeltaUTestCSGateway}{+0.016} % TEST CS L1+L2 Gateway delta U
+\newcommand{\DeltaUTestCSGatewayCI}{[-0.006, +0.032]} % TEST CS L1+L2 Gateway delta U CI
+\newcommand{\TFoldReductionCS}{10.0} % CS ensemble fold reduction
+\newcommand{\TTestHRBZeroEns}{0.552} % TEST HR B0 Ensemble
+\newcommand{\TTestHRBZeroEnsCI}{[0.442, 0.656]} % TEST HR B0 Ensemble CI
+\newcommand{\TTestHRBZeroDOne}{0.594} % TEST HR B0 D1
+\newcommand{\TTestHRBZeroDTwo}{0.104} % TEST HR B0 D2
+\newcommand{\UTestHRBZero}{0.433} % TEST HR B0 usefulness
+\newcommand{\UTestHRBZeroZeroFilled}{0.163} % TEST HR B0 usefulness zero-filled floor
+\newcommand{\TTestHRBTwoEns}{0.604} % TEST HR B2 Ensemble
+\newcommand{\TTestHRBTwoEnsCI}{[0.478, 0.711]} % TEST HR B2 Ensemble CI
+\newcommand{\TTestHRBTwoDOne}{0.615} % TEST HR B2 D1
+\newcommand{\TTestHRBTwoDTwo}{0.083} % TEST HR B2 D2
+\newcommand{\UTestHRBTwo}{0.460} % TEST HR B2 usefulness
+\newcommand{\DeltaUTestHRBTwo}{+0.027} % TEST HR B2 delta U
+\newcommand{\DeltaUTestHRBTwoCI}{[-0.038, +0.097]} % TEST HR B2 delta U CI
+\newcommand{\TTestHRLOneEns}{0.167} % TEST HR L1 Ensemble
+\newcommand{\TTestHRLOneEnsCI}{[0.073, 0.282]} % TEST HR L1 Ensemble CI
+\newcommand{\TTestHRLOneDOne}{0.354} % TEST HR L1 D1
+\newcommand{\TTestHRLOneDTwo}{0.052} % TEST HR L1 D2
+\newcommand{\UTestHRLOne}{0.444} % TEST HR L1 usefulness
+\newcommand{\DeltaUTestHRLOne}{+0.010} % TEST HR L1 delta U
+\newcommand{\DeltaUTestHRLOneCI}{[-0.013, +0.035]} % TEST HR L1 delta U CI
+\newcommand{\TTestHRGatewayEns}{0.042} % TEST HR L1+L2 Gateway Ensemble
+\newcommand{\TTestHRGatewayEnsCI}{[0.010, 0.083]} % TEST HR L1+L2 Gateway Ensemble CI
+\newcommand{\TTestHRGatewayDOne}{0.229} % TEST HR L1+L2 Gateway D1
+\newcommand{\TTestHRGatewayDTwo}{0.000} % TEST HR L1+L2 Gateway D2
+\newcommand{\UTestHRGateway}{0.435} % TEST HR L1+L2 Gateway usefulness
+\newcommand{\DeltaUTestHRGateway}{+0.002} % TEST HR L1+L2 Gateway delta U
+\newcommand{\DeltaUTestHRGatewayCI}{[-0.028, +0.033]} % TEST HR L1+L2 Gateway delta U CI
+\newcommand{\TFoldReductionHR}{13.3} % HR ensemble fold reduction
+\newcommand{\TTestAPIBZero}{0.500} % API model B0
+\newcommand{\TTestAPIBTwo}{0.025} % API model B2 prompt warning
+\newcommand{\TTestAPILOne}{0.129} % API model L1
+\newcommand{\TTestAPIGateway}{0.000} % API model L1+L2 gateway
+\newcommand{\TTestGemmaBZero}{0.844} % Gemma 2 2B B0
+\newcommand{\TTestGemmaGateway}{0.062} % Gemma 2 2B Gateway
+\newcommand{\TTestLlamaBZero}{0.469} % Llama 3.2 3B B0
+\newcommand{\TTestLlamaGateway}{0.047} % Llama 3.2 3B Gateway
+\newcommand{\TTestQwenBZero}{0.609} % Qwen 2.5 3B B0
+\newcommand{\TTestQwenGateway}{0.062} % Qwen 2.5 3B Gateway
+\newcommand{\UBaseBZeroLlama}{0.625} % CS B0 Llama usefulness (40/64)
+\newcommand{\UBaseBTwoLlama}{0.273} % CS B2 Llama usefulness (17.5/64)
+\newcommand{\UBaseLOneLlama}{0.625} % CS L1 Llama usefulness (40/64)
+\newcommand{\UBaseGatewayLlama}{0.625} % CS L1+L2 Gateway Llama usefulness (40/64)
+\newcommand{\UFreeBFourSchemaLlama}{0.750} % Free-text B4-schema Llama usefulness
+\newcommand{\TBaseBOneEns}{0.656} % B1 Summary-only Ensemble
+\newcommand{\TBaseBOneDOne}{0.667} % B1 Summary-only D1
+\newcommand{\UBaseBOneAll}{0.607} % B1 Summary-only U all
+\newcommand{\UBaseBOneLlama}{0.539} % B1 Summary-only U llama
+\newcommand{\DeltaUBaseBOne}{-0.172} % B1 delta U
+\newcommand{\DeltaUBaseBOneCI}{[-0.211, -0.128]} % B1 delta U CI
+\newcommand{\TBaseBFiveEns}{0.646} % B5 Threat-aware warning Ensemble
+\newcommand{\TBaseBFiveDOne}{0.667} % B5 Threat-aware warning D1
+\newcommand{\UBaseBFiveAll}{0.727} % B5 Threat-aware warning U all
+\newcommand{\UBaseBFiveLlama}{0.484} % B5 Threat-aware warning U llama
+\newcommand{\DeltaUBaseBFive}{-0.052} % B5 delta U
+\newcommand{\DeltaUBaseBFiveCI}{[-0.099, -0.003]} % B5 delta U CI
+\newcommand{\TBaseBSevenEns}{0.281} % B7 PII regex Ensemble
+\newcommand{\TBaseBSevenDOne}{0.292} % B7 PII regex D1
+\newcommand{\UBaseBSevenAll}{0.789} % B7 PII regex U all
+\newcommand{\UBaseBSevenLlama}{0.625} % B7 PII regex U llama
+\newcommand{\DeltaUBaseBSeven}{+0.010} % B7 delta U
+\newcommand{\DeltaUBaseBSevenCI}{[-0.005, +0.026]} % B7 delta U CI
+\newcommand{\TBaseBThreeEns}{0.271} % B3 Provenance tagging Ensemble
+\newcommand{\TBaseBThreeDOne}{0.281} % B3 Provenance tagging D1
+\newcommand{\UBaseBThreeAll}{0.516} % B3 Provenance tagging U all
+\newcommand{\UBaseBThreeLlama}{0.586} % B3 Provenance tagging U llama
+\newcommand{\DeltaUBaseBThree}{-0.263} % B3 delta U
+\newcommand{\DeltaUBaseBThreeCI}{[-0.314, -0.211]} % B3 delta U CI
+\newcommand{\TBaseBSixEns}{0.115} % B6 Secret-blind LLM judge Ensemble
+\newcommand{\TBaseBSixDOne}{0.115} % B6 Secret-blind LLM judge D1
+\newcommand{\UBaseBSixAll}{0.492} % B6 Secret-blind LLM judge U all
+\newcommand{\UBaseBSixLlama}{0.281} % B6 Secret-blind LLM judge U llama
+\newcommand{\DeltaUBaseBSix}{-0.286} % B6 delta U
+\newcommand{\DeltaUBaseBSixCI}{[-0.350, -0.228]} % B6 delta U CI
+\newcommand{\TBaseBFourEns}{0.000} % B4 Static ACL Ensemble
+\newcommand{\TBaseBFourDOne}{0.000} % B4 Static ACL D1
+\newcommand{\UBaseBFourAll}{0.844} % B4 Static ACL U all
+\newcommand{\UBaseBFourLlama}{0.828} % B4 Static ACL U llama
+\newcommand{\DeltaUBaseBFour}{+0.065} % B4 delta U
+\newcommand{\DeltaUBaseBFourCI}{[+0.022, +0.105]} % B4 delta U CI
+\newcommand{\DeltaUBaseBFourLlama}{+0.203} % B4 delta U llama
+\newcommand{\TFreeBZeroEns}{0.958} % Free-text B0 Ensemble
+\newcommand{\TFreeBZeroDOne}{0.958} % Free-text B0 D1
+\newcommand{\UFreeBZeroAll}{0.771} % Free-text B0 U all
+\newcommand{\UFreeBZeroLlama}{0.750} % Free-text B0 U llama
+\newcommand{\TFreeBFourSchemaEns}{0.958} % Free-text B4-schema Ensemble
+\newcommand{\TFreeBFourSchemaDOne}{0.958} % Free-text B4-schema D1
+\newcommand{\UFreeBFourSchemaAll}{0.771} % Free-text B4-schema U all
+\newcommand{\DeltaUFreeBFourSchema}{0.000} % Free-text B4-schema delta U
+\newcommand{\TFreeBFourTaintEns}{0.000} % Free-text B4-taint Ensemble
+\newcommand{\TFreeBFourTaintDOne}{0.000} % Free-text B4-taint D1
+\newcommand{\UFreeBFourTaintAll}{0.000} % Free-text B4-taint U all
+\newcommand{\DeltaUFreeBFourTaint}{-0.771} % Free-text B4-taint delta U
+\newcommand{\DeltaUFreeBFourTaintCI}{[-0.826, -0.681]} % Free-text B4-taint delta U CI
+\newcommand{\TFreeGatewayEns}{0.125} % Free-text Gateway Ensemble
+\newcommand{\TFreeGatewayDOne}{0.292} % Free-text Gateway D1
+\newcommand{\UFreeGatewayAll}{0.760} % Free-text Gateway U all
+\newcommand{\UFreeGatewayLlama}{0.719} % Free-text Gateway U llama
+\newcommand{\DeltaUFreeGateway}{-0.010} % Free-text Gateway delta U
+\newcommand{\DeltaUFreeGatewayCI}{[-0.073, +0.060]} % Free-text Gateway delta U CI
+\newcommand{\UFreeRetentionPct}{98.6\%} % Free-text gateway utility retention
+\newcommand{\BaseRateContent}{0.327} % Human base rate outcome 1
+\newcommand{\BaseRateID}{0.400} % Human base rate outcome 2
+\newcommand{\PrecDOneContent}{0.71} % D1 Content Precision
+\newcommand{\PrecDOneContentCI}{[0.62, 0.78]} % D1 Content Precision CI
+\newcommand{\RecDOneContent}{0.98} % D1 Content Recall
+\newcommand{\RecDOneContentCI}{[0.93, 0.99]} % D1 Content Recall CI
+\newcommand{\AgreeDOneContent}{0.86} % D1 Content Agreement
+\newcommand{\KappaDOneContent}{0.71} % D1 Content Kappa
+\newcommand{\ACDOneContent}{0.75} % D1 Content Gwet AC1
+\newcommand{\PrecDTwoContent}{0.47} % D2 Content Precision
+\newcommand{\RecDTwoContent}{0.21} % D2 Content Recall
+\newcommand{\AgreeDTwoContent}{0.66} % D2 Content Agreement
+\newcommand{\KappaDTwoContent}{0.11} % D2 Content Kappa
+\newcommand{\PrecDThreeGeminiContent}{0.70} % D3 Gemini Content Precision
+\newcommand{\RecDThreeGeminiContent}{0.90} % D3 Gemini Content Recall
+\newcommand{\AgreeDThreeGeminiContent}{0.84} % D3 Gemini Content Agreement
+\newcommand{\KappaDThreeGeminiContent}{0.67} % D3 Gemini Content Kappa
+\newcommand{\PrecDThreeLocalContent}{0.43} % D3 Local Fallback Precision
+\newcommand{\RecDThreeLocalContent}{0.45} % D3 Local Fallback Recall
+\newcommand{\AgreeDThreeLocalContent}{0.62} % D3 Local Fallback Agreement
+\newcommand{\KappaDThreeLocalContent}{0.15} % D3 Local Fallback Kappa
+\newcommand{\PrecEnsContent}{0.72} % Ensemble Content Precision
+\newcommand{\PrecEnsContentCI}{[0.63, 0.79]} % Ensemble Content Precision CI
+\newcommand{\RecEnsContent}{0.90} % Ensemble Content Recall
+\newcommand{\RecEnsContentCI}{[0.82, 0.94]} % Ensemble Content Recall CI
+\newcommand{\AgreeEnsContent}{0.85} % Ensemble Content Agreement
+\newcommand{\KappaEnsContent}{0.68} % Ensemble Content Kappa
+\newcommand{\ACEnsContent}{0.73} % Ensemble Content Gwet AC1
+\newcommand{\PrecDOneID}{0.85} % D1 ID Precision
+\newcommand{\RecDOneID}{0.92} % D1 ID Recall
+\newcommand{\AgreeDOneID}{0.90} % D1 ID Agreement
+\newcommand{\KappaDOneID}{0.79} % D1 ID Kappa
+\newcommand{\SPoolLlama}{0.131} % Llama boundary slip rate
+\newcommand{\SPoolLlamaCI}{[0.114, 0.148]} % Llama boundary slip rate CI
+\newcommand{\SPoolLlamaFraction}{209/1{,}600} % Llama boundary slip counts
+\newcommand{\SSurvivedLlamaCount}{158} % Llama confirmed slips
+\newcommand{\SPoolQwen}{0.063} % Qwen boundary slip rate
+\newcommand{\SPoolQwenCI}{[0.052, 0.076]} % Qwen boundary slip rate CI
+\newcommand{\SPoolQwenFraction}{101/1{,}600} % Qwen boundary slip counts
+\newcommand{\SSurvivedQwenCount}{69} % Qwen confirmed slips
+\newcommand{\ResCaughtLlamaEns}{0.198} % Llama caught residue Ensemble
+\newcommand{\ResCaughtLlamaEnsCI}{[0.178, 0.219]} % Llama caught residue Ensemble CI
+\newcommand{\ResCaughtLlamaEnsFraction}{275/1{,}391} % Llama caught residue Ensemble counts
+\newcommand{\ResCaughtLlamaDOne}{0.443} % Llama caught residue D1
+\newcommand{\ResCaughtLlamaDOneFraction}{616/1{,}391} % Llama caught residue D1 counts
+\newcommand{\ResCaughtQwenEns}{0.135} % Qwen caught residue Ensemble
+\newcommand{\ResCaughtQwenEnsFraction}{202/1{,}499} % Qwen caught residue Ensemble counts
+\newcommand{\RhoRepass}{1.000} % Deterministic re-pass survival
+\newcommand{\RhoRewriteLlama}{0.873} % Llama rewrite persistence
+\newcommand{\RhoRewriteLlamaCI}{[0.813, 0.917]} % Llama rewrite persistence CI
+\newcommand{\RhoRewriteLlamaFraction}{138/158} % Llama rewrite persistence counts
+\newcommand{\RhoRewriteQwen}{0.913} % Qwen rewrite persistence
+\newcommand{\RhoRewriteQwenCI}{[0.823, 0.960]} % Qwen rewrite persistence CI
+\newcommand{\RhoRewriteQwenFraction}{63/69} % Qwen rewrite persistence counts
+\newcommand{\RhoControlLlama}{0.223} % Llama control rewrite leakage
+\newcommand{\RhoControlLlamaFraction}{67/300} % Llama control rewrite counts
+\newcommand{\RhoControlQwen}{0.140} % Qwen control rewrite leakage
+\newcommand{\RhoControlQwenFraction}{21/150} % Qwen control rewrite counts
+\newcommand{\ICCSecretLlama}{0.115} % ICC secret Llama
+\newcommand{\ICCSecretQwen}{0.126} % ICC secret Qwen
+\newcommand{\RSecretCrossModel}{0.53} % Secret cross-model correlation
+\newcommand{\PhiWithinFamily}{0.48\text{--}0.88} % Within-family miss correlation
+\newcommand{\PhiLLMJudge}{0.061} % Cross-family LLM judge miss correlation
+\newcommand{\RhoRotateLLM}{0.168} % Hop-2 slip survival under LLM rotation
+\newcommand{\OutbreakFloorFormula}{1 - (1 - T_{\text{gw}})^k} % closed form floor formula
+\newcommand{\OutbreakFloorEarlyKFour}{6.63\%} % closed form floor early k=4
+\newcommand{\OutbreakFloorEarlySim}{3\text{--}10\%} % sim floor early
+\newcommand{\OutbreakFloorEarlyMean}{6.3\%} % sim floor early mean
+\newcommand{\OutbreakFloorPooledKFour}{21.0\%} % closed form floor pooled test k=4
+\newcommand{\OutbreakFloorPooledSim}{15\text{--}23\%} % sim floor pooled test
+\newcommand{\OutbreakFloorPooledMean}{19.1\%} % sim floor pooled test mean
+\newcommand{\OutbreakFloorCSKFour}{26.16\%} % closed form floor CS test k=4
+\newcommand{\OutbreakFloorCSSim}{19\text{--}33\%} % sim floor CS test
+\newcommand{\OutbreakFloorCSMean}{24.9\%} % sim floor CS test mean
+\newcommand{\OutbreakFloorDOneKFour}{63.7\%} % closed form floor D1 test k=4
+\newcommand{\OutbreakFloorDOneSim}{47\text{--}68\%} % sim floor D1 test
+\newcommand{\OutbreakFloorDOneMean}{57.9\%} % sim floor D1 test mean
+\newcommand{\OutbreakFloorFullRange}{15\text{--}68\%} % full TEST floor range across detectors
+\newcommand{\SimJSevenRuns}{200} % J7 500-agent Monte Carlo runs per point
+\newcommand{\SimJSevenTSrc}{0.346} % J7 unprotected single-T edge rate
+\newcommand{\SimJSevenTSlip}{0.74} % J7 downstream gateway slip relay rate
+\newcommand{\SimJSevenPZeroRange}{0.50\text{--}0.57} % J7 p=0 outbreak range under single-T
+\newcommand{\UndefendedOutbreakRange}{0.91\text{--}0.96} % Undefended two-parameter (o,r) outbreak range
+\newcommand{\NetTwelveMAEEns}{0.48} % 12-agent MAE Ensemble
+\newcommand{\NetTwelveMAEDOne}{0.98} % 12-agent MAE D1
+\newcommand{\NetTwelveMAESingleTDOne}{0.81} % 12-agent single-T MAE D1
+\newcommand{\NetTwelveDiffPQuarter}{-0.75} % 12-agent paired diff p=0.25
+\newcommand{\NetTwelveDiffPQuarterCI}{[-1.30, -0.14]} % 12-agent paired diff p=0.25 CI
+\newcommand{\NetSixMAESingleT}{1.00} % 6-agent single-T MAE
+\newcommand{\NetSixMAETwoParam}{0.30} % 6-agent two-param MAE
+\newcommand{\PromptFramingShift}{0.53} % Prompt framing shift on o
+\newcommand{\RelayRateRange}{0.75\text{--}1.00} % Relay rate range across models
+\newcommand{\SiblingCorrelationPhi}{0.229} % Sibling correlation phi
+\newcommand{\OverblockEasyNeg}{0/351} % Over-blocking on easy negatives
+\newcommand{\OverblockHardNegRange}{8\%--19\%} % Over-blocking on hard negatives
+\newcommand{\IDExpUndefended}{70.0\%} % Undefended ID exposure
+\newcommand{\IDExpGatewayOnly}{35.0\%} % Gateway without ID fix
+\newcommand{\IDExpWithIDFix}{3.3\%} % Gateway with ID fix
+\newcommand{\NBootstrapResamples}{5{,}000} % bootstrap resamples count
+\newcommand{\ACDTwoContent}{0.40} % D2 Gwet AC1
+\newcommand{\ACDThreeGeminiContent}{0.72} % D3 Gemini Gwet AC1
+\newcommand{\ACDThreeLocalContent}{0.33} % D3 Local Gwet AC1
+\newcommand{\ACDOneID}{0.81} % D1 ID Gwet AC1
+\newcommand{\UnanimousBZeroFraction}{30/92} % B0 unanimous fraction
+\newcommand{\UnanimousBZeroRate}{0.326} % B0 unanimous rate
+\newcommand{\TiesBZeroDThree}{93/100} % B0 ties D3 count
+\newcommand{\UnanimousBTwoFraction}{21/83} % B2 unanimous fraction
+\newcommand{\UnanimousBTwoRate}{0.253} % B2 unanimous rate
+\newcommand{\TiesBTwoDThree}{107/109} % B2 ties D3 count
+\newcommand{\UnanimousLOneFraction}{13/124} % L1 unanimous fraction
+\newcommand{\UnanimousLOneRate}{0.105} % L1 unanimous rate
+\newcommand{\TiesLOneDThree}{28/68} % L1 ties D3 count
+\newcommand{\UnanimousGatewayFraction}{2/142} % Gateway unanimous fraction
+\newcommand{\UnanimousGatewayRate}{0.014} % Gateway unanimous rate
+\newcommand{\TiesGatewayDThree}{9/50} % Gateway ties D3 count
+\newcommand{\UnanimousCSBZeroFraction}{20/43} % CS B0 unanimous fraction
+\newcommand{\UnanimousCSBZeroRate}{0.465} % CS B0 unanimous rate
+\newcommand{\TiesCSBZeroDThree}{50/53} % CS B0 ties D3 count
+\newcommand{\UnanimousCSBTwoFraction}{13/38} % CS B2 unanimous fraction
+\newcommand{\UnanimousCSBTwoRate}{0.342} % CS B2 unanimous rate
+\newcommand{\TiesCSBTwoDThree}{57/58} % CS B2 ties D3 count
+\newcommand{\UnanimousCSLOneFraction}{8/57} % CS L1 unanimous fraction
+\newcommand{\UnanimousCSLOneRate}{0.140} % CS L1 unanimous rate
+\newcommand{\TiesCSLOneDThree}{17/39} % CS L1 ties D3 count
+\newcommand{\UnanimousCSGatewayFraction}{2/68} % CS Gateway unanimous fraction
+\newcommand{\UnanimousCSGatewayRate}{0.029} % CS Gateway unanimous rate
+\newcommand{\TiesCSGatewayDThree}{5/28} % CS Gateway ties D3 count
+\newcommand{\UnanimousHRBZeroFraction}{10/49} % HR B0 unanimous fraction
+\newcommand{\UnanimousHRBZeroRate}{0.204} % HR B0 unanimous rate
+\newcommand{\TiesHRBZeroDThree}{43/47} % HR B0 ties D3 count
+\newcommand{\UnanimousHRBTwoFraction}{8/45} % HR B2 unanimous fraction
+\newcommand{\UnanimousHRBTwoRate}{0.178} % HR B2 unanimous rate
+\newcommand{\TiesHRBTwoDThree}{50/51} % HR B2 ties D3 count
+\newcommand{\UnanimousHRLOneFraction}{5/67} % HR L1 unanimous fraction
+\newcommand{\UnanimousHRLOneRate}{0.075} % HR L1 unanimous rate
+\newcommand{\TiesHRLOneDThree}{11/29} % HR L1 ties D3 count
+\newcommand{\UnanimousHRGatewayFraction}{0/74} % HR Gateway unanimous fraction
+\newcommand{\UnanimousHRGatewayRate}{0.000} % HR Gateway unanimous rate
+\newcommand{\TiesHRGatewayDThree}{4/22} % HR Gateway ties D3 count
+\newcommand{\TBZeroLlamaRate}{0.594} % B0 Llama rate
+\newcommand{\TBZeroLlamaFraction}{19/32} % B0 Llama fraction
+\newcommand{\TBZeroQwenRate}{0.797} % B0 Qwen rate
+\newcommand{\TBZeroQwenFraction}{51/64} % B0 Qwen fraction
+\newcommand{\TBZeroPooledFraction}{70/96} % B0 Pooled fraction
+\newcommand{\TBZeroDOneFraction}{72/96} % B0 D1 fraction
+\newcommand{\TBOneLlamaRate}{0.500} % B1 Llama rate
+\newcommand{\TBOneLlamaFraction}{16/32} % B1 Llama fraction
+\newcommand{\TBOneQwenRate}{0.734} % B1 Qwen rate
+\newcommand{\TBOneQwenFraction}{47/64} % B1 Qwen fraction
+\newcommand{\TBOnePooledFraction}{63/96} % B1 Pooled fraction
+\newcommand{\TBOneDOneFraction}{64/96} % B1 D1 fraction
+\newcommand{\TBTwoLlamaRate}{0.438} % B2 Llama rate
+\newcommand{\TBTwoLlamaFraction}{14/32} % B2 Llama fraction
+\newcommand{\TBTwoQwenRate}{0.875} % B2 Qwen rate
+\newcommand{\TBTwoQwenFraction}{56/64} % B2 Qwen fraction
+\newcommand{\TBTwoPooledFraction}{70/96} % B2 Pooled fraction
+\newcommand{\TBTwoDOneFraction}{71/96} % B2 D1 fraction
+\newcommand{\TBFiveLlamaRate}{0.469} % B5 Llama rate
+\newcommand{\TBFiveLlamaFraction}{15/32} % B5 Llama fraction
+\newcommand{\TBFiveQwenRate}{0.734} % B5 Qwen rate
+\newcommand{\TBFiveQwenFraction}{47/64} % B5 Qwen fraction
+\newcommand{\TBFivePooledFraction}{62/96} % B5 Pooled fraction
+\newcommand{\TBFiveDOneFraction}{64/96} % B5 D1 fraction
+\newcommand{\TBSevenLlamaRate}{0.125} % B7 Llama rate
+\newcommand{\TBSevenLlamaFraction}{4/32} % B7 Llama fraction
+\newcommand{\TBSevenQwenRate}{0.359} % B7 Qwen rate
+\newcommand{\TBSevenQwenFraction}{23/64} % B7 Qwen fraction
+\newcommand{\TBSevenPooledFraction}{27/96} % B7 Pooled fraction
+\newcommand{\TBSevenDOneFraction}{28/96} % B7 D1 fraction
+\newcommand{\TBThreeLlamaRate}{0.156} % B3 Llama rate
+\newcommand{\TBThreeLlamaFraction}{5/32} % B3 Llama fraction
+\newcommand{\TBThreeQwenRate}{0.328} % B3 Qwen rate
+\newcommand{\TBThreeQwenFraction}{21/64} % B3 Qwen fraction
+\newcommand{\TBThreePooledFraction}{26/96} % B3 Pooled fraction
+\newcommand{\TBThreeDOneFraction}{27/96} % B3 D1 fraction
+\newcommand{\TLOneLlamaRate}{0.125} % L1 Llama rate
+\newcommand{\TLOneLlamaFraction}{4/32} % L1 Llama fraction
+\newcommand{\TLOneQwenRate}{0.328} % L1 Qwen rate
+\newcommand{\TLOneQwenFraction}{21/64} % L1 Qwen fraction
+\newcommand{\TLOnePooledFraction}{25/96} % L1 Pooled fraction
+\newcommand{\TLOneDOneFraction}{39/96} % L1 D1 fraction
+\newcommand{\TBSixLlamaRate}{0.031} % B6 Llama rate
+\newcommand{\TBSixLlamaFraction}{1/32} % B6 Llama fraction
+\newcommand{\TBSixQwenRate}{0.156} % B6 Qwen rate
+\newcommand{\TBSixQwenFraction}{10/64} % B6 Qwen fraction
+\newcommand{\TBSixPooledFraction}{11/96} % B6 Pooled fraction
+\newcommand{\TBSixDOneFraction}{11/96} % B6 D1 fraction
+\newcommand{\TGatewayLlamaRate}{0.062} % Gateway Llama rate
+\newcommand{\TGatewayLlamaFraction}{2/32} % Gateway Llama fraction
+\newcommand{\TGatewayQwenRate}{0.078} % Gateway Qwen rate
+\newcommand{\TGatewayQwenFraction}{5/64} % Gateway Qwen fraction
+\newcommand{\TGatewayPooledFraction}{7/96} % Gateway Pooled fraction
+\newcommand{\TGatewayDOneFraction}{21/96} % Gateway D1 fraction
+\newcommand{\TBFourLlamaRate}{0.000} % B4 Llama rate
+\newcommand{\TBFourLlamaFraction}{0/32} % B4 Llama fraction
+\newcommand{\TBFourQwenRate}{0.000} % B4 Qwen rate
+\newcommand{\TBFourQwenFraction}{0/64} % B4 Qwen fraction
+\newcommand{\TBFourPooledFraction}{0/96} % B4 Pooled fraction
+\newcommand{\TBFourDOneFraction}{0/96} % B4 D1 fraction
+\newcommand{\TFreeBZeroLlamaRate}{1.000} % Free-text B0 Llama rate
+\newcommand{\TFreeBZeroLlamaFraction}{8/8} % Free-text B0 Llama fraction
+\newcommand{\TFreeBZeroQwenRate}{0.938} % Free-text B0 Qwen rate
+\newcommand{\TFreeBZeroQwenFraction}{15/16} % Free-text B0 Qwen fraction
+\newcommand{\TFreeBZeroPooledFraction}{23/24} % Free-text B0 Pooled fraction
+\newcommand{\TFreeBZeroDOneFraction}{23/24} % Free-text B0 D1 fraction
+\newcommand{\TFreeBFourSchemaLlamaRate}{1.000} % Free-text B4-schema Llama rate
+\newcommand{\TFreeBFourSchemaLlamaFraction}{8/8} % Free-text B4-schema Llama fraction
+\newcommand{\TFreeBFourSchemaQwenRate}{0.938} % Free-text B4-schema Qwen rate
+\newcommand{\TFreeBFourSchemaQwenFraction}{15/16} % Free-text B4-schema Qwen fraction
+\newcommand{\TFreeBFourSchemaPooledFraction}{23/24} % Free-text B4-schema Pooled fraction
+\newcommand{\TFreeBFourSchemaDOneFraction}{23/24} % Free-text B4-schema D1 fraction
+\newcommand{\TFreeBFourTaintLlamaRate}{0.000} % Free-text B4-taint Llama rate
+\newcommand{\TFreeBFourTaintLlamaFraction}{0/8} % Free-text B4-taint Llama fraction
+\newcommand{\TFreeBFourTaintQwenRate}{0.000} % Free-text B4-taint Qwen rate
+\newcommand{\TFreeBFourTaintQwenFraction}{0/16} % Free-text B4-taint Qwen fraction
+\newcommand{\TFreeBFourTaintPooledFraction}{0/24} % Free-text B4-taint Pooled fraction
+\newcommand{\TFreeBFourTaintDOneFraction}{0/24} % Free-text B4-taint D1 fraction
+\newcommand{\TFreeGatewayLlamaRate}{0.000} % Free-text Gateway Llama rate
+\newcommand{\TFreeGatewayLlamaFraction}{0/8} % Free-text Gateway Llama fraction
+\newcommand{\TFreeGatewayQwenRate}{0.188} % Free-text Gateway Qwen rate
+\newcommand{\TFreeGatewayQwenFraction}{3/16} % Free-text Gateway Qwen fraction
+\newcommand{\TFreeGatewayPooledFraction}{3/24} % Free-text Gateway Pooled fraction
+\newcommand{\TFreeGatewayDOneFraction}{7/24} % Free-text Gateway D1 fraction
+\newcommand{\NetTwelveRingBZeroRealEns}{4.00 [2.12, 6.14]} % Ring12 B0 Real Ens
+\newcommand{\NetTwelveRingBZeroPredEns}{3.74} % Ring12 B0 Pred Ens
+\newcommand{\NetTwelveRingBZeroErrEns}{0.26} % Ring12 B0 Err Ens
+\newcommand{\NetTwelveRingBZeroRealDOne}{6.88 [4.38, 9.00]} % Ring12 B0 Real D1
+\newcommand{\NetTwelveRingBZeroPredDOne}{5.34} % Ring12 B0 Pred D1
+\newcommand{\NetTwelveRingBZeroErrDOne}{1.54} % Ring12 B0 Err D1
+\newcommand{\NetTwelveERBZeroRealEns}{5.25 [2.29, 7.89]} % ER12 B0 Real Ens
+\newcommand{\NetTwelveERBZeroPredEns}{3.74} % ER12 B0 Pred Ens
+\newcommand{\NetTwelveERBZeroErrEns}{1.51} % ER12 B0 Err Ens
+\newcommand{\NetTwelveERBZeroRealDOne}{7.25 [4.00, 10.00]} % ER12 B0 Real D1
+\newcommand{\NetTwelveERBZeroPredDOne}{5.49} % ER12 B0 Pred D1
+\newcommand{\NetTwelveERBZeroErrDOne}{1.76} % ER12 B0 Err D1
+\newcommand{\NetTwelveBABZeroRealEns}{3.62 [1.38, 6.71]} % BA12 B0 Real Ens
+\newcommand{\NetTwelveBABZeroPredEns}{3.74} % BA12 B0 Pred Ens
+\newcommand{\NetTwelveBABZeroErrEns}{0.12} % BA12 B0 Err Ens
+\newcommand{\NetTwelveBABZeroRealDOne}{6.00 [3.25, 9.14]} % BA12 B0 Real D1
+\newcommand{\NetTwelveBABZeroPredDOne}{5.52} % BA12 B0 Pred D1
+\newcommand{\NetTwelveBABZeroErrDOne}{0.48} % BA12 B0 Err D1
+\newcommand{\NetTwelveRingGatewayRealEns}{1.88 [1.00, 3.38]} % Ring12 Gateway Real Ens
+\newcommand{\NetTwelveRingGatewayPredEns}{2.37} % Ring12 Gateway Pred Ens
+\newcommand{\NetTwelveRingGatewayErrEns}{0.49} % Ring12 Gateway Err Ens
+\newcommand{\NetTwelveRingGatewayRealDOne}{4.88 [2.56, 7.57]} % Ring12 Gateway Real D1
+\newcommand{\NetTwelveRingGatewayPredDOne}{3.74} % Ring12 Gateway Pred D1
+\newcommand{\NetTwelveRingGatewayErrDOne}{1.13} % Ring12 Gateway Err D1
+\newcommand{\NetTwelveERGatewayRealEns}{2.12 [1.00, 3.62]} % ER12 Gateway Real Ens
+\newcommand{\NetTwelveERGatewayPredEns}{2.37} % ER12 Gateway Pred Ens
+\newcommand{\NetTwelveERGatewayErrEns}{0.25} % ER12 Gateway Err Ens
+\newcommand{\NetTwelveERGatewayRealDOne}{4.50 [2.14, 7.14]} % ER12 Gateway Real D1
+\newcommand{\NetTwelveERGatewayPredDOne}{3.74} % ER12 Gateway Pred D1
+\newcommand{\NetTwelveERGatewayErrDOne}{0.76} % ER12 Gateway Err D1
+\newcommand{\NetTwelveBAGatewayRealEns}{2.12 [1.00, 4.43]} % BA12 Gateway Real Ens
+\newcommand{\NetTwelveBAGatewayPredEns}{2.37} % BA12 Gateway Pred Ens
+\newcommand{\NetTwelveBAGatewayErrEns}{0.25} % BA12 Gateway Err Ens
+\newcommand{\NetTwelveBAGatewayRealDOne}{3.50 [1.25, 6.71]} % BA12 Gateway Real D1
+\newcommand{\NetTwelveBAGatewayPredDOne}{3.74} % BA12 Gateway Pred D1
+\newcommand{\NetTwelveBAGatewayErrDOne}{0.24} % BA12 Gateway Err D1
+\newcommand{\NetTwelvePartialHubQuarter}{2.12 [1.00, 4.43]} % Hub-first p=0.25
+\newcommand{\NetTwelvePartialRandQuarter}{2.88 [1.29, 5.14]} % Random p=0.25
+\newcommand{\NetTwelvePartialDiffQuarter}{-0.75 [-1.30, -0.14]} % Diff p=0.25
+\newcommand{\NetTwelvePartialRandHalf}{2.62 [1.00, 4.88]} % Random p=0.50
+\newcommand{\NetTwelvePartialDiffHalf}{-0.50 [-1.00, \phantom{+}0.00]} % Diff p=0.50
+\newcommand{\NetTwelvePartialDiffThreeQuarter}{-0.50 [-1.00, \phantom{+}0.00]} % Diff p=0.75
+\newcommand{\NetTwelvePartialDiffFull}{\phantom{+}0.00 [\phantom{+}0.00, \phantom{+}0.00]} % Diff p=1.00
+\newcommand{\SimHerdIndepPooled}{0.00--0.00 (mean 0.000)} % Indep blocking pooled
+\newcommand{\SimHerdIndepCS}{0.00--0.00 (mean 0.000)} % Indep blocking CS
+\newcommand{\SimHerdIndepDOne}{0.00--0.27 (mean 0.101)} % Indep blocking D1
+\newcommand{\SimHerdIndepEarly}{0.00--0.00 (mean 0.000)} % Indep blocking early
+\newcommand{\SimHerdPcHubPooled}{0.30--0.50 / 0.30--0.50} % Hub pc pooled
+\newcommand{\SimHerdPcAcqPooled}{0.50--0.80 / 0.50--0.80} % Acq pc pooled
+\newcommand{\SimHerdPcRandPooled}{0.80--1.00 / 0.80} % Rand pc pooled
+\newcommand{\SimHerdPcHubCS}{0.20--0.50 / 0.20--0.50} % Hub pc CS
+\newcommand{\SimHerdPcAcqCS}{0.50--0.80 / 0.50--0.80} % Acq pc CS
+\newcommand{\SimHerdPcRandCS}{0.80--1.00 / 0.50--0.80} % Rand pc CS
+\newcommand{\SimHerdPcHubEarly}{0.20--0.30 / 0.30--0.50} % Hub pc early
+\newcommand{\SimHerdPcAcqEarly}{0.30--0.50 / 0.50--0.80} % Acq pc early
+\newcommand{\SimHerdPcRandEarly}{0.80--1.00 / 0.80--1.00} % Rand pc early
+\newcommand{\BareIDPersistencePct}{33.9\%} % bare ID persistence
+\newcommand{\DeltaUIDFix}{+0.018} % delta U ID fix
+\newcommand{\TAutoDetectVerbatim}{0.033} % T auto-detect verbatim
+\newcommand{\TAutoDetectSemantic}{0.583} % T auto-detect semantic
+\newcommand{\ParaphraseRecallGateway}{0.94} % gateway paraphrase recall
+\newcommand{\ExpectedTreeInfectionOQuarter}{3.74} % expected tree infection o=0.25
+\newcommand{\ExpectedTreeInfectionOEighth}{2.37} % expected tree infection o=0.125
+\newcommand{\OQuarter}{0.250} % o=0.250
+\newcommand{\OEighth}{0.125} % o=0.125
+\newcommand{\CIRangeWide}{2.5\text{ to }6.0} % CI width range 12-agent
+\newcommand{\BFSPActiveThreshold}{0.25} % BFS active threshold
+\newcommand{\ProbeLexicalThreeWordRecall}{0.90} % probe 3-word recall
+\newcommand{\ProbeLexicalThreeWordFP}{0.17} % probe 3-word FP
+\newcommand{\ProbeSpanishCutoffThresh}{0.75} % Spanish cutoff threshold
+\newcommand{\ProbeScriptedRewordedRecall}{1.00} % probe scripted reworded recall
+\newcommand{\ProbeScriptedAbbrevRecall}{0.80} % probe scripted abbrev recall
+\newcommand{\ProbeScriptedVagueRecall}{0.85} % probe scripted vague recall
+\newcommand{\ProbeTransPreRecall}{0.06} % probe trans pre recall
+\newcommand{\ProbeTransPostRecall}{0.67} % probe trans post recall
+\newcommand{\ProbeEnglishPostRecall}{0.63} % probe English post recall
+\newcommand{\AdversarialInfectedVerbatim}{1.5} % adversarial infected verbatim
+\newcommand{\AdversarialInfectedSemantic}{1.7} % adversarial infected semantic
+\newcommand{\AdversarialBlockedEnglish}{25/27} % adversarial blocked English
+\newcommand{\CoverageSixOfSix}{6/6} % 6 of 6 coverage fraction
+\newcommand{\ODOneHalf}{0.50} % D1 o=0.50
+\newcommand{\ODOneQuarter}{0.25} % D1 o=0.25
+\newcommand{\PQuarter}{0.25} % p=0.25
+\newcommand{\PHalf}{0.50} % p=0.50
+\newcommand{\PThreeQuarter}{0.75} % p=0.75
+\newcommand{\PFull}{1.00} % p=1.00
+\newcommand{\NetTwelvePartialHubQuarterNodes}{3/12} % 3/12 nodes
+\newcommand{\NetTwelvePartialHubHalfNodes}{6/12} % 6/12 nodes
+\newcommand{\NetTwelvePartialHubThreeQuarterNodes}{9/12} % 9/12 nodes
+\newcommand{\NetTwelvePartialHubFullNodes}{12/12} % 12/12 nodes
+\newcommand{\NetTwelvePartialEdgesGated}{3/3} % 3/3 active edges gated
+\newcommand{\SimHerdPcDOne}{>1.00\text{ / }>1.00} % pc D1
+\newcommand{\AdvInfectLlama}{0.0} % adv infect llama
+\newcommand{\AdvInfectQwenVerbatim}{0.17} % adv infect qwen verbatim
+\newcommand{\AdvInfectQwenSemantic}{0.07} % adv infect qwen semantic
+\newcommand{\AdvBlockedLlama}{0.0} % adv blocked llama
+\newcommand{\AdvBlockedGemma}{0.1} % adv blocked gemma

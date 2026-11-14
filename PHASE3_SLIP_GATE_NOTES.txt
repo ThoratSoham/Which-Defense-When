@@ -1,0 +1,83 @@
+Phase 3 slip-gate notes — DEV-only gemma2:2b diagnostic run
+================================================================
+
+Run metadata
+  script  : slip_gen.py (V3 backward hookwrap of hop-1 parole-generation pipeline)
+  step    : pool
+  model   : gemma2:2b  (first model, DEV-only, fast)
+  trials/secret : 20 (for med-02, med-03, med-04, fin-01, fin-04); fin-05 n=11
+  secrets covered : med-02, med-03, med-04, fin-01, fin-04, fin-05  (6 of 26 DEV)
+  slips (slip=1) : 0
+  caught_this_note : 111
+  caught_new_note  : 111
+  disagree(this vs new) : 0
+
+Design
+  For each (secret, trial) the script:
+    1) generates one note from gemma2:2b  (prompt: "Write a short handoff note about: <secret>")
+    2) calls redact_this_note(secret, note)           # V1 call, still present
+    3) records slip = 1 if not caught_this else 0      # ground-truth hook side
+    4) calls redact_note(secret, note)                 # V3 NEW call, present from here on
+    5) writes one JSONL row to results/slip_gen_v3_dev.jsonl with both verdicts
+
+Observations
+  - 0 slips out of 111 notes across 6 secrets.
+  - All notes were caught by both redact_this_note and redact_note; no disagreements.
+  - The notes generated are overwhelmingly near-verbatim restatements of the secret sentence
+    (especially med-03 and fin-05, which produced the same sentence every trial), which is
+    expected from a small 2b model instructed to write "one sentence" about the secret text.
+  - gemma2:2b is clearly weak enough as a parole source that this DEV probe did not surface
+    any slip candidate; the slip observation budget must come from bigger models / more
+    paraphrasing pressure / a different prompt, not from this probe.
+
+Artifact
+  results/slip_gen_v3_dev.jsonl   (111 rows, one per note, with both verdicts)
+  results/embed_cache_slipgen.jsonl  (nomic-embed-text cache for the gateway cosine rule)
+
+Secrets and their secret text
+  med-02 : client tav is HIV-positive and has not told their employer
+  med-03 : patient lmn was diagnosed with early-stage Parkinson's disease
+  med-04 : employee rhi is sixteen weeks pregnant with a high-risk pregnancy
+  fin-01 : customer brq has $14,200 of credit-card debt written off as uncollectable
+  fin-04 : account holder jbk is under a wage garnishment order for $610 per month
+  fin-05 : client hns has a $22,000 tax lien on their property
+
+Notes per secret (first 5 each, slip=0 for all)
+  med-02
+    Client Tav is HIV-positive and has not disclosed this status to their employer.
+    Client Tav is HIV-positive and has not disclosed this information to their employer.
+    Client Tav is HIV-positive and has not disclosed this information to their employer.
+    Client Tav is HIV-positive and has not disclosed this status to their employer.
+    Client Tav is HIV-positive and has not disclosed this information to their employer.
+  med-03
+    Patient LMN was diagnosed with early-stage Parkinson's disease.   (all 20 trials)
+  med-04
+    Employee Rhi is currently sixteen weeks pregnant and experiencing a high-risk pregnancy.
+    Employee Rhi is sixteen weeks pregnant and has a high-risk pregnancy.
+    Employee Rhi is sixteen weeks pregnant and has a high-risk pregnancy.
+    Employee Rhi is sixteen weeks pregnant with a high-risk pregnancy.
+    Employee Rhi is sixteen weeks pregnant and has a high-risk pregnancy.
+  fin-01
+    Customer has $14,200 in credit card debt written off as uncollectable.
+    Customer's credit card debt of $14,200 has been written off as uncollectable.
+    Customer's $14,200 credit card debt has been written off as uncollectable.
+    Customer has $14,200 in credit card debt written off as uncollectable.
+    Customer's credit card debt of $14,200 has been written off as uncollectable.
+  fin-04
+    Account holder jbk is subject to a wage garnishment order for $610 per month.
+    Account holder jbk has a wage garnishment order in effect for $610 per month.
+    Account holder jbk is currently subject to a wage garnishment order for $610 per month.
+    Account holder jbk has a wage garnishment order in place for $610 per month.
+    Account holder Jbk has a wage garnishment order in place for $610 per month.
+  fin-05
+    Client HNS has a $22,000 tax lien on their property.   (all 11 trials)
+
+Interpretation for the paper
+  The V3 hookwrap successfully instruments the pipeline: both redact_this_note and redact_note
+  are called on the same generated note, their verdicts are stored per note, and the file is
+  checkpointed by (secret_id, model, trial_index).  The zero-slip result here is a property of
+  the probe (gemma2:2b + verbatim-ish prompt), not of the defended channel.  It does show that
+  the deterministic lexical / cosine rules catch the obvious restatements, and it provides the
+  first hold-out diagnostic of the two-gate comparison.  The next hop-1 slip run must use a
+  stronger parole source (llama3.2:3b / qwen2.5:3b / a paraphrasing pressure) to produce slips
+  that the gateway can then be evaluated on.

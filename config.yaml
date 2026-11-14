@@ -78,7 +78,7 @@ experiment:
   pressures: [low, high]
   kinds: [verbatim, semantic]
   tasks: [customer_service, hr_onboarding]
-  episodes_primary: 30          # pre-registered primary cells
+  episodes_primary: 8          # reduced for 3h deadline (PREREG §6 amendment)
   episodes_secondary: 15        # pre-registered secondary cells
   chain_hops: 2                 # 3-agent chain
   network_episodes: 30

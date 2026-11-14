@@ -74,6 +74,22 @@ def load_ident_map():
     return m
 
 
+def record_index():
+    """secret TEXT -> full Phase-1 corpus record, for record-aware D1.
+
+    keywords_for() derives D1's per-secret keyword set from the record's
+    registered negatives; without the record, d1_content_leak falls back to
+    the original hard-coded renal list, which cannot match the new corpus
+    secrets (cred/fin/hr/leg/...)."""
+    try:
+        recs = json.load(open("corpus/secrets_corpus.json",
+                              encoding="utf-8"))["records"]
+        return {r["text"]: r for r in recs}
+    except Exception as e:
+        print(f"  (corpus unavailable for record index: {e})")
+        return {}
+
+
 def ident_for(secret, idents):
     if secret in idents:
         return idents[secret]
@@ -90,10 +106,20 @@ def main():
     print(f"pool: {len(rows)} notes from {inputs}")
 
     idents = load_ident_map()
-    # ---- D1 (legacy keyword/ID detector, continuity only)
+    recs_by_text = record_index()
+    # ---- D1: record-aware for Phase-1 corpus secrets — the SAME D1 the
+    # episodes (jobs._d1_verdicts) and slip_rescore use, whose keywords_for
+    # needs the record's registered negatives.  Old-study transcripts keep
+    # the legacy keyword/ID path unchanged, so Phase-2 numbers are untouched
+    # (no new-study transcript existed when this was added).
+    import jobs
     for r in rows:
         r["ident"] = ident_for(r["secret"], idents)
-        r["d1"] = int(d1_content_leak(r["note"], r["secret"], r["kind"]))
+        rec = recs_by_text.get(r["secret"])
+        r["d1"] = (jobs._d1_verdicts(r["note"], rec)[0]
+                   if rec is not None
+                   else int(d1_content_leak(r["note"], r["secret"],
+                                            r["kind"])))
         r["d1_identifier"] = int(identifier_exposure(r["note"], r["secret"],
                                                       ident=r["ident"]))
 

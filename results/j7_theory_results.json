@@ -1,0 +1,323 @@
+{
+  "closed_form_comparison": {
+    "k=2": {
+      "T_early_0.017": 0.0337,
+      "T_test_0.073": 0.1407,
+      "T_d1_0.292": 0.4987
+    },
+    "k=3": {
+      "T_early_0.017": 0.0501,
+      "T_test_0.073": 0.2034,
+      "T_d1_0.292": 0.6451
+    },
+    "k=4": {
+      "T_early_0.017": 0.0663,
+      "T_test_0.073": 0.2616,
+      "T_d1_0.292": 0.7487
+    },
+    "k=6": {
+      "T_early_0.017": 0.0978,
+      "T_test_0.073": 0.3654,
+      "T_d1_0.292": 0.874
+    },
+    "k=8": {
+      "T_early_0.017": 0.1282,
+      "T_test_0.073": 0.4547,
+      "T_d1_0.292": 0.9369
+    },
+    "k=12": {
+      "T_early_0.017": 0.186,
+      "T_test_0.073": 0.5973,
+      "T_d1_0.292": 0.9841
+    }
+  },
+  "floor_at_k4": {
+    "T_early_0.017": 0.06628556847900002,
+    "T_test_0.073": 0.26155366975899985,
+    "T_d1_0.292": 0.7487344023040001
+  },
+  "sim_test_0.073": {
+    "er": {
+      "random": {
+        "0.0": {
+          "p_outbreak": 0.52,
+          "mean_infected": 127.545
+        },
+        "0.05": {
+          "p_outbreak": 0.445,
+          "mean_infected": 101.79
+        },
+        "0.1": {
+          "p_outbreak": 0.385,
+          "mean_infected": 90.355
+        },
+        "0.2": {
+          "p_outbreak": 0.28,
+          "mean_infected": 84.355
+        },
+        "0.3": {
+          "p_outbreak": 0.225,
+          "mean_infected": 81.46
+        },
+        "0.5": {
+          "p_outbreak": 0.235,
+          "mean_infected": 100.68
+        },
+        "0.8": {
+          "p_outbreak": 0.225,
+          "mean_infected": 103.71
+        },
+        "1.0": {
+          "p_outbreak": 0.25,
+          "mean_infected": 118.76
+        }
+      },
+      "hub-first": {
+        "0.0": {
+          "p_outbreak": 0.495,
+          "mean_infected": 122.485
+        },
+        "0.05": {
+          "p_outbreak": 0.4,
+          "mean_infected": 106.195
+        },
+        "0.1": {
+          "p_outbreak": 0.275,
+          "mean_infected": 95.175
+        },
+        "0.2": {
+          "p_outbreak": 0.275,
+          "mean_infected": 114.115
+        },
+        "0.3": {
+          "p_outbreak": 0.21,
+          "mean_infected": 91.89
+        },
+        "0.5": {
+          "p_outbreak": 0.205,
+          "mean_infected": 94.335
+        },
+        "0.8": {
+          "p_outbreak": 0.28,
+          "mean_infected": 132.465
+        },
+        "1.0": {
+          "p_outbreak": 0.225,
+          "mean_infected": 106.91
+        }
+      }
+    },
+    "ba": {
+      "random": {
+        "0.0": {
+          "p_outbreak": 0.52,
+          "mean_infected": 139.995
+        },
+        "0.05": {
+          "p_outbreak": 0.545,
+          "mean_infected": 141.325
+        },
+        "0.1": {
+          "p_outbreak": 0.475,
+          "mean_infected": 118.87
+        },
+        "0.2": {
+          "p_outbreak": 0.37,
+          "mean_infected": 104.135
+        },
+        "0.3": {
+          "p_outbreak": 0.355,
+          "mean_infected": 110.91
+        },
+        "0.5": {
+          "p_outbreak": 0.335,
+          "mean_infected": 130.42
+        },
+        "0.8": {
+          "p_outbreak": 0.24,
+          "mean_infected": 110.66
+        },
+        "1.0": {
+          "p_outbreak": 0.215,
+          "mean_infected": 103.6
+        }
+      },
+      "hub-first": {
+        "0.0": {
+          "p_outbreak": 0.565,
+          "mean_infected": 151.105
+        },
+        "0.05": {
+          "p_outbreak": 0.405,
+          "mean_infected": 150.86
+        },
+        "0.1": {
+          "p_outbreak": 0.32,
+          "mean_infected": 133.335
+        },
+        "0.2": {
+          "p_outbreak": 0.315,
+          "mean_infected": 141.545
+        },
+        "0.3": {
+          "p_outbreak": 0.305,
+          "mean_infected": 140.92
+        },
+        "0.5": {
+          "p_outbreak": 0.26,
+          "mean_infected": 123.785
+        },
+        "0.8": {
+          "p_outbreak": 0.23,
+          "mean_infected": 110.21
+        },
+        "1.0": {
+          "p_outbreak": 0.205,
+          "mean_infected": 98.94
+        }
+      }
+    }
+  },
+  "sim_early_0.017": {
+    "er": {
+      "random": {
+        "0.0": {
+          "p_outbreak": 0.925,
+          "mean_infected": 431.39
+        },
+        "0.05": {
+          "p_outbreak": 0.86,
+          "mean_infected": 395.05
+        },
+        "0.1": {
+          "p_outbreak": 0.78,
+          "mean_infected": 352.22
+        },
+        "0.2": {
+          "p_outbreak": 0.73,
+          "mean_infected": 317.77
+        },
+        "0.3": {
+          "p_outbreak": 0.615,
+          "mean_infected": 260.625
+        },
+        "0.5": {
+          "p_outbreak": 0.3,
+          "mean_infected": 136.335
+        },
+        "0.8": {
+          "p_outbreak": 0.12,
+          "mean_infected": 57.49
+        },
+        "1.0": {
+          "p_outbreak": 0.085,
+          "mean_infected": 42.565
+        }
+      },
+      "hub-first": {
+        "0.0": {
+          "p_outbreak": 0.93,
+          "mean_infected": 432.66
+        },
+        "0.05": {
+          "p_outbreak": 0.85,
+          "mean_infected": 380.63
+        },
+        "0.1": {
+          "p_outbreak": 0.76,
+          "mean_infected": 331.37
+        },
+        "0.2": {
+          "p_outbreak": 0.515,
+          "mean_infected": 234.935
+        },
+        "0.3": {
+          "p_outbreak": 0.28,
+          "mean_infected": 123.585
+        },
+        "0.5": {
+          "p_outbreak": 0.1,
+          "mean_infected": 50.475
+        },
+        "0.8": {
+          "p_outbreak": 0.055,
+          "mean_infected": 27.99
+        },
+        "1.0": {
+          "p_outbreak": 0.07,
+          "mean_infected": 35.215
+        }
+      }
+    },
+    "ba": {
+      "random": {
+        "0.0": {
+          "p_outbreak": 0.925,
+          "mean_infected": 433.735
+        },
+        "0.05": {
+          "p_outbreak": 0.905,
+          "mean_infected": 417.815
+        },
+        "0.1": {
+          "p_outbreak": 0.845,
+          "mean_infected": 380.63
+        },
+        "0.2": {
+          "p_outbreak": 0.685,
+          "mean_infected": 295.04
+        },
+        "0.3": {
+          "p_outbreak": 0.565,
+          "mean_infected": 231.295
+        },
+        "0.5": {
+          "p_outbreak": 0.39,
+          "mean_infected": 157.315
+        },
+        "0.8": {
+          "p_outbreak": 0.135,
+          "mean_infected": 66.79
+        },
+        "1.0": {
+          "p_outbreak": 0.07,
+          "mean_infected": 35.88
+        }
+      },
+      "hub-first": {
+        "0.0": {
+          "p_outbreak": 0.945,
+          "mean_infected": 442.745
+        },
+        "0.05": {
+          "p_outbreak": 0.77,
+          "mean_infected": 339.15
+        },
+        "0.1": {
+          "p_outbreak": 0.525,
+          "mean_infected": 249.81
+        },
+        "0.2": {
+          "p_outbreak": 0.3,
+          "mean_infected": 150.1
+        },
+        "0.3": {
+          "p_outbreak": 0.255,
+          "mean_infected": 128.415
+        },
+        "0.5": {
+          "p_outbreak": 0.16,
+          "mean_infected": 81.18
+        },
+        "0.8": {
+          "p_outbreak": 0.08,
+          "mean_infected": 41.07
+        },
+        "1.0": {
+          "p_outbreak": 0.05,
+          "mean_infected": 25.905
+        }
+      }
+    }
+  }
+}

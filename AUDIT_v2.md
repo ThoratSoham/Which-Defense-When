@@ -61,3 +61,4 @@ Recomputed agreement on all 300 notes:
 * None of the 300 blinded benchmark notes were used to generate or tune the $D_1$ content-leak keywords.
 * The subject-handle refinement for Outcome 2 was documented in PREREG §6 Amendment 2 and reflects the pre-specified semantic definition that disclosing a patient handle constitutes identifier exposure.
 * In accordance with integrity rules, both values ($\kappa = 0.7945$ with handle refinement, and $\kappa = 0.2429$ without) are documented.
+

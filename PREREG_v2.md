@@ -90,3 +90,4 @@
 * **J7 (Theory Check):** Formalize closed-form full-coverage outbreak floor $P_{\text{outbreak}} \approx 1 - (1 - T_{\text{gw}})^k$ and compare against 500-agent Monte Carlo simulations.
 * **J8 (Gateway Profiling):** Measure CPU latency (ms/note), RAM, and API overhead across 200 notes for `L1`, `L2`, and `B6`.
 * **J9 (Rubric-Based Usefulness v2):** Evaluate 1–5 scale LLM rubric usefulness on J1 episodes; test Spearman correlation with 5-item checklist $U$.
+

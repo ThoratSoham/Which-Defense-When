@@ -41,3 +41,4 @@ Measured via `http://localhost:11434/api/generate` at temperature 0.7:
 1. All local generations use the established SQLite call cache (`results/llm_cache_v2.sqlite3`) keyed by `(provider, model, prompt, temperature, seed)`.
 2. All primary headline detector tie-breaking and evaluations requiring Gemini use Google Gemini API with automated exponential backoff and persistent resume logging (`results/d3_google_v2.jsonl`).
 3. If an API quota is reached, the runner writes an intermediate checkpoint, records the timestamp, and waits for quota recovery rather than falling back to local models for primary headline metrics.
+

@@ -1,8 +1,9 @@
-"""Leak rate vs task success per defense.  Run: python pareto.py results_v2.csv"""
+"""Leak rate vs task success per defense.  Run: python pareto.py results_v2r.csv"""
 import sys, pandas as pd, matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt, os
-F = sys.argv[1] if len(sys.argv) > 1 else "results_T.csv"; stem = os.path.splitext(F)[0]
+F = sys.argv[1] if len(sys.argv) > 1 else "results_v2r.csv"; stem = os.path.splitext(F)[0]
 r = pd.read_csv(F, names=["model","defense","pressure","kind","hop","leaked"]); r = r[(r.hop == 1) & (r.model != "qwen2.5:7b")]
-k = pd.read_csv(stem + "_task.csv", names=["model","defense","pressure","kind","episode","task_ok"])
+task_f = stem + "_task.csv" if os.path.exists(stem + "_task.csv") else stem.rstrip("r") + "_task.csv"
+k = pd.read_csv(task_f, names=["model","defense","pressure","kind","episode","task_ok"])
 t = pd.DataFrame({"T": r.groupby("defense").leaked.mean(), "task_success": k.groupby("defense").task_ok.mean()}).round(3)
 print(t.to_string())
 import numpy as np

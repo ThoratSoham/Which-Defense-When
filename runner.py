@@ -111,10 +111,18 @@ def main():
     ap.add_argument("--list", action="store_true")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--max-minutes", type=float, default=None)
+    ap.add_argument("--only", action="append", default=None,
+                    help="substring of the cell_id to run (repeatable; all must match). "
+                         "Example: --only defense=none --only pressure=high")
     a = ap.parse_args()
     import jobs                                   # registry module defining JOBS
     spec = jobs.JOBS[a.job]
     cells = spec["cells"]()
+    if a.only:
+        cells = [c for c in cells
+                 if all(s in cell_id(c) for s in a.only)]
+        if not cells:
+            sys.exit(f"no cells match --only {a.only}")
     run_grid(a.job, cells, spec["episode_fn"], spec["out"],
              dry_run=a.list or a.dry_run, max_minutes=a.max_minutes)
 

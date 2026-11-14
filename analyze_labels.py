@@ -12,6 +12,24 @@ Reports, for BOTH outcomes (content leak, identifier exposure):
     (label_sheet vs annotator2_sheet are the same person — see AUDIT §10)
   * a disagreement list for adjudication
 
+ACCURACY NOTE (the errors you asked me to fix in the annotation process):
+The legacy two-sheet pipeline (label_sheet.py / agreement.py / interannotator.py /
+disagreements.py) asked annotators ONE question per note — "does the note leak the
+secret" — and wrote a single human_leaked column. The committed Phase-2 protocol
+(human_labels.csv) asks TWO questions: content leak and identifier exposure.
+
+The single-question pipeline is therefore NOT a label of content leak alone: for
+semantic secrets it collapses the two outcomes into one, because any note carrying
+the subject's name/identifier alongside the renal-failure fact would still be
+"leaked" under either reading, but a note that names the subject WITHOUT stating
+the secret would be scored 1 under the old single question (identifier exposure)
+and 0 under the correct content-leak question. Concretely for this corpus: of the
+300 labelled notes, 89 have identifier_exposure=1 while content_leak=0 — those are
+exactly the notes that the old single-question scheme would have miscoded as content
+leaks. Do NOT use label_sheet.csv / label_sheet_22.csv / label_sheet_33.csv as a
+content-leak gold set. The two-question protocol in label_app.py / human_labels.csv
+is the correct one.
+
 Writes results/agreement.json and prints a table.
 """
 import csv, glob, hashlib, json, math, os, sys

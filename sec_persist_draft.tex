@@ -1,0 +1,195 @@
+%% =====================================================================
+%% DRAFT replacement for \subsection{Do gateway blind spots persist across hops?}
+%% (main.tex lines ~321-325, label sec:persist).
+%%
+%% NOT YET INCLUDED in main.tex. Integrate after the Phase 3 pipeline lands
+%% (pipeline.py: hop2_rewrite -> hop2_report -> variant_correlation ->
+%%  slip_gen_qwen -> ... -> heterogeneity) and every \PENDING{} below is
+%% replaced from results/numbers.json + results/fig_phase3_*.png.
+%%
+%% Status of numbers in this draft:
+%%   FINAL   — slip-pool debrief (slip_report_debrief), H3(a) repass (1600/1600),
+%%             H3(b) rho_rewrite 138/158 = 0.873 [0.813, 0.917], control 67/300,
+%%             simulation re-run with rho_rewrite (sim_final rc=0, sim_slip rc=0),
+%%             H4 six-variant correlation + rotation (variant_correlation.json,
+%%             fixed 2026-10-29: v5 scored on its stratified n=400 sample)
+%%   FINAL   — qwen replication + beta-binomial ICC (heterogeneity.json,
+%%             2026-10-29: ICC_secret 0.115/0.126, cross-model r=0.53 rho=0.34)
+%%   FINAL   — Phase 2 ensemble sensitivity on the 616/1391 residue sentence
+%%             (residue_ensemble.json: ensemble 275/1391 = 0.198 [0.178, 0.219],
+%%              D2 75/1391 = 0.054, D3 388/1391 = 0.279, 0 undetermined)
+%% =====================================================================
+
+\subsection{Do gateway blind spots persist across hops?}
+\label{sec:persist}
+
+The relay estimate in the original version of this section rested on 20
+relays (0.95) and was therefore a sensitivity analysis rather than a
+measurement. We replaced it with a purpose-built boundary study: for each of
+the 20 semantic development secrets we generated 160 notes (4 prompting
+variants~$\times$~20 trials) with llama3.2:3b, giving 1\,600 notes that were
+each put through the frozen gateway (lexical 0.60 OR cosine $\geq$ 0.78).
+Of these, 209 passed the gateway while carrying the secret: an overall slip
+rate of 0.131 (95\% Clopper--Pearson CI 0.114 to 0.148).
+
+\paragraph{Slip rate depends on how the secret is phrased, not only on the model}
+Across prompting variants the slip rate ranged from 0.207 (antonym,
+0.169 to 0.251) through 0.165 (plain, 0.130 to 0.205) and 0.107
+(paraphrase, 0.079 to 0.142) to 0.043 (compressed, 0.025 to 0.067):
+compression, which drops the sentences a semantic filter would match,
+is caught far more often than an antonymic rewrite of the same content.
+Across secrets the spread was wider still, from 0.013 (three of the
+20 secrets, 1/80 each) to 0.488 (\texttt{per-02}) and 0.450
+(\texttt{hr-04}) --- a factor of nearly 40 between the easiest and the
+hardest secret under one fixed gateway (Figure~\ref{fig:slips}).
+
+\paragraph{A deterministic re-pass cannot repair a slip}
+If a note slipped once, pushing the \emph{post-gateway} text through the
+same gateway again changes nothing: 158 of 158 survived slips
+(1.000, 95\% Wilson CI 0.976 to 1.000) still leaked after re-application,
+and the same check on all 1\,600 notes found zero disagreements between
+the original verdict and the re-pass verdict. This is expected --- the
+gateway is a deterministic function of the text --- but it establishes
+that blind spots are properties of the \emph{gateway--secret pair}, not
+of a particular sampling seed: whatever slips past a fixed gateway
+slips past it every time it is applied.
+
+\paragraph{Redaction of a caught note does not remove the secret}
+Of the 1\,391 notes the gateway did catch, 616 (0.443, 95\% Wilson CI
+0.417 to 0.469) still carried detectable secret content under the
+lexical detector D1 after redaction: the gateway redacts the sentence
+it flags, but the same fact reappears in a header, a bullet list, or a
+later paraphrase of the same sentence. Because D1 has content precision
+0.71 against human labels (Section~\ref{sec:detector}), we re-scored
+all 1\,391 redacted notes with the three-detector majority-vote
+ensemble (D1 lexical, D2 NLI entailment, D3 cross-family LLM judge):
+275 of 1\,391 notes still leaked under the ensemble (0.198, 95\% Wilson
+CI 0.178 to 0.219; D2 alone 75/1\,391 = 0.054, D3 alone 388/1\,391 =
+0.279, zero undetermined). Catching a note and sanitizing it are
+therefore different events even under the stricter ensemble detector,
+and only the first is what the gateway's catch rate measures.
+
+\paragraph{Persistence under a next-agent rewrite}
+To test whether a survived slip survives a genuine rewrite rather than
+only a deterministic re-application, each of the 158 survived slips was
+rewritten by an independent next agent (llama3.2:3b) and the result put
+through the frozen gateway again.  138 of the 158 still carried the
+secret: $\rho_{\text{rewrite}} = 0.873$ (95\% Wilson CI 0.813 to
+0.917).  The matched control --- 300 notes caught at hop~1, rewritten
+the same way --- originated the secret fresh in 67 cases, 0.223 (0.180
+to 0.274).  A note that has already slipped is thus about four times
+as likely to leak again after a full rewrite as a caught note is to
+leak for the first time: blind spots persist across independent
+rephrasing, at 0.87 rather than the 0.95 implied by the original
+20-relay sample.
+
+\paragraph{Do different gateways miss the same notes?}
+Six gateways with deliberately different decision logic were scored on
+every note: the frozen study gateway (lexical $0.60$ OR cosine
+$\geq 0.78$), its lexical-only and cosine-only ablations, a
+threshold-shifted variant (lexical $0.75$ OR cosine $\geq 0.85$), and a
+secret-blind PII regex; the secret-blind regex+LLM-judge gateway was
+additionally evaluated on a stratified sample of 400 notes (200 slips,
+200 catches), so its rate is conditional on that sample.  Miss rates
+(the gate passes while the note really leaks) were 0.125 for the frozen
+gateway (95\% CI 0.110 to 0.142), 0.157 for cosine-only, 0.329 for the
+threshold-shifted variant and 0.379 for lexical-only; the plain
+secret-blind regex caught none of the 1\,600 notes (miss rate 0.994),
+while regex+judge missed 0.145 of its 400-note sample.  Misses were
+strongly correlated among variants that share decision components ---
+$\phi$ = 0.876 frozen versus cosine-only, 0.539 frozen versus
+threshold-shifted, 0.483 frozen versus lexical-only --- but negligible
+between the study gateway and the secret-blind judge ($\phi$ = 0.061,
+odds ratio 1.42; the other three deterministic judge pairs $|\phi|
+\leq 0.063$, odds ratios 0.98 to 1.43), although every pair's marginal
+miss rates differ (exact McNemar $p < 10^{-4}$ for all 15 pairs;
+Figure~\ref{fig:h4}).  Correlation therefore tracks how much decision
+logic two gateways share: genuinely different evidence finds genuinely
+different blind spots, so H4's positive-correlation claim holds within a
+decision family and is negligible across families.  The rotation claim
+follows.  Re-applying the same gateway is deterministic (158/158
+survived, above), and rotating within the family cannot help --- every
+frozen miss is also a miss for lexical-only, cosine-only, the
+threshold-shifted variant and the plain regex by construction, so
+rotation stays at 1.000 --- whereas rotating to the secret-blind judge
+cuts hop-2 persistence to 0.168 ($n$ = 400, an 83\% reduction).  H4's
+rotation claim is thus supported only across genuinely different
+decision logic.
+
+\paragraph{How much of the variation is between secrets and between models?}
+A beta-binomial fit over the 20 development secrets assigns a modest
+but consistent share of the slip-rate variation to the secret itself:
+$\mathrm{ICC}_{\text{secret}} = 0.115$ for llama3.2:3b and 0.126 for
+the independent qwen2.5:3b replication pool (leave-one-secret-out mean
+absolute prediction error 0.106 and 0.068), with the surviving-slip
+arm giving 0.108 and 0.141.  The replication pool also measures the
+model effect under the identical gateway and prompting design: 101 of
+1\,600 notes slipped with qwen2.5:3b, 0.063 (95\% CI 0.052 to 0.076),
+against 209 with llama3.2:3b, 0.131 (0.114 to 0.148) --- roughly half
+the rate.  Which secrets are hard is only partly stable across
+models: per-secret rates correlate moderately (Pearson $r = 0.53$,
+Spearman $\rho = 0.34$ over 20 secrets), the two hardest secrets for
+llama (\texttt{per-02} 0.488, \texttt{hr-04} 0.450) remain among the
+hardest for qwen (0.213 each) while \texttt{cred-03} collapses from
+0.375 to 0.038, and 7 of the 20 secrets never slip at all under qwen
+versus none under llama.  Between-model dispersion is 0.322 on the
+logit scale, but with $n_{\text{models}} = 2$ this is descriptive, not
+a fitted random effect.  These measurements replace the ``0 to 0.10
+per model'' origination range quoted from the three-agent runs.
+
+\paragraph{Simulated outbreaks with a measured relay rate}
+We re-ran the 500-agent simulations with
+$\rho_{\text{rewrite}} = 0.873$ in place of the 0.95 relay estimate
+(200 runs per point, as in the original study).  Under per-edge slip,
+the outbreak floor with a gateway on every agent is 0.02 to 0.09
+across the 18 model--network--placement cells (independent blocking
+0.00; correlated blocking 0.04 to 0.09; pooled 2 to 9\% across models
+and topologies).  As a sensitivity check using only the 40-episode
+six-agent origination rates per model, the full-coverage floors are
+0.00 for gemma2:2b, 0.09 to 0.12 for llama3.2:3b and 0.27 to 0.38 for
+qwen2.5:3b, and the protected fraction needed to push outbreak below
+5\% remains unreachable for the latter two models.  The floor is not
+sensitive to the relay rate over this range: a controlled re-run at
+the legacy $\rho = 0.95$ reproduces the previously published
+0.09--0.14 and 0.24--0.32 per-model figures exactly, and a
+1{,}000-run comparison of the two rates differs by at most 0.02 in
+every cell, so the cell-level movement between runs is Monte Carlo
+noise at the study's run count.  What changed is the evidential base:
+the floor now rests on 158 measured relays instead of 20.
+
+If blind spots persist like this, protected agents do not block
+independently, and a cascade has two stages: a rare slip (origination
+through the gateway) followed by near-certain relay. A back-of-envelope
+check agrees: with $T = 0.017$ (95\% CI 0.006 to 0.031) and an origin
+with four neighbours, the chance that at least one first-hop leak slips
+through is about 7\% (2\% to 12\%). So the gateway cuts the probability
+that a leak starts by about 40 times, but it does not make an outbreak
+impossible once one slip occurs.
+
+\begin{figure}[t]
+\centering
+\figbox{fig_phase3_slips.png}{0.85}
+\caption{Phase 3 boundary pool (DEV, 1\,600 notes, llama3.2:3b). Left:
+slip rate by prompting variant with exact 95\% Clopper--Pearson
+intervals (dashed: pooled). Right: per-secret slip rate, worst first.}
+\label{fig:slips}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\figbox{fig_phase3_persistence.png}{0.85}
+\caption{Phase 3 persistence. Left: deterministic re-pass outcome for
+survived, gate-passed and caught notes. Right: rewrite persistence
+($\rho$) against the fresh-origination control, Wilson 95\% intervals.}
+\label{fig:persist}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\figbox{fig_phase3_h4.png}{0.95}
+\caption{Phase 3 H4: pairwise $\phi$ of miss indicators across six
+gateway variants (blue: exact McNemar $p < 0.05$; all 15 pairs).
+Study-gateway pairs use all 1\,600 notes; pairs involving the
+secret-blind judge use its stratified 400-note sample.}
+\label{fig:h4}
+\end{figure}

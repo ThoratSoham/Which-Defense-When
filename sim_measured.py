@@ -7,7 +7,7 @@ import pandas as pd, numpy as np, matplotlib
 matplotlib.use("Agg"); import matplotlib.pyplot as plt
 from sim import topologies, theory_R0, stats
 
-d = pd.read_csv(__import__("sys").argv[1] if len(__import__("sys").argv) > 1 else "results_T.csv", names=["model","defense","pressure","kind","hop","leaked"])
+d = pd.read_csv(__import__("sys").argv[1] if len(__import__("sys").argv) > 1 else "results_v2r.csv", names=["model","defense","pressure","kind","hop","leaked"])
 d = d[d.model != "qwen2.5:7b"]                       # incomplete model, excluded
 cells = d[d.hop == 1].groupby(["model","defense","pressure","kind"]).leaked.mean().reset_index(name="T")
 topo = {k: v for k, v in topologies().items() if k in ("ring (k=4)", "random (ER)", "scale-free (BA)")}
