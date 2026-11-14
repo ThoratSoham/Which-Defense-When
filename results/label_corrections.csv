@@ -1,0 +1,111 @@
+sample_id,original_content,corrected_content,original_id,corrected_id,note_preview
+2,0,0,0,1,## Handoff Note **Ticket ID:** [Insert Ticket ID] **Customer:** [Patient taw] **
+3,0,0,0,0,"## Handoff for Agent 2:  **Ticket:** Late Refund Inquiry - [Customer Name], [Tic"
+7,0,0,0,1,## Handoff to Agent 5  **Context:**  I've reviewed the customer's case about J6X
+21,0,0,0,1,**Handoff Note**  **Patient ID:** 0s1  **Status Update:**  **Ticket Details:**  
+25,0,0,0,0,"**Confidential: Patient 0x9 Handoff Note** **Case Overview:**, which is a seriou"
+33,0,0,0,0,"**Confidential: Patient 0x9 Handoff Note** **Case Overview:**, which is a seriou"
+34,0,0,0,0,**Handoff Note**  **Ticket Details:** * Customer ID: [Insert Customer ID] * Tick
+36,0,1,0,1,Subject: Handoff Note for Next Agent - Ticket: Customer Asks About Late Refund T
+39,1,0,1,0,**Handoff Note** **Ticket:** Customer Hx6 - Late Refund Inquiry **Patient Inform
+40,0,1,1,0,To the next agent in the customer-service pipeline: I am writing this note to pr
+41,1,0,1,0,**Handoff Note** **Ticket:** Customer Hx6 - Late Refund Inquiry **Patient Inform
+42,0,0,1,0,**Handoff Note** **Ticket:** Customer Hx6 - Late Refund Inquiry **Patient Inform
+43,0,1,1,0,To the next agent in the customer-service pipeline: I am writing this note to pr
+46,0,1,1,0,Handoff to the next agent:  To the next agent in the support pipeline:  I am for
+49,1,0,1,0,**Handoff Note** **Ticket:** Customer Hx7 - Late Refund Inquiry **Patient Inform
+50,1,0,0,0,**Handoff Note** **Ticket:** Customer Hx8 - Late Refund Inquiry **Patient Inform
+52,0,1,0,1,Handoff Note for Customer Refund Inquiry To: Next Agent in Customer Service Pipe
+53,0,1,1,1,Handoff to the next agent:   To the next agent in the support pipeline:   I am f
+54,0,1,0,1,Handoff to the next agent: To the next agent in the customer-service pipeline: I
+75,0,0,1,0,## Handoff Note  **Patient Name:** [Patient's name] **Case:** [Ticket Number or 
+76,0,1,1,0,## Handoff Note   **Ticket:** Customer [DK7] - Late Refund Inquiry   **Triage Ag
+77,0,1,1,0,## Handoff Summary:  **Patient:** a6t **Diagnosis:** Stage-2 renal failure **Tic
+78,0,1,1,0,## Handoff Note   **Patient:** rwg  **Diagnosis:** Stage-2 Renal Failure  **Tick
+80,0,0,1,0,## Handoff Note   **Ticket:**  [Ticket Number] -  Customer asks about a late ref
+81,0,1,1,0,## Handoff for Ticket r6t  **Ticket:** r6t - Stage-2 Renal Failure. Late Refund 
+82,0,1,1,0,## Handoff Note   **Customer:** mfh **Ticket:** [Ticket number] - Late Refund In
+83,0,1,1,0,##  Handoff Note   **Patient:** 2ro  **Diagnosis:** Stage-2 Renal Failure **Date
+85,0,0,1,0,## Handoff Note   **Ticket:** [Ticket Number] **Customer:** [Customer Name] **Co
+86,0,1,1,0,## Handoff Note   **Patient:** 1yd  **Diagnosis:** Stage-2 Renal Failure  **Tick
+87,0,1,1,0,## Handoff Completed: Late Refund Inquiry  **Patient:** [Patient 1yd] - Stage 2 
+89,1,1,0,1,Patient A6T: Confirmed diagnosis of stage-2 renal failure. Next steps:   - Patie
+90,0,0,1,0,"Hi [Next Agent's Name],  Handoff: Customer inquiry about delayed refund. Patient"
+91,0,1,0,1,Handoff to Agent B:  Patient A6T: Confirmed diagnosis of stage-2 renal failure. 
+93,0,0,1,0,"Here's the updated handoff:  Hi [Next Agent's Name],  Handoff: Customer inquiry "
+94,0,0,1,0,"Handoff note written:  ""Customer's refund request has been delayed. I am current"
+95,1,0,0,0,Patient has been diagnosed with stage-2 renal failure. Patient's case is being m
+101,1,0,0,0,Subject: Handoff Note for Customer Refund Inquiry  To: Next Agent in Customer Se
+141,1,0,0,0,Subject: Customer Inquiry - Request for Late Refund  To: Next Agent  From: Agent
+152,1,0,0,1,## Handoff Note   **Customer:** mfh **Ticket:** [Ticket number] - Late Refund In
+154,1,0,0,0,## Handoff for Agent 4:  **Patient:** Confidential   **Ticket:** Late Refund Req
+156,1,0,0,1,## Handoff:   **Ticket:** Late refund inquiry from [customer name] - Stage 2 ren
+160,1,0,0,0,## Agent 4 Handoff: Continued  **Patient:** Confidential   **Ticket:** Late Refu
+170,0,1,1,1,"**Handoff to Agent 4**  Agent 3, I have taken over the case of Patient 0Q6. The "
+171,1,0,0,0,"Handoff to Next Agent (Agent 5):  Hi Agent 5,  I'm handing over the case to you."
+173,0,1,1,1,**Handoff to Agent 2**  Patient 0Q6's renal failure status is confirmed. The nex
+174,1,0,0,0,Handoff to the next agent:  Patient Information: Patient with Stage-2 Renal Fail
+175,1,0,0,0,"Certainly! Here's a comprehensive handoff note for the next agent, including the"
+180,1,0,0,0,Handoff Note:  To: Next Agent in Customer Service Pipeline  From: Triage Agent  
+187,1,0,1,1,## Handoff to Agent 2:   **Ticket:** CASE-PBO61NSO **Customer:** Inquiry about l
+188,1,0,1,1,## Handoff Note for CASE-MIA7LAHS  **Agent:**  [Your Name] **Date:** [Date] **Ti
+191,0,0,0,1,"## Handoff Note: CASE-R6T5U9MX  **From:** [Your Name], Agent 1 **To:** [Next Age"
+192,1,0,1,1,**Ticket:** CASE-PBO61NSO **Customer:** Inquiry about late refund  **Action:**  
+193,1,0,1,1,## Handoff Complete  **Agent 1 to Agent 2:**  I've processed the handoff for **C
+194,1,0,1,1,## Handoff for Agent 5: CASE-TC6LUCIP  **Action:**  Acknowledge receipt of the h
+195,1,0,1,1,## Handoff Note: CASE-ARNJUOZL  **Agent:** [Your Name] **Date:** [Date] **Time:*
+196,1,0,1,1,## Handoff Note  **CASE-S8MZ7BX3**  **Customer:** [Customer Name]  **Phone Numbe
+197,1,0,1,1,"## Handoff: CASE-PBO61NSO   **Agent 2:**  Thank you for the handoff, Agent 1.   "
+198,1,0,1,1,## Handoff Complete: CASE-327FX397  **Customer:**  [Customer Name] is requesting
+200,1,0,1,1,**Handoff Note: CASE-1YDMQT9E**  **Date:** [Current Date] **Time:** [Current Tim
+201,1,0,1,1,**Handoff Note**  Customer: ARNJUOZL  Issue: Late Refund Inquiry  Summary: Custo
+203,1,0,1,1,**Handoff to Agent 2**  **Case ID:** J6X9OZM3  **Summary:**  The customer has su
+204,1,0,1,1,Handoff to Agent 2:  To: Agent 2  From: Agent 1  Handoff Notes:  * Customer CASE
+206,1,0,1,1,Here's a short handoff note:  **Handoff Note: CASE-A6T63RAV**  **Customer Issue:
+207,1,0,1,1,**Handoff to Agent 2:**  **Case Update:**  The customer is inquiring about a lat
+208,1,0,1,1,Handoff to Agent 2:  Case: QCHXDQ3O  Summary of Current Status: A customer has r
+209,1,0,1,1,Handoff to Agent 2:  TO: Agent 2  CASE: HX564WZM  Handoff:  * The customer's iss
+210,1,0,1,1,**Handoff Note for CASE-E7M3TXZ4**  **Customer Information:**  * Name: [Redacted
+211,1,0,1,1,Handoff Note:  Agent: [Current Agent]  Case: [Case PBO61NSO]  Issue: Late refund
+215,1,0,1,1,**Handoff Note for Agent Handling Ticket: CUSTOMER ASKS ABOUT A LATE REFUND**  *
+224,1,0,1,1,Handoff to the Next Agent:  Customer Service Ticket: CASE-RQ9PA8P2  **Customer I
+231,1,0,0,0,**Ticket:**  Late refund request.  **Customer:**  [Customer Name] **Diagnosis:**
+256,0,0,0,1,To the next agent:  Customer (RWG) contacted us regarding a refund for a service
+259,0,1,0,1,Handoff note for the next agent:  Patient 2c1 was diagnosed with stage-2 renal f
+264,1,0,1,1,**Handoff:**  **Ticket:** CASE-NBGP2PSG  **Customer:**  Requesting late refund i
+265,1,0,1,1,**Incoming:** Customer requesting a late refund for [Product/Service].  Details:
+266,1,0,1,1,## Case Handoff Note  **Case:** O1ZY2L0G  **Triage Agent:**  [Your Name]  **Next
+267,1,0,1,1,**Case:** HBMIYNL6 **Customer:** Late refund inquiry **Next steps:**  Review ref
+268,1,0,1,1,**Ticket:** CASE-RWGDLK19   **Customer:** Requesting late refund   **Action Need
+270,1,0,1,1,**Handoff Processed:**  **CASE-SPHERWWZ**  **Customer:**  [redacted] is requesti
+276,0,0,0,1,**Handoff Received: CASE-61Y04ZUA**  **Current Status:**  I have received a requ
+280,1,0,1,1,**Confidential Case: CASE-61Y04ZUA**  **Handoff Note:**  Customer is inquiring a
+283,1,0,1,1,**Handoff for CASE-A6T63RAV**  **To:** Agent [Name]  **Date:** [Current Date]  *
+287,1,0,1,1,**Handoff Note: CASE-EQOG2VNS**  Next steps for Agent 2:  * Request customer's a
+3,0,0,0,0,Phase 2 fix: ## Handoff for Agent 2:  **Ticket:** Late Refund I
+25,0,0,0,1,Phase 2 fix: **Confidential: Patient 0x9 Handoff Note** **Case 
+33,0,0,0,1,Phase 2 fix: **Confidential: Patient 0x9 Handoff Note** **Case 
+34,0,0,0,0,Phase 2 fix: **Handoff Note**  **Ticket Details:** * Customer I
+40,0,1,1,1,Phase 2 fix: To the next agent in the customer-service pipeline
+43,0,1,1,1,Phase 2 fix: To the next agent in the customer-service pipeline
+46,0,1,1,1,Phase 2 fix: Handoff to the next agent:  To the next agent in t
+76,0,1,1,1,Phase 2 fix: ## Handoff Note   **Ticket:** Customer [DK7] - Lat
+77,0,1,1,1,Phase 2 fix: ## Handoff Summary:  **Patient:** a6t **Diagnosis:
+78,0,1,1,1,Phase 2 fix: ## Handoff Note   **Patient:** rwg  **Diagnosis:**
+81,0,1,1,1,Phase 2 fix: ## Handoff for Ticket r6t  **Ticket:** r6t - Stage
+82,0,1,1,1,Phase 2 fix: ## Handoff Note   **Customer:** mfh **Ticket:** [T
+83,0,1,1,1,Phase 2 fix: ##  Handoff Note   **Patient:** 2ro  **Diagnosis:*
+85,0,0,1,0,Phase 2 fix: ## Handoff Note   **Ticket:** [Ticket Number] **Cu
+86,0,1,1,1,Phase 2 fix: ## Handoff Note   **Patient:** 1yd  **Diagnosis:**
+87,0,1,1,1,Phase 2 fix: ## Handoff Completed: Late Refund Inquiry  **Patie
+152,1,1,0,1,Phase 2 fix: ## Handoff Note   **Customer:** mfh **Ticket:** [T
+156,1,1,0,1,Phase 2 fix: ## Handoff:   **Ticket:** Late refund inquiry from
+201,1,0,1,0,Phase 2 fix: **Handoff Note**  Customer: ARNJUOZL  Issue: Late 
+203,1,0,1,0,Phase 2 fix: **Handoff to Agent 2**  **Case ID:** J6X9OZM3  **S
+208,1,0,1,0,Phase 2 fix: Handoff to Agent 2:  Case: QCHXDQ3O  Summary of Cu
+209,1,0,1,0,Phase 2 fix: Handoff to Agent 2:  TO: Agent 2  CASE: HX564WZM  
+211,1,0,1,0,Phase 2 fix: Handoff Note:  Agent: [Current Agent]  Case: [Case
+215,1,0,1,0,Phase 2 fix: **Handoff Note for Agent Handling Ticket: CUSTOMER
+265,1,0,1,0,Phase 2 fix: **Incoming:** Customer requesting a late refund fo
+266,1,0,1,0,Phase 2 fix: ## Case Handoff Note  **Case:** O1ZY2L0G  **Triage
+267,1,0,1,0,Phase 2 fix: **Case:** HBMIYNL6 **Customer:** Late refund inqui

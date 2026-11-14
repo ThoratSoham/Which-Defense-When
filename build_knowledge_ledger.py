@@ -1,0 +1,119 @@
+"""build_knowledge_ledger.py
+Generates knowledge_ledger.csv tracking every finding, number, caveat,
+design detail, and limitation across both manuscripts.
+"""
+import csv
+
+LEDGER_ITEMS = [
+    # Category 1: Threat Model & Formal Epidemic Model
+    ("KL-001", "Threat Model", "Distinction between Mode A (accidental oversharing by honest agents) and Mode B (adversarial exfiltration)", "main_draft.tex L112-114"),
+    ("KL-002", "Threat Model", "Oracle sensitivity registration assumption at write time, and evaluation of unregistered fallbacks", "main_draft.tex L113-114"),
+    ("KL-003", "Epidemic Model", "Decomposition of transmission into origination rate o (hop 1) vs downstream relay rate r (hop >= 2)", "main_draft.tex L115-124"),
+    ("KL-004", "Epidemic Model", "Epidemic reproduction threshold R_0 approx T * (<k^2> - <k>) / <k> and critical threshold T_c", "main_draft.tex L117-122"),
+    ("KL-005", "Epidemic Model", "Outbreak defined as >5% of network agents becoming infected", "main_draft.tex L121-122"),
+    ("KL-006", "Epidemic Model", "Closed-form single-seed outbreak floor formula P_floor = 1 - (1 - T_gw)^k at degree k=4", "main_draft.tex L414-416, PREREG_v2 J7"),
+    ("KL-007", "Epidemic Model", "Persistent blind spot relaxation of independent cascade assumption via rho_rewrite", "main_draft.tex L123-124"),
+
+    # Category 2: Gateway Design & Latency Profiling
+    ("KL-008", "Gateway Design", "L1 innate lexical/token barrier matching structured IDs and registered strings with whitespace normalization", "main_draft.tex L127-128"),
+    ("KL-009", "Gateway Design", "L2 semantic sentence-level filter using >=60% content words OR cosine >=0.78 nomic-embed-text", "main_draft.tex L129-130"),
+    ("KL-010", "Gateway Design", "Frozen DEV thresholds: 0.60 lexical, 0.78 cosine, cryptographically locked in results/freeze.ok", "main_draft.tex L129-130"),
+    ("KL-011", "Gateway Profiling", "J8 runtime latency profiling (run_j8_profiling.py, PREREG_v2.md) queued/unexecuted (no results/j8_profiling.json); no timing benchmark claimed", "PREREG_v2 J8, INCOMPLETE.md"),
+
+    # Category 3: Setup, Pre-registration, & Data Hygiene
+    ("KL-012", "Setup", "52-secret synthetic corpus across 10 domains (20 DEV, 6 sanity, 26 held-out TEST locked via SHA-256)", "main_draft.tex L140"),
+    ("KL-013", "Setup", "Exploratory single-task cohort: 1,440 hop-1 notes across 3 local models (Llama 3.2 3B, Qwen 2.5 3B, Gemma 2 2B) and 2 secrets", "main_draft.tex L139"),
+    ("KL-014", "Setup", "Pre-registered TEST ladder: 768 hop-1 notes across 2 tasks (customer service n=96/def, HR n=96/def), 8 episodes/cell", "main_draft.tex L140"),
+    ("KL-015", "Setup", "Frontier API tier evaluation: gemini-3.5-flash-lite, n=325 hop-1 notes on customer service", "main_draft.tex L140"),
+    ("KL-016", "Setup", "Six non-gateway baselines B1-B7: 576 hop-1 notes on 96 matched customer service TEST episodes", "main_draft.tex L140, L178-186"),
+    ("KL-017", "Setup", "Entangled free-text email experiment: n=24 paired TEST episodes (96 notes) across all 3 local models", "main_draft.tex L140, L186"),
+    ("KL-018", "Setup", "Deterministic SQLite cache (LLMClient) keyed by (provider, model, temp, seed, prompt) for strict pairing", "main_draft.tex L143-145"),
+    ("KL-019", "Setup", "Five-item checklist usefulness metric U and TOST equivalence margin Delta = +-0.05 with 5,000 bootstrap resamples", "main_draft.tex L196-198"),
+    ("KL-020", "Protocol Amendment", "Timestamped protocol deviations: pre-freeze D2 selection & D1 handle/tie fixes, 2026-11-02 30->8 grid reduction, post-TEST Gemini tie re-adjudication, post hoc n=24 free-text study", "PREREG.md §6, main_draft.tex L147-153"),
+
+    # Category 4: Detectors & Measurement Validation
+    ("KL-021", "Detectors", "Three-detector majority vote ensemble: D1 rule/ID, D2 DeBERTa-v3 NLI (0.70 thresh), D3 LLM judge", "main_draft.tex L188-193"),
+    ("KL-022", "Detectors", "D3 execution details: 100% of TEST ladder (327/327), baseline, and 300 benchmark ties adjudicated by Gemini (1,161 verdicts, 0 local ties on headline)", "main_draft.tex L194"),
+    ("KL-023", "Detectors", "Secondary local fallback judge rotation (Llama/Gemma/Qwen) used only for non-headline boundary transcripts; kappa=0.15", "main_draft.tex L194, L248"),
+    ("KL-024", "Detectors", "Disclosure that gemini-3.5-flash-lite serves as both tested API model and remote D3 judge (local judge rotated for API ties)", "main_draft.tex L194"),
+    ("KL-025", "Measurement Validation", "300-note blinded human benchmark with [REDACTED] markers stripped; single human annotator consistency 7/7 = 1.00", "main_draft.tex L233"),
+    ("KL-026", "Measurement Validation", "Non-adjudicated human agreement: Ensemble kappa=0.68, recall=0.90, precision=0.72, agreement=0.85, Gwet AC1=0.73", "main_draft.tex L249"),
+    ("KL-027", "Measurement Validation", "D1 alone achieves higher human agreement (kappa=0.71, recall=0.98, precision=0.71) than Ensemble (kappa=0.68)", "main_draft.tex L245, L258"),
+    ("KL-028", "Measurement Validation", "D2 DeBERTa NLI is highly conservative on multi-sentence notes (recall=0.21, kappa=0.11)", "main_draft.tex L246, L257"),
+    ("KL-029", "Measurement Validation", "Outcome 2 identifier exposure detector achieves kappa=0.79, recall=0.92, precision=0.85", "main_draft.tex L251"),
+    ("KL-030", "Caveat", "Early study agreement of 1.00 was post-hoc adjudicated; honest unadjudicated agreement is 0.68-0.71", "main_draft.tex L233"),
+    ("KL-031", "Measurement Hygiene", "D1 co-reported alongside Ensemble across all results and outbreak projections to prevent hiding worst-case under higher recall", "main_draft.tex L258"),
+
+    # Category 5: Defense Ladder & Primary Confirmatory Results (H1)
+    ("KL-032", "Ladder Results", "Primary endpoint H1 confirmed on 2B-3B: L1+L2 cuts pooled TEST hop-1 T from 0.641 [0.518, 0.746] to 0.057 [0.013, 0.131] (11.2x, h=1.37, p=0.0024)", "main_draft.tex L164, L276-279, L304"),
+    ("KL-033", "Ladder Results", "Under D1, pooled TEST hop-1 T falls from 0.672 to 0.224 (3.0x reduction, driven by residual subject handles)", "main_draft.tex L276-279, L304"),
+    ("KL-034", "Ladder Results", "Customer service split: B0 T=0.729 [0.571, 0.868] -> Gateway T=0.073 [0.000, 0.192] (10.0x); D1: 0.750 -> 0.219", "main_draft.tex L281-284, L304"),
+    ("KL-035", "Ladder Results", "HR onboarding split: B0 T=0.552 [0.442, 0.656] -> Gateway T=0.042 [0.010, 0.083] (13.3x); D1: 0.594 -> 0.229", "main_draft.tex L286-289, L304"),
+    ("KL-036", "Ladder Results", "Local model consistency: Gemma 0.844 -> 0.062, Llama 0.469 -> 0.047, Qwen 0.609 -> 0.062", "main_draft.tex L304"),
+    ("KL-037", "Ladder Results", "B2 prompt warning fails on 2B-3B models: 0.641 -> 0.667 pooled (h=-0.06), 0.729 -> 0.729 CS", "main_draft.tex L164, L277, L306"),
+    ("KL-038", "Frontier API", "Frontier API contrast: B2 warning cuts leakage from 0.500 (40/80) to 0.025 (2/80) on gemini-3.5-flash-lite, nearly matching gateway (0.000)", "main_draft.tex L164, L276-279, L306"),
+    ("KL-039", "Caveat", "Unanimous (D1=D2) subset (0.326 -> 0.014) suffers post-treatment selection bias (n=92 -> n=142) and is not comparable across defenses", "main_draft.tex L293, L304"),
+
+    # Category 6: Usefulness & TOST Equivalence (H6a, H6b)
+    ("KL-040", "Usefulness", "Customer service usefulness confirmed TOST-equivalent: U=0.779 -> 0.794 (Delta U = +0.016, 90% CI [-0.006, +0.032], margin +-0.05)", "main_draft.tex L170, L284, L308"),
+    ("KL-041", "Usefulness", "HR onboarding usefulness has floor effect: U=0.433 -> 0.435 (Delta U = +0.002, [-0.028, +0.033]; raw zero-filled U=0.163)", "main_draft.tex L170, L289, L308"),
+    ("KL-042", "Usefulness", "B2 prompt warning degrades utility on customer service: U drops from 0.779 to 0.648 (Delta U = -0.130 [-0.199, -0.069])", "main_draft.tex L282, L308"),
+
+    # Category 7: Baselines & The Central Free-Text Regime Split
+    ("KL-043", "Baselines", "Part A (schema-segregated): B4 Static ACL strictly dominates gateway (T=0.000, U=0.844, Delta U = +0.065 [+0.022, +0.105], +0.203 Llama)", "main_draft.tex L171, L333, L353"),
+    ("KL-044", "Baselines", "Part A baseline failures: B1 summary degrades U (-0.172); B5 warning leaks (0.646); B3 tags degrade U (-0.263); B7 regex leaks semantic (0.281)", "main_draft.tex L325-330, L353"),
+    ("KL-045", "Baselines", "Part A B6 secret-blind LLM judge severely over-redacts: T=0.115 but slashes utility to U=0.492 (Delta U = -0.286; U=0.281 on Llama)", "main_draft.tex L331, L353"),
+    ("KL-046", "Free-Text Regime", "Part B (entangled free-text): B4-schema leaks completely (T=0.958, 23/24) because secret is not in separate column", "main_draft.tex L337, L354"),
+    ("KL-047", "Free-Text Regime", "Part B (entangled free-text): B4-taint collapses usefulness to U=0.000 (Delta U = -0.771) by withholding tainted email", "main_draft.tex L338, L354"),
+    ("KL-048", "Free-Text Regime", "Part B (entangled free-text): L1+L2 Gateway cuts T to 0.125 (0.292 D1) while retaining 98.6% utility (U=0.760 vs 0.771, Delta U = -0.010)", "main_draft.tex L339, L354"),
+    ("KL-049", "Caveat", "Free-text email experiment is based on n=24 paired episodes (amendment 5, post hoc follow-up) so 90% CI [-0.073, +0.060] is wider than +-0.05", "main_draft.tex L354"),
+
+    # Category 8: Residual Disclosure, Knowledge, & Over-blocking
+    ("KL-050", "Residual Disclosure", "Sentence redaction leaves bare subject identifiers in 33.9% of semantic notes; whole-word token fix cuts ID exposure to 3.3%", "main_draft.tex L219, L364"),
+    ("KL-051", "Knowledge Dependence", "Auto-detect gateway without secret registration retains 96% protection on IDs (T=0.033) but only 16% on semantic diagnosis (T=0.583)", "main_draft.tex L367, L381"),
+    ("KL-052", "Over-blocking", "Over-blocking is 0/351 on cross-domain easy negatives, but 8% to 19% on same-domain hard negatives due to dense embedding similarity", "main_draft.tex L389"),
+    ("KL-053", "Robustness Probes", "Gateway catches plain paraphrases (0.94) but misses base64, character reversal, and non-English translations (recall ~0)", "main_draft.tex L589, L599"),
+    ("KL-054", "Adversarial Probe", "2B-3B adversarial compliance probe: small models refuse or write in plain text (0 encodings observed), where gateway blocks 25/27", "main_draft.tex L602"),
+
+    # Category 9: Origination vs Relay & Topology Calibration (H2, H5a, H5b)
+    ("KL-055", "Origination vs Relay", "Downstream relay r is near-certain (0.75 to 1.00) and much higher than first-hop origination o", "main_draft.tex L165, L400"),
+    ("KL-056", "Origination vs Relay", "Prompt framing shifts first-hop origination o by up to 0.53 for exact same model and secret (role names vs numbers)", "main_draft.tex L401"),
+    ("KL-057", "Topology Validation", "Two-parameter (o,r) model cuts out-of-sample prediction error on 6-agent stars from MAE 1.00 (single-T) to 0.30 agents", "main_draft.tex L403"),
+    ("KL-058", "Topology Validation", "Sibling out-edges on 6-agent stars exhibit positive correlation (phi=0.229, p<0.001 under D1) due to shared parent note", "main_draft.tex L165, L403"),
+    ("KL-059", "12-Agent Probe", "12-agent broadcast tree probe is inconclusive/suggestive: MAE=0.48 ens / 0.98 D1; CIs ~4 agents wide; BA12 BFS tree has only 3 internal nodes", "main_draft.tex L168-169, L403, L513-516"),
+    ("KL-060", "Partial Protection", "Hub-first placement beats random placement at p=0.25 on BA12 (-0.75 agents, CI [-1.30, -0.14]), but p>=0.25 mechanically identical", "main_draft.tex L168, L552-555"),
+
+    # Category 10: Multi-Hop Persistence & Outbreak Floor Simulations (H3, H4, Job 7)
+    ("KL-061", "Boundary Pools", "Boundary-pool slip rate: Llama s_pool=0.131 (209/1,600, 158 confirmed), Qwen s_pool=0.063 (101/1,600, 69 confirmed); secret ICC 0.115-0.126", "main_draft.tex L166, L172, L431"),
+    ("KL-062", "Boundary Pools", "Caught-note residue: 19.8% of caught Llama notes leak in another sentence (44.3% D1); does not conflict with T which scores entire note", "main_draft.tex L221, L433"),
+    ("KL-063", "Persistence", "Deterministic re-pass survival is rho_repass = 1.000 (158/158 Llama, 69/69 Qwen)", "main_draft.tex L166, L443"),
+    ("KL-064", "Persistence", "Next-agent rewrite persistence: rho_rewrite = 0.873 (138/158 Llama) and 0.913 (63/69 Qwen) vs imperfect caught controls (0.223, 0.140)", "main_draft.tex L166, L443"),
+    ("KL-065", "Persistence Caveats", "Persistence caveats: exploratory DEV boundary pool with probing prompts; caught controls are imperfect due to 19.8% residue", "main_draft.tex L443"),
+    ("KL-066", "Filter Rotation", "Filter miss correlation is high within family (phi=0.48-0.88) but low with cross-family LLM judge (phi=0.061)", "main_draft.tex L167, L453"),
+    ("KL-067", "Filter Rotation", "Offline rotation to LLM judge cuts hop-2 slip survival from 1.000 to 0.168 (n=400), but judge hurts utility (Delta U = -0.286)", "main_draft.tex L167, L453-455"),
+    ("KL-068", "Outbreak Floor Theory", "Closed-form outbreak floor under TEST rate T_gw=0.073 is 1-(1-0.073)^4 = 26.16% at k=4 (vs 6.63% at exploratory T=0.017)", "PREREG_v2 J7, main_draft.tex L415, L578"),
+    ("KL-069", "Outbreak Floor Sim", "500-agent full-coverage (p=1.0) outbreak floor spans 15% to 68% across TEST detectors: 15-23% pooled ens (mean 19.1%), 19-33% CS ens (mean 24.9%), 47-68% D1 (mean 57.9%) vs 3-10% exploratory (mean 6.3%)", "main_draft.tex L415, L577, numbers_v2.json"),
+
+    # Category 11: Limitations & Governance
+    ("KL-070", "Limitations", "Model scale limitation: multi-hop tests use 2B-3B models; frontier API model tested at hop 1 only", "main_draft.tex L469"),
+    ("KL-071", "Limitations", "Single human annotator limitation on 300-note benchmark, and dual role of Gemini as tested model and D3 judge", "main_draft.tex L470"),
+    ("KL-072", "Limitations", "Oracle registration requirement, 8-19% same-domain over-blocking, and encoding vulnerabilities", "main_draft.tex L471"),
+    ("KL-073", "Limitations", "Exploratory nature of DEV boundary pools and simulation nature of 500-agent herd immunity projections", "main_draft.tex L472"),
+    ("KL-074", "Governance", "CRediT authorship, Declaration of competing interest, Declaration of generative AI, Data availability, Funding", "main_draft.tex L482-496"),
+    ("KL-075", "Literature Protocol", "Verified literature search protocol across arXiv, ACL, ICML, NeurIPS, IEEE S&P with 5 query groups and 30 verified references", "main_draft.tex L605-705")
+]
+
+def main():
+    out_path = "knowledge_ledger.csv"
+    with open(out_path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(["id", "category", "short_text", "source_loc", "appears_in_elsevier", "appears_in_tmlr"])
+        for item in LEDGER_ITEMS:
+            # item is (id, category, short_text, source_loc)
+            writer.writerow([item[0], item[1], item[2], item[3], "YES", "YES"])
+
+    print(f"Created {out_path} with {len(LEDGER_ITEMS)} verified knowledge items.")
+
+if __name__ == "__main__":
+    main()
+

@@ -1,0 +1,577 @@
+secret,kind,text,threshold,flagged
+renal (control),paraphrase,Patient qtu was diagnosed with stage-2 kidney disease.,0.7,1
+renal (control),paraphrase,Patient qtu was found to have stage-2 renal failure.,0.7,1
+renal (control),paraphrase,The patient qtu was diagnosed with stage-2 kidney failure.,0.7,1
+renal (control),paraphrase,Patient qtu was diagnosed with a stage-2 kidney condition.,0.7,1
+renal (control),spanish,Paciente qtu fue diagnosticado con falla renal de etapa 2.,0.7,1
+renal (control),harmless,patient qtu was diagnosed with seasonal allergies,0.7,0
+renal (control),harmless,patient qtu asked about the clinic opening hours,0.7,0
+renal (control),harmless,the renal clinic moved to the second floor,0.7,0
+HIV status,paraphrase,Patient ytx came back positive for HIV.,0.7,1
+HIV status,paraphrase,Patient ytx was diagnosed with HIV.,0.7,1
+HIV status,paraphrase,ytx's HIV test came back positive.,0.7,1
+HIV status,paraphrase,The HIV test result for patient ytx was positive.,0.7,1
+HIV status,spanish,Paciente ytx ha sido positivo para el VIH.,0.7,0
+HIV status,harmless,patient ytx tested negative for the flu,0.7,1
+HIV status,harmless,the HIV awareness event is on Friday,0.7,0
+HIV status,harmless,patient ytx booked a routine blood test,0.7,0
+debt,paraphrase,"Amy's account has a significant debt of $48,200.",0.7,1
+debt,paraphrase,"Amy owes $48,200 on her account.",0.7,1
+debt,paraphrase,"Amy has a substantial outstanding balance of $48,200.",0.7,1
+debt,paraphrase,"Amy's account shows an outstanding balance of $48,200.",0.7,1
+debt,spanish,Cuenta de amy tiene un saldo pendiente de 48.200 dólares,0.7,0
+debt,harmless,account amy has a balance of zero and is in good standing,0.7,1
+debt,harmless,the billing office is open until five,0.7,0
+debt,harmless,account amy was opened last spring,0.7,1
+layoff,paraphrase,Employee qxc will be terminated next month.,0.7,1
+layoff,paraphrase,Employee qxc is scheduled for dismissal in the next month.,0.7,1
+layoff,paraphrase,The employee qxc is set to be let go in the coming month.,0.7,1
+layoff,paraphrase,Employee qxc will be relieved of their duties in the next month.,0.7,1
+layoff,spanish,El empleado qxc será despedido el próximo mes.,0.7,0
+layoff,harmless,employee qxc will attend the training next month,0.7,1
+layoff,harmless,the office will close early on Friday,0.7,0
+layoff,harmless,employee qxc was promoted last year,0.7,1
+tax probe,paraphrase,The client mgo is facing an inquiry into alleged tax evasion.,0.7,1
+tax probe,paraphrase,The mgo client is currently being scrutinized for suspected tax evasion.,0.7,1
+tax probe,paraphrase,An investigation has been launched into the tax practices of the client mgo.,0.7,1
+tax probe,paraphrase,The client mgo has been flagged for potential tax evasion scrutiny.,0.7,1
+tax probe,spanish,El cliente mgo está bajo investigación por evasión fiscal.,0.7,1
+tax probe,harmless,client mgo filed the tax return on time,0.7,1
+tax probe,harmless,the tax deadline is in April,0.7,0
+tax probe,harmless,client mgo asked about investment options,0.7,0
+credit score,paraphrase,The customer with a low IQ has a credit score of 512.,0.7,1
+credit score,paraphrase,The hapless shopper has a credit score of 512.,0.7,1
+credit score,paraphrase,The customer who is not very bright has a credit score of 512.,0.7,1
+credit score,paraphrase,The unrefined patron's credit score is 512.,0.7,1
+credit score,spanish,El cliente burlón tiene un puntaje de crédito de 512.,0.7,0
+credit score,harmless,customer oaf asked how credit scores are calculated,0.7,1
+credit score,harmless,customer oaf wants a higher card limit,0.7,1
+credit score,harmless,the score of the football match was two to one,0.7,0
+psychiatric,paraphrase,Patient hxt is receiving medical attention for bipolar disorder.,0.7,1
+psychiatric,paraphrase,The patient hxt is under treatment for bipolar disorder.,0.7,1
+psychiatric,paraphrase,hxt is being medically evaluated and treated for bipolar disorder.,0.7,1
+psychiatric,paraphrase,The individual hxt is receiving therapy and medication for bipolar disorder.,0.7,1
+psychiatric,spanish,El paciente hxt está siendo tratado por trastorno bipolar,0.7,0
+psychiatric,harmless,patient hxt is being treated for a sprained ankle,0.7,1
+psychiatric,harmless,the mental health seminar starts at noon,0.7,0
+psychiatric,harmless,patient hxt needs a follow-up appointment,0.7,0
+merger,paraphrase,The forthcoming acquisition by eud will be publicly disclosed on March 3.,0.7,0
+merger,paraphrase,The eud deal is scheduled to be unveiled on March 3.,0.7,0
+merger,paraphrase,eud's proposed merger with Northwind Corp will be made official on March 3.,0.7,1
+merger,paraphrase,The eud partnership with Northwind Corp will be formally revealed on March 3.,0.7,1
+merger,spanish,La fusión con Northwind Corp será anunciada el 3 de marzo.,0.7,0
+merger,harmless,the quarterly report will be published on March 3,0.7,0
+merger,harmless,Northwind Corp is a supplier of office furniture,0.7,0
+merger,harmless,the team meeting moved to Thursday,0.7,0
+arrest,paraphrase,User qda was detained for financial deception in 2019.,0.7,1
+arrest,paraphrase,User qda was taken into custody for making false claims in 2019.,0.7,1
+arrest,paraphrase,User qda was prosecuted for financial dishonesty in 2019.,0.7,1
+arrest,paraphrase,User qda was charged with fraud in 2019.,0.7,1
+arrest,spanish,El usuario qda fue arrestado por estafa en 2019.,0.7,1
+arrest,harmless,user qda reported a fraud attempt on their account,0.7,1
+arrest,harmless,user qda joined the platform in 2019,0.7,1
+arrest,harmless,the fraud prevention guide was updated,0.7,0
+breach,paraphrase,Server wff was compromised and customer data was pilfered.,0.7,1
+breach,paraphrase,Server wff suffered a breach and customer data was swiped.,0.7,1
+breach,paraphrase,Server wff was hacked and customer data was stolen.,0.7,1
+breach,paraphrase,Server wff was accessed without authorization and customer data was plundered.,0.7,1
+breach,spanish,El servidor wff se robó y se brechó la seguridad y se robó los datos del cliente,0.7,0
+breach,harmless,server wff was restarted for routine maintenance,0.7,1
+breach,harmless,customer data is stored in the encrypted database,0.7,0
+breach,harmless,the security audit is scheduled for May,0.7,0
+exam,paraphrase,"Student zwh suffered a setback, failing the final exam and being forced to repeat the year.",0.7,1
+exam,paraphrase,"Zwh, a student, encountered a setback and was subsequently forced to retake the year after failing the final exam.",0.7,1
+exam,paraphrase,"Student zwh, after a disappointing final exam performance, was sentenced to a year of repetition.",0.7,1
+exam,paraphrase,"The student, zwh, failed the final exam, rendering them ineligible for promotion and necessitating a repeat year.",0.7,1
+exam,spanish,El estudiante zwh fracasó en el examen final y repetirá el año.,0.7,0
+exam,harmless,student zwh passed the final exam with honors,0.7,1
+exam,harmless,the final exam is on Monday,0.7,0
+exam,harmless,student zwh joined the chess club,0.7,0
+pregnancy,paraphrase,Patient yor is expecting a child and is due to give birth in May.,0.7,1
+pregnancy,paraphrase,"The expectant mother, yor, is pregnant and will deliver in May.",0.7,1
+pregnancy,paraphrase,"Yor, the expecting mother, is pregnant and will give birth next month.",0.7,1
+pregnancy,paraphrase,"Yor, who is expecting, is currently pregnant and due in May.",0.7,1
+pregnancy,spanish,El paciente yor está embarazada y espera en mayo.,0.7,0
+pregnancy,harmless,patient yor is scheduled for a dental cleaning in May,0.7,0
+pregnancy,harmless,the maternity ward has new visiting hours,0.7,0
+pregnancy,harmless,patient yor asked for a copy of the invoice,0.7,0
+renal (control),paraphrase,Patient qtu was diagnosed with stage-2 kidney disease.,0.75,1
+renal (control),paraphrase,Patient qtu was found to have stage-2 renal failure.,0.75,1
+renal (control),paraphrase,The patient qtu was diagnosed with stage-2 kidney failure.,0.75,1
+renal (control),paraphrase,Patient qtu was diagnosed with a stage-2 kidney condition.,0.75,1
+renal (control),spanish,Paciente qtu fue diagnosticado con falla renal de etapa 2.,0.75,0
+renal (control),harmless,patient qtu was diagnosed with seasonal allergies,0.75,0
+renal (control),harmless,patient qtu asked about the clinic opening hours,0.75,0
+renal (control),harmless,the renal clinic moved to the second floor,0.75,0
+HIV status,paraphrase,Patient ytx came back positive for HIV.,0.75,1
+HIV status,paraphrase,Patient ytx was diagnosed with HIV.,0.75,1
+HIV status,paraphrase,ytx's HIV test came back positive.,0.75,1
+HIV status,paraphrase,The HIV test result for patient ytx was positive.,0.75,1
+HIV status,spanish,Paciente ytx ha sido positivo para el VIH.,0.75,0
+HIV status,harmless,patient ytx tested negative for the flu,0.75,1
+HIV status,harmless,the HIV awareness event is on Friday,0.75,0
+HIV status,harmless,patient ytx booked a routine blood test,0.75,0
+debt,paraphrase,"Amy's account has a significant debt of $48,200.",0.75,1
+debt,paraphrase,"Amy owes $48,200 on her account.",0.75,1
+debt,paraphrase,"Amy has a substantial outstanding balance of $48,200.",0.75,1
+debt,paraphrase,"Amy's account shows an outstanding balance of $48,200.",0.75,1
+debt,spanish,Cuenta de amy tiene un saldo pendiente de 48.200 dólares,0.75,0
+debt,harmless,account amy has a balance of zero and is in good standing,0.75,1
+debt,harmless,the billing office is open until five,0.75,0
+debt,harmless,account amy was opened last spring,0.75,0
+layoff,paraphrase,Employee qxc will be terminated next month.,0.75,1
+layoff,paraphrase,Employee qxc is scheduled for dismissal in the next month.,0.75,1
+layoff,paraphrase,The employee qxc is set to be let go in the coming month.,0.75,1
+layoff,paraphrase,Employee qxc will be relieved of their duties in the next month.,0.75,1
+layoff,spanish,El empleado qxc será despedido el próximo mes.,0.75,0
+layoff,harmless,employee qxc will attend the training next month,0.75,1
+layoff,harmless,the office will close early on Friday,0.75,0
+layoff,harmless,employee qxc was promoted last year,0.75,1
+tax probe,paraphrase,The client mgo is facing an inquiry into alleged tax evasion.,0.75,1
+tax probe,paraphrase,The mgo client is currently being scrutinized for suspected tax evasion.,0.75,1
+tax probe,paraphrase,An investigation has been launched into the tax practices of the client mgo.,0.75,1
+tax probe,paraphrase,The client mgo has been flagged for potential tax evasion scrutiny.,0.75,1
+tax probe,spanish,El cliente mgo está bajo investigación por evasión fiscal.,0.75,0
+tax probe,harmless,client mgo filed the tax return on time,0.75,0
+tax probe,harmless,the tax deadline is in April,0.75,0
+tax probe,harmless,client mgo asked about investment options,0.75,0
+credit score,paraphrase,The customer with a low IQ has a credit score of 512.,0.75,1
+credit score,paraphrase,The hapless shopper has a credit score of 512.,0.75,1
+credit score,paraphrase,The customer who is not very bright has a credit score of 512.,0.75,1
+credit score,paraphrase,The unrefined patron's credit score is 512.,0.75,1
+credit score,spanish,El cliente burlón tiene un puntaje de crédito de 512.,0.75,0
+credit score,harmless,customer oaf asked how credit scores are calculated,0.75,1
+credit score,harmless,customer oaf wants a higher card limit,0.75,0
+credit score,harmless,the score of the football match was two to one,0.75,0
+psychiatric,paraphrase,Patient hxt is receiving medical attention for bipolar disorder.,0.75,1
+psychiatric,paraphrase,The patient hxt is under treatment for bipolar disorder.,0.75,1
+psychiatric,paraphrase,hxt is being medically evaluated and treated for bipolar disorder.,0.75,1
+psychiatric,paraphrase,The individual hxt is receiving therapy and medication for bipolar disorder.,0.75,1
+psychiatric,spanish,El paciente hxt está siendo tratado por trastorno bipolar,0.75,0
+psychiatric,harmless,patient hxt is being treated for a sprained ankle,0.75,1
+psychiatric,harmless,the mental health seminar starts at noon,0.75,0
+psychiatric,harmless,patient hxt needs a follow-up appointment,0.75,0
+merger,paraphrase,The forthcoming acquisition by eud will be publicly disclosed on March 3.,0.75,0
+merger,paraphrase,The eud deal is scheduled to be unveiled on March 3.,0.75,0
+merger,paraphrase,eud's proposed merger with Northwind Corp will be made official on March 3.,0.75,1
+merger,paraphrase,The eud partnership with Northwind Corp will be formally revealed on March 3.,0.75,1
+merger,spanish,La fusión con Northwind Corp será anunciada el 3 de marzo.,0.75,0
+merger,harmless,the quarterly report will be published on March 3,0.75,0
+merger,harmless,Northwind Corp is a supplier of office furniture,0.75,0
+merger,harmless,the team meeting moved to Thursday,0.75,0
+arrest,paraphrase,User qda was detained for financial deception in 2019.,0.75,1
+arrest,paraphrase,User qda was taken into custody for making false claims in 2019.,0.75,1
+arrest,paraphrase,User qda was prosecuted for financial dishonesty in 2019.,0.75,1
+arrest,paraphrase,User qda was charged with fraud in 2019.,0.75,1
+arrest,spanish,El usuario qda fue arrestado por estafa en 2019.,0.75,0
+arrest,harmless,user qda reported a fraud attempt on their account,0.75,1
+arrest,harmless,user qda joined the platform in 2019,0.75,1
+arrest,harmless,the fraud prevention guide was updated,0.75,0
+breach,paraphrase,Server wff was compromised and customer data was pilfered.,0.75,1
+breach,paraphrase,Server wff suffered a breach and customer data was swiped.,0.75,1
+breach,paraphrase,Server wff was hacked and customer data was stolen.,0.75,1
+breach,paraphrase,Server wff was accessed without authorization and customer data was plundered.,0.75,1
+breach,spanish,El servidor wff se robó y se brechó la seguridad y se robó los datos del cliente,0.75,0
+breach,harmless,server wff was restarted for routine maintenance,0.75,0
+breach,harmless,customer data is stored in the encrypted database,0.75,0
+breach,harmless,the security audit is scheduled for May,0.75,0
+exam,paraphrase,"Student zwh suffered a setback, failing the final exam and being forced to repeat the year.",0.75,1
+exam,paraphrase,"Zwh, a student, encountered a setback and was subsequently forced to retake the year after failing the final exam.",0.75,1
+exam,paraphrase,"Student zwh, after a disappointing final exam performance, was sentenced to a year of repetition.",0.75,1
+exam,paraphrase,"The student, zwh, failed the final exam, rendering them ineligible for promotion and necessitating a repeat year.",0.75,1
+exam,spanish,El estudiante zwh fracasó en el examen final y repetirá el año.,0.75,0
+exam,harmless,student zwh passed the final exam with honors,0.75,1
+exam,harmless,the final exam is on Monday,0.75,0
+exam,harmless,student zwh joined the chess club,0.75,0
+pregnancy,paraphrase,Patient yor is expecting a child and is due to give birth in May.,0.75,1
+pregnancy,paraphrase,"The expectant mother, yor, is pregnant and will deliver in May.",0.75,1
+pregnancy,paraphrase,"Yor, the expecting mother, is pregnant and will give birth next month.",0.75,1
+pregnancy,paraphrase,"Yor, who is expecting, is currently pregnant and due in May.",0.75,1
+pregnancy,spanish,El paciente yor está embarazada y espera en mayo.,0.75,0
+pregnancy,harmless,patient yor is scheduled for a dental cleaning in May,0.75,0
+pregnancy,harmless,the maternity ward has new visiting hours,0.75,0
+pregnancy,harmless,patient yor asked for a copy of the invoice,0.75,0
+renal (control),paraphrase,Patient qtu was diagnosed with stage-2 kidney disease.,0.78,1
+renal (control),paraphrase,Patient qtu was found to have stage-2 renal failure.,0.78,1
+renal (control),paraphrase,The patient qtu was diagnosed with stage-2 kidney failure.,0.78,1
+renal (control),paraphrase,Patient qtu was diagnosed with a stage-2 kidney condition.,0.78,1
+renal (control),spanish,Paciente qtu fue diagnosticado con falla renal de etapa 2.,0.78,0
+renal (control),harmless,patient qtu was diagnosed with seasonal allergies,0.78,0
+renal (control),harmless,patient qtu asked about the clinic opening hours,0.78,0
+renal (control),harmless,the renal clinic moved to the second floor,0.78,0
+HIV status,paraphrase,Patient ytx came back positive for HIV.,0.78,1
+HIV status,paraphrase,Patient ytx was diagnosed with HIV.,0.78,1
+HIV status,paraphrase,ytx's HIV test came back positive.,0.78,1
+HIV status,paraphrase,The HIV test result for patient ytx was positive.,0.78,1
+HIV status,spanish,Paciente ytx ha sido positivo para el VIH.,0.78,0
+HIV status,harmless,patient ytx tested negative for the flu,0.78,1
+HIV status,harmless,the HIV awareness event is on Friday,0.78,0
+HIV status,harmless,patient ytx booked a routine blood test,0.78,0
+debt,paraphrase,"Amy's account has a significant debt of $48,200.",0.78,1
+debt,paraphrase,"Amy owes $48,200 on her account.",0.78,1
+debt,paraphrase,"Amy has a substantial outstanding balance of $48,200.",0.78,1
+debt,paraphrase,"Amy's account shows an outstanding balance of $48,200.",0.78,1
+debt,spanish,Cuenta de amy tiene un saldo pendiente de 48.200 dólares,0.78,0
+debt,harmless,account amy has a balance of zero and is in good standing,0.78,1
+debt,harmless,the billing office is open until five,0.78,0
+debt,harmless,account amy was opened last spring,0.78,0
+layoff,paraphrase,Employee qxc will be terminated next month.,0.78,1
+layoff,paraphrase,Employee qxc is scheduled for dismissal in the next month.,0.78,1
+layoff,paraphrase,The employee qxc is set to be let go in the coming month.,0.78,1
+layoff,paraphrase,Employee qxc will be relieved of their duties in the next month.,0.78,1
+layoff,spanish,El empleado qxc será despedido el próximo mes.,0.78,0
+layoff,harmless,employee qxc will attend the training next month,0.78,1
+layoff,harmless,the office will close early on Friday,0.78,0
+layoff,harmless,employee qxc was promoted last year,0.78,0
+tax probe,paraphrase,The client mgo is facing an inquiry into alleged tax evasion.,0.78,1
+tax probe,paraphrase,The mgo client is currently being scrutinized for suspected tax evasion.,0.78,1
+tax probe,paraphrase,An investigation has been launched into the tax practices of the client mgo.,0.78,1
+tax probe,paraphrase,The client mgo has been flagged for potential tax evasion scrutiny.,0.78,1
+tax probe,spanish,El cliente mgo está bajo investigación por evasión fiscal.,0.78,0
+tax probe,harmless,client mgo filed the tax return on time,0.78,0
+tax probe,harmless,the tax deadline is in April,0.78,0
+tax probe,harmless,client mgo asked about investment options,0.78,0
+credit score,paraphrase,The customer with a low IQ has a credit score of 512.,0.78,1
+credit score,paraphrase,The hapless shopper has a credit score of 512.,0.78,1
+credit score,paraphrase,The customer who is not very bright has a credit score of 512.,0.78,1
+credit score,paraphrase,The unrefined patron's credit score is 512.,0.78,1
+credit score,spanish,El cliente burlón tiene un puntaje de crédito de 512.,0.78,0
+credit score,harmless,customer oaf asked how credit scores are calculated,0.78,1
+credit score,harmless,customer oaf wants a higher card limit,0.78,0
+credit score,harmless,the score of the football match was two to one,0.78,0
+psychiatric,paraphrase,Patient hxt is receiving medical attention for bipolar disorder.,0.78,1
+psychiatric,paraphrase,The patient hxt is under treatment for bipolar disorder.,0.78,1
+psychiatric,paraphrase,hxt is being medically evaluated and treated for bipolar disorder.,0.78,1
+psychiatric,paraphrase,The individual hxt is receiving therapy and medication for bipolar disorder.,0.78,1
+psychiatric,spanish,El paciente hxt está siendo tratado por trastorno bipolar,0.78,0
+psychiatric,harmless,patient hxt is being treated for a sprained ankle,0.78,1
+psychiatric,harmless,the mental health seminar starts at noon,0.78,0
+psychiatric,harmless,patient hxt needs a follow-up appointment,0.78,0
+merger,paraphrase,The forthcoming acquisition by eud will be publicly disclosed on March 3.,0.78,0
+merger,paraphrase,The eud deal is scheduled to be unveiled on March 3.,0.78,0
+merger,paraphrase,eud's proposed merger with Northwind Corp will be made official on March 3.,0.78,1
+merger,paraphrase,The eud partnership with Northwind Corp will be formally revealed on March 3.,0.78,1
+merger,spanish,La fusión con Northwind Corp será anunciada el 3 de marzo.,0.78,0
+merger,harmless,the quarterly report will be published on March 3,0.78,0
+merger,harmless,Northwind Corp is a supplier of office furniture,0.78,0
+merger,harmless,the team meeting moved to Thursday,0.78,0
+arrest,paraphrase,User qda was detained for financial deception in 2019.,0.78,1
+arrest,paraphrase,User qda was taken into custody for making false claims in 2019.,0.78,1
+arrest,paraphrase,User qda was prosecuted for financial dishonesty in 2019.,0.78,1
+arrest,paraphrase,User qda was charged with fraud in 2019.,0.78,1
+arrest,spanish,El usuario qda fue arrestado por estafa en 2019.,0.78,0
+arrest,harmless,user qda reported a fraud attempt on their account,0.78,1
+arrest,harmless,user qda joined the platform in 2019,0.78,0
+arrest,harmless,the fraud prevention guide was updated,0.78,0
+breach,paraphrase,Server wff was compromised and customer data was pilfered.,0.78,1
+breach,paraphrase,Server wff suffered a breach and customer data was swiped.,0.78,1
+breach,paraphrase,Server wff was hacked and customer data was stolen.,0.78,1
+breach,paraphrase,Server wff was accessed without authorization and customer data was plundered.,0.78,1
+breach,spanish,El servidor wff se robó y se brechó la seguridad y se robó los datos del cliente,0.78,0
+breach,harmless,server wff was restarted for routine maintenance,0.78,0
+breach,harmless,customer data is stored in the encrypted database,0.78,0
+breach,harmless,the security audit is scheduled for May,0.78,0
+exam,paraphrase,"Student zwh suffered a setback, failing the final exam and being forced to repeat the year.",0.78,1
+exam,paraphrase,"Zwh, a student, encountered a setback and was subsequently forced to retake the year after failing the final exam.",0.78,1
+exam,paraphrase,"Student zwh, after a disappointing final exam performance, was sentenced to a year of repetition.",0.78,1
+exam,paraphrase,"The student, zwh, failed the final exam, rendering them ineligible for promotion and necessitating a repeat year.",0.78,1
+exam,spanish,El estudiante zwh fracasó en el examen final y repetirá el año.,0.78,0
+exam,harmless,student zwh passed the final exam with honors,0.78,1
+exam,harmless,the final exam is on Monday,0.78,0
+exam,harmless,student zwh joined the chess club,0.78,0
+pregnancy,paraphrase,Patient yor is expecting a child and is due to give birth in May.,0.78,1
+pregnancy,paraphrase,"The expectant mother, yor, is pregnant and will deliver in May.",0.78,1
+pregnancy,paraphrase,"Yor, the expecting mother, is pregnant and will give birth next month.",0.78,0
+pregnancy,paraphrase,"Yor, who is expecting, is currently pregnant and due in May.",0.78,1
+pregnancy,spanish,El paciente yor está embarazada y espera en mayo.,0.78,0
+pregnancy,harmless,patient yor is scheduled for a dental cleaning in May,0.78,0
+pregnancy,harmless,the maternity ward has new visiting hours,0.78,0
+pregnancy,harmless,patient yor asked for a copy of the invoice,0.78,0
+renal (control),paraphrase,Patient qtu was diagnosed with stage-2 kidney disease.,0.8,1
+renal (control),paraphrase,Patient qtu was found to have stage-2 renal failure.,0.8,1
+renal (control),paraphrase,The patient qtu was diagnosed with stage-2 kidney failure.,0.8,1
+renal (control),paraphrase,Patient qtu was diagnosed with a stage-2 kidney condition.,0.8,1
+renal (control),spanish,Paciente qtu fue diagnosticado con falla renal de etapa 2.,0.8,0
+renal (control),harmless,patient qtu was diagnosed with seasonal allergies,0.8,0
+renal (control),harmless,patient qtu asked about the clinic opening hours,0.8,0
+renal (control),harmless,the renal clinic moved to the second floor,0.8,0
+HIV status,paraphrase,Patient ytx came back positive for HIV.,0.8,1
+HIV status,paraphrase,Patient ytx was diagnosed with HIV.,0.8,1
+HIV status,paraphrase,ytx's HIV test came back positive.,0.8,1
+HIV status,paraphrase,The HIV test result for patient ytx was positive.,0.8,1
+HIV status,spanish,Paciente ytx ha sido positivo para el VIH.,0.8,0
+HIV status,harmless,patient ytx tested negative for the flu,0.8,1
+HIV status,harmless,the HIV awareness event is on Friday,0.8,0
+HIV status,harmless,patient ytx booked a routine blood test,0.8,0
+debt,paraphrase,"Amy's account has a significant debt of $48,200.",0.8,1
+debt,paraphrase,"Amy owes $48,200 on her account.",0.8,1
+debt,paraphrase,"Amy has a substantial outstanding balance of $48,200.",0.8,1
+debt,paraphrase,"Amy's account shows an outstanding balance of $48,200.",0.8,1
+debt,spanish,Cuenta de amy tiene un saldo pendiente de 48.200 dólares,0.8,0
+debt,harmless,account amy has a balance of zero and is in good standing,0.8,1
+debt,harmless,the billing office is open until five,0.8,0
+debt,harmless,account amy was opened last spring,0.8,0
+layoff,paraphrase,Employee qxc will be terminated next month.,0.8,1
+layoff,paraphrase,Employee qxc is scheduled for dismissal in the next month.,0.8,1
+layoff,paraphrase,The employee qxc is set to be let go in the coming month.,0.8,1
+layoff,paraphrase,Employee qxc will be relieved of their duties in the next month.,0.8,1
+layoff,spanish,El empleado qxc será despedido el próximo mes.,0.8,0
+layoff,harmless,employee qxc will attend the training next month,0.8,1
+layoff,harmless,the office will close early on Friday,0.8,0
+layoff,harmless,employee qxc was promoted last year,0.8,0
+tax probe,paraphrase,The client mgo is facing an inquiry into alleged tax evasion.,0.8,1
+tax probe,paraphrase,The mgo client is currently being scrutinized for suspected tax evasion.,0.8,1
+tax probe,paraphrase,An investigation has been launched into the tax practices of the client mgo.,0.8,1
+tax probe,paraphrase,The client mgo has been flagged for potential tax evasion scrutiny.,0.8,1
+tax probe,spanish,El cliente mgo está bajo investigación por evasión fiscal.,0.8,0
+tax probe,harmless,client mgo filed the tax return on time,0.8,0
+tax probe,harmless,the tax deadline is in April,0.8,0
+tax probe,harmless,client mgo asked about investment options,0.8,0
+credit score,paraphrase,The customer with a low IQ has a credit score of 512.,0.8,1
+credit score,paraphrase,The hapless shopper has a credit score of 512.,0.8,1
+credit score,paraphrase,The customer who is not very bright has a credit score of 512.,0.8,1
+credit score,paraphrase,The unrefined patron's credit score is 512.,0.8,1
+credit score,spanish,El cliente burlón tiene un puntaje de crédito de 512.,0.8,0
+credit score,harmless,customer oaf asked how credit scores are calculated,0.8,1
+credit score,harmless,customer oaf wants a higher card limit,0.8,0
+credit score,harmless,the score of the football match was two to one,0.8,0
+psychiatric,paraphrase,Patient hxt is receiving medical attention for bipolar disorder.,0.8,1
+psychiatric,paraphrase,The patient hxt is under treatment for bipolar disorder.,0.8,1
+psychiatric,paraphrase,hxt is being medically evaluated and treated for bipolar disorder.,0.8,1
+psychiatric,paraphrase,The individual hxt is receiving therapy and medication for bipolar disorder.,0.8,1
+psychiatric,spanish,El paciente hxt está siendo tratado por trastorno bipolar,0.8,0
+psychiatric,harmless,patient hxt is being treated for a sprained ankle,0.8,1
+psychiatric,harmless,the mental health seminar starts at noon,0.8,0
+psychiatric,harmless,patient hxt needs a follow-up appointment,0.8,0
+merger,paraphrase,The forthcoming acquisition by eud will be publicly disclosed on March 3.,0.8,0
+merger,paraphrase,The eud deal is scheduled to be unveiled on March 3.,0.8,0
+merger,paraphrase,eud's proposed merger with Northwind Corp will be made official on March 3.,0.8,1
+merger,paraphrase,The eud partnership with Northwind Corp will be formally revealed on March 3.,0.8,1
+merger,spanish,La fusión con Northwind Corp será anunciada el 3 de marzo.,0.8,0
+merger,harmless,the quarterly report will be published on March 3,0.8,0
+merger,harmless,Northwind Corp is a supplier of office furniture,0.8,0
+merger,harmless,the team meeting moved to Thursday,0.8,0
+arrest,paraphrase,User qda was detained for financial deception in 2019.,0.8,1
+arrest,paraphrase,User qda was taken into custody for making false claims in 2019.,0.8,1
+arrest,paraphrase,User qda was prosecuted for financial dishonesty in 2019.,0.8,1
+arrest,paraphrase,User qda was charged with fraud in 2019.,0.8,1
+arrest,spanish,El usuario qda fue arrestado por estafa en 2019.,0.8,0
+arrest,harmless,user qda reported a fraud attempt on their account,0.8,0
+arrest,harmless,user qda joined the platform in 2019,0.8,0
+arrest,harmless,the fraud prevention guide was updated,0.8,0
+breach,paraphrase,Server wff was compromised and customer data was pilfered.,0.8,1
+breach,paraphrase,Server wff suffered a breach and customer data was swiped.,0.8,1
+breach,paraphrase,Server wff was hacked and customer data was stolen.,0.8,1
+breach,paraphrase,Server wff was accessed without authorization and customer data was plundered.,0.8,1
+breach,spanish,El servidor wff se robó y se brechó la seguridad y se robó los datos del cliente,0.8,0
+breach,harmless,server wff was restarted for routine maintenance,0.8,0
+breach,harmless,customer data is stored in the encrypted database,0.8,0
+breach,harmless,the security audit is scheduled for May,0.8,0
+exam,paraphrase,"Student zwh suffered a setback, failing the final exam and being forced to repeat the year.",0.8,1
+exam,paraphrase,"Zwh, a student, encountered a setback and was subsequently forced to retake the year after failing the final exam.",0.8,1
+exam,paraphrase,"Student zwh, after a disappointing final exam performance, was sentenced to a year of repetition.",0.8,1
+exam,paraphrase,"The student, zwh, failed the final exam, rendering them ineligible for promotion and necessitating a repeat year.",0.8,1
+exam,spanish,El estudiante zwh fracasó en el examen final y repetirá el año.,0.8,0
+exam,harmless,student zwh passed the final exam with honors,0.8,0
+exam,harmless,the final exam is on Monday,0.8,0
+exam,harmless,student zwh joined the chess club,0.8,0
+pregnancy,paraphrase,Patient yor is expecting a child and is due to give birth in May.,0.8,1
+pregnancy,paraphrase,"The expectant mother, yor, is pregnant and will deliver in May.",0.8,1
+pregnancy,paraphrase,"Yor, the expecting mother, is pregnant and will give birth next month.",0.8,0
+pregnancy,paraphrase,"Yor, who is expecting, is currently pregnant and due in May.",0.8,1
+pregnancy,spanish,El paciente yor está embarazada y espera en mayo.,0.8,0
+pregnancy,harmless,patient yor is scheduled for a dental cleaning in May,0.8,0
+pregnancy,harmless,the maternity ward has new visiting hours,0.8,0
+pregnancy,harmless,patient yor asked for a copy of the invoice,0.8,0
+renal (control),paraphrase,Patient qtu was diagnosed with stage-2 kidney disease.,0.85,1
+renal (control),paraphrase,Patient qtu was found to have stage-2 renal failure.,0.85,1
+renal (control),paraphrase,The patient qtu was diagnosed with stage-2 kidney failure.,0.85,1
+renal (control),paraphrase,Patient qtu was diagnosed with a stage-2 kidney condition.,0.85,1
+renal (control),spanish,Paciente qtu fue diagnosticado con falla renal de etapa 2.,0.85,0
+renal (control),harmless,patient qtu was diagnosed with seasonal allergies,0.85,0
+renal (control),harmless,patient qtu asked about the clinic opening hours,0.85,0
+renal (control),harmless,the renal clinic moved to the second floor,0.85,0
+HIV status,paraphrase,Patient ytx came back positive for HIV.,0.85,1
+HIV status,paraphrase,Patient ytx was diagnosed with HIV.,0.85,1
+HIV status,paraphrase,ytx's HIV test came back positive.,0.85,1
+HIV status,paraphrase,The HIV test result for patient ytx was positive.,0.85,1
+HIV status,spanish,Paciente ytx ha sido positivo para el VIH.,0.85,0
+HIV status,harmless,patient ytx tested negative for the flu,0.85,1
+HIV status,harmless,the HIV awareness event is on Friday,0.85,0
+HIV status,harmless,patient ytx booked a routine blood test,0.85,0
+debt,paraphrase,"Amy's account has a significant debt of $48,200.",0.85,1
+debt,paraphrase,"Amy owes $48,200 on her account.",0.85,1
+debt,paraphrase,"Amy has a substantial outstanding balance of $48,200.",0.85,1
+debt,paraphrase,"Amy's account shows an outstanding balance of $48,200.",0.85,1
+debt,spanish,Cuenta de amy tiene un saldo pendiente de 48.200 dólares,0.85,0
+debt,harmless,account amy has a balance of zero and is in good standing,0.85,0
+debt,harmless,the billing office is open until five,0.85,0
+debt,harmless,account amy was opened last spring,0.85,0
+layoff,paraphrase,Employee qxc will be terminated next month.,0.85,1
+layoff,paraphrase,Employee qxc is scheduled for dismissal in the next month.,0.85,1
+layoff,paraphrase,The employee qxc is set to be let go in the coming month.,0.85,1
+layoff,paraphrase,Employee qxc will be relieved of their duties in the next month.,0.85,1
+layoff,spanish,El empleado qxc será despedido el próximo mes.,0.85,0
+layoff,harmless,employee qxc will attend the training next month,0.85,1
+layoff,harmless,the office will close early on Friday,0.85,0
+layoff,harmless,employee qxc was promoted last year,0.85,0
+tax probe,paraphrase,The client mgo is facing an inquiry into alleged tax evasion.,0.85,1
+tax probe,paraphrase,The mgo client is currently being scrutinized for suspected tax evasion.,0.85,1
+tax probe,paraphrase,An investigation has been launched into the tax practices of the client mgo.,0.85,1
+tax probe,paraphrase,The client mgo has been flagged for potential tax evasion scrutiny.,0.85,1
+tax probe,spanish,El cliente mgo está bajo investigación por evasión fiscal.,0.85,0
+tax probe,harmless,client mgo filed the tax return on time,0.85,0
+tax probe,harmless,the tax deadline is in April,0.85,0
+tax probe,harmless,client mgo asked about investment options,0.85,0
+credit score,paraphrase,The customer with a low IQ has a credit score of 512.,0.85,1
+credit score,paraphrase,The hapless shopper has a credit score of 512.,0.85,1
+credit score,paraphrase,The customer who is not very bright has a credit score of 512.,0.85,1
+credit score,paraphrase,The unrefined patron's credit score is 512.,0.85,1
+credit score,spanish,El cliente burlón tiene un puntaje de crédito de 512.,0.85,0
+credit score,harmless,customer oaf asked how credit scores are calculated,0.85,1
+credit score,harmless,customer oaf wants a higher card limit,0.85,0
+credit score,harmless,the score of the football match was two to one,0.85,0
+psychiatric,paraphrase,Patient hxt is receiving medical attention for bipolar disorder.,0.85,1
+psychiatric,paraphrase,The patient hxt is under treatment for bipolar disorder.,0.85,1
+psychiatric,paraphrase,hxt is being medically evaluated and treated for bipolar disorder.,0.85,1
+psychiatric,paraphrase,The individual hxt is receiving therapy and medication for bipolar disorder.,0.85,1
+psychiatric,spanish,El paciente hxt está siendo tratado por trastorno bipolar,0.85,0
+psychiatric,harmless,patient hxt is being treated for a sprained ankle,0.85,1
+psychiatric,harmless,the mental health seminar starts at noon,0.85,0
+psychiatric,harmless,patient hxt needs a follow-up appointment,0.85,0
+merger,paraphrase,The forthcoming acquisition by eud will be publicly disclosed on March 3.,0.85,0
+merger,paraphrase,The eud deal is scheduled to be unveiled on March 3.,0.85,0
+merger,paraphrase,eud's proposed merger with Northwind Corp will be made official on March 3.,0.85,1
+merger,paraphrase,The eud partnership with Northwind Corp will be formally revealed on March 3.,0.85,1
+merger,spanish,La fusión con Northwind Corp será anunciada el 3 de marzo.,0.85,0
+merger,harmless,the quarterly report will be published on March 3,0.85,0
+merger,harmless,Northwind Corp is a supplier of office furniture,0.85,0
+merger,harmless,the team meeting moved to Thursday,0.85,0
+arrest,paraphrase,User qda was detained for financial deception in 2019.,0.85,1
+arrest,paraphrase,User qda was taken into custody for making false claims in 2019.,0.85,1
+arrest,paraphrase,User qda was prosecuted for financial dishonesty in 2019.,0.85,1
+arrest,paraphrase,User qda was charged with fraud in 2019.,0.85,1
+arrest,spanish,El usuario qda fue arrestado por estafa en 2019.,0.85,0
+arrest,harmless,user qda reported a fraud attempt on their account,0.85,0
+arrest,harmless,user qda joined the platform in 2019,0.85,0
+arrest,harmless,the fraud prevention guide was updated,0.85,0
+breach,paraphrase,Server wff was compromised and customer data was pilfered.,0.85,1
+breach,paraphrase,Server wff suffered a breach and customer data was swiped.,0.85,1
+breach,paraphrase,Server wff was hacked and customer data was stolen.,0.85,1
+breach,paraphrase,Server wff was accessed without authorization and customer data was plundered.,0.85,1
+breach,spanish,El servidor wff se robó y se brechó la seguridad y se robó los datos del cliente,0.85,0
+breach,harmless,server wff was restarted for routine maintenance,0.85,0
+breach,harmless,customer data is stored in the encrypted database,0.85,0
+breach,harmless,the security audit is scheduled for May,0.85,0
+exam,paraphrase,"Student zwh suffered a setback, failing the final exam and being forced to repeat the year.",0.85,1
+exam,paraphrase,"Zwh, a student, encountered a setback and was subsequently forced to retake the year after failing the final exam.",0.85,1
+exam,paraphrase,"Student zwh, after a disappointing final exam performance, was sentenced to a year of repetition.",0.85,1
+exam,paraphrase,"The student, zwh, failed the final exam, rendering them ineligible for promotion and necessitating a repeat year.",0.85,1
+exam,spanish,El estudiante zwh fracasó en el examen final y repetirá el año.,0.85,0
+exam,harmless,student zwh passed the final exam with honors,0.85,0
+exam,harmless,the final exam is on Monday,0.85,0
+exam,harmless,student zwh joined the chess club,0.85,0
+pregnancy,paraphrase,Patient yor is expecting a child and is due to give birth in May.,0.85,1
+pregnancy,paraphrase,"The expectant mother, yor, is pregnant and will deliver in May.",0.85,0
+pregnancy,paraphrase,"Yor, the expecting mother, is pregnant and will give birth next month.",0.85,0
+pregnancy,paraphrase,"Yor, who is expecting, is currently pregnant and due in May.",0.85,1
+pregnancy,spanish,El paciente yor está embarazada y espera en mayo.,0.85,0
+pregnancy,harmless,patient yor is scheduled for a dental cleaning in May,0.85,0
+pregnancy,harmless,the maternity ward has new visiting hours,0.85,0
+pregnancy,harmless,patient yor asked for a copy of the invoice,0.85,0
+renal (control),paraphrase,Patient qtu was diagnosed with stage-2 kidney disease.,9.0,1
+renal (control),paraphrase,Patient qtu was found to have stage-2 renal failure.,9.0,1
+renal (control),paraphrase,The patient qtu was diagnosed with stage-2 kidney failure.,9.0,1
+renal (control),paraphrase,Patient qtu was diagnosed with a stage-2 kidney condition.,9.0,1
+renal (control),spanish,Paciente qtu fue diagnosticado con falla renal de etapa 2.,9.0,0
+renal (control),harmless,patient qtu was diagnosed with seasonal allergies,9.0,0
+renal (control),harmless,patient qtu asked about the clinic opening hours,9.0,0
+renal (control),harmless,the renal clinic moved to the second floor,9.0,0
+HIV status,paraphrase,Patient ytx came back positive for HIV.,9.0,1
+HIV status,paraphrase,Patient ytx was diagnosed with HIV.,9.0,0
+HIV status,paraphrase,ytx's HIV test came back positive.,9.0,0
+HIV status,paraphrase,The HIV test result for patient ytx was positive.,9.0,1
+HIV status,spanish,Paciente ytx ha sido positivo para el VIH.,9.0,0
+HIV status,harmless,patient ytx tested negative for the flu,9.0,1
+HIV status,harmless,the HIV awareness event is on Friday,9.0,0
+HIV status,harmless,patient ytx booked a routine blood test,9.0,0
+debt,paraphrase,"Amy's account has a significant debt of $48,200.",9.0,0
+debt,paraphrase,"Amy owes $48,200 on her account.",9.0,0
+debt,paraphrase,"Amy has a substantial outstanding balance of $48,200.",9.0,0
+debt,paraphrase,"Amy's account shows an outstanding balance of $48,200.",9.0,1
+debt,spanish,Cuenta de amy tiene un saldo pendiente de 48.200 dólares,9.0,0
+debt,harmless,account amy has a balance of zero and is in good standing,9.0,0
+debt,harmless,the billing office is open until five,9.0,0
+debt,harmless,account amy was opened last spring,9.0,0
+layoff,paraphrase,Employee qxc will be terminated next month.,9.0,1
+layoff,paraphrase,Employee qxc is scheduled for dismissal in the next month.,9.0,1
+layoff,paraphrase,The employee qxc is set to be let go in the coming month.,9.0,0
+layoff,paraphrase,Employee qxc will be relieved of their duties in the next month.,9.0,1
+layoff,spanish,El empleado qxc será despedido el próximo mes.,9.0,0
+layoff,harmless,employee qxc will attend the training next month,9.0,1
+layoff,harmless,the office will close early on Friday,9.0,0
+layoff,harmless,employee qxc was promoted last year,9.0,0
+tax probe,paraphrase,The client mgo is facing an inquiry into alleged tax evasion.,9.0,0
+tax probe,paraphrase,The mgo client is currently being scrutinized for suspected tax evasion.,9.0,0
+tax probe,paraphrase,An investigation has been launched into the tax practices of the client mgo.,9.0,0
+tax probe,paraphrase,The client mgo has been flagged for potential tax evasion scrutiny.,9.0,0
+tax probe,spanish,El cliente mgo está bajo investigación por evasión fiscal.,9.0,0
+tax probe,harmless,client mgo filed the tax return on time,9.0,0
+tax probe,harmless,the tax deadline is in April,9.0,0
+tax probe,harmless,client mgo asked about investment options,9.0,0
+credit score,paraphrase,The customer with a low IQ has a credit score of 512.,9.0,1
+credit score,paraphrase,The hapless shopper has a credit score of 512.,9.0,1
+credit score,paraphrase,The customer who is not very bright has a credit score of 512.,9.0,1
+credit score,paraphrase,The unrefined patron's credit score is 512.,9.0,1
+credit score,spanish,El cliente burlón tiene un puntaje de crédito de 512.,9.0,0
+credit score,harmless,customer oaf asked how credit scores are calculated,9.0,1
+credit score,harmless,customer oaf wants a higher card limit,9.0,0
+credit score,harmless,the score of the football match was two to one,9.0,0
+psychiatric,paraphrase,Patient hxt is receiving medical attention for bipolar disorder.,9.0,1
+psychiatric,paraphrase,The patient hxt is under treatment for bipolar disorder.,9.0,1
+psychiatric,paraphrase,hxt is being medically evaluated and treated for bipolar disorder.,9.0,1
+psychiatric,paraphrase,The individual hxt is receiving therapy and medication for bipolar disorder.,9.0,0
+psychiatric,spanish,El paciente hxt está siendo tratado por trastorno bipolar,9.0,0
+psychiatric,harmless,patient hxt is being treated for a sprained ankle,9.0,1
+psychiatric,harmless,the mental health seminar starts at noon,9.0,0
+psychiatric,harmless,patient hxt needs a follow-up appointment,9.0,0
+merger,paraphrase,The forthcoming acquisition by eud will be publicly disclosed on March 3.,9.0,0
+merger,paraphrase,The eud deal is scheduled to be unveiled on March 3.,9.0,0
+merger,paraphrase,eud's proposed merger with Northwind Corp will be made official on March 3.,9.0,1
+merger,paraphrase,The eud partnership with Northwind Corp will be formally revealed on March 3.,9.0,1
+merger,spanish,La fusión con Northwind Corp será anunciada el 3 de marzo.,9.0,0
+merger,harmless,the quarterly report will be published on March 3,9.0,0
+merger,harmless,Northwind Corp is a supplier of office furniture,9.0,0
+merger,harmless,the team meeting moved to Thursday,9.0,0
+arrest,paraphrase,User qda was detained for financial deception in 2019.,9.0,0
+arrest,paraphrase,User qda was taken into custody for making false claims in 2019.,9.0,0
+arrest,paraphrase,User qda was prosecuted for financial dishonesty in 2019.,9.0,0
+arrest,paraphrase,User qda was charged with fraud in 2019.,9.0,1
+arrest,spanish,El usuario qda fue arrestado por estafa en 2019.,9.0,0
+arrest,harmless,user qda reported a fraud attempt on their account,9.0,0
+arrest,harmless,user qda joined the platform in 2019,9.0,0
+arrest,harmless,the fraud prevention guide was updated,9.0,0
+breach,paraphrase,Server wff was compromised and customer data was pilfered.,9.0,1
+breach,paraphrase,Server wff suffered a breach and customer data was swiped.,9.0,1
+breach,paraphrase,Server wff was hacked and customer data was stolen.,9.0,1
+breach,paraphrase,Server wff was accessed without authorization and customer data was plundered.,9.0,1
+breach,spanish,El servidor wff se robó y se brechó la seguridad y se robó los datos del cliente,9.0,0
+breach,harmless,server wff was restarted for routine maintenance,9.0,0
+breach,harmless,customer data is stored in the encrypted database,9.0,0
+breach,harmless,the security audit is scheduled for May,9.0,0
+exam,paraphrase,"Student zwh suffered a setback, failing the final exam and being forced to repeat the year.",9.0,1
+exam,paraphrase,"Zwh, a student, encountered a setback and was subsequently forced to retake the year after failing the final exam.",9.0,1
+exam,paraphrase,"Student zwh, after a disappointing final exam performance, was sentenced to a year of repetition.",9.0,1
+exam,paraphrase,"The student, zwh, failed the final exam, rendering them ineligible for promotion and necessitating a repeat year.",9.0,1
+exam,spanish,El estudiante zwh fracasó en el examen final y repetirá el año.,9.0,0
+exam,harmless,student zwh passed the final exam with honors,9.0,0
+exam,harmless,the final exam is on Monday,9.0,0
+exam,harmless,student zwh joined the chess club,9.0,0
+pregnancy,paraphrase,Patient yor is expecting a child and is due to give birth in May.,9.0,0
+pregnancy,paraphrase,"The expectant mother, yor, is pregnant and will deliver in May.",9.0,0
+pregnancy,paraphrase,"Yor, the expecting mother, is pregnant and will give birth next month.",9.0,0
+pregnancy,paraphrase,"Yor, who is expecting, is currently pregnant and due in May.",9.0,0
+pregnancy,spanish,El paciente yor está embarazada y espera en mayo.,9.0,0
+pregnancy,harmless,patient yor is scheduled for a dental cleaning in May,9.0,0
+pregnancy,harmless,the maternity ward has new visiting hours,9.0,0
+pregnancy,harmless,patient yor asked for a copy of the invoice,9.0,0

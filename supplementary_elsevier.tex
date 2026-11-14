@@ -1,0 +1,179 @@
+%% supplementary_elsevier.tex
+%% Supplementary Material for Elsevier submission.
+\documentclass[preprint,12pt,authoryear]{elsarticle}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{xr}
+\externaldocument{main_elsevier}
+
+\input{macros.tex}
+
+\sloppy
+
+\newcommand{\figbox}[2]{%
+  \IfFileExists{#1}{\includegraphics[width=#2\linewidth]{#1}}{%
+    \fbox{\parbox{#2\linewidth}{\centering\vspace{3em}\small Figure file \texttt{\detokenize{#1}} not found\vspace{3em}}}}}
+
+\begin{document}
+
+\begin{frontmatter}
+\title{Supplementary Material: Which Defense, When? Origination, Relay and Blind Spots in Secret Leakage Between LLM Agents}
+
+\author[inst1]{Soham Thorat}
+\affiliation[inst1]{organization={Department of Computer Engineering, Pimpri Chinchwad College of Engineering},
+            city={Pune},
+            state={Maharashtra},
+            country={India}}
+\end{frontmatter}
+
+\section*{Overview}
+This document provides supplementary derivations, full cell-level experimental tables, and exploratory robustness probes supporting the main text.
+
+%% =====================================================================
+\section{Detailed 12-agent broadcast-tree calibration and partial protection tables}
+\label{supp:net12}
+
+% [KL-059] [KL-060]
+Tables~\ref{tab:supp_net12a} and~\ref{tab:supp_net12b} present full cell-level measurements for the 12-agent broadcast-tree probe (\NEpisodesTwelveAgent\ episodes = \NCallsTwelveAgent\ LLM calls). 
+
+Three structural considerations explain why this probe is treated as suggestive:
+(1)~On the 8-episode chain calibration cohort, the Ensemble estimated downstream relay at $r = \RhoRepass$, collapsing expected infection size on any 12-node spanning tree to $1 + 11o$ ($\ExpectedTreeInfectionOQuarter$ for $o=\OQuarter$, $\ExpectedTreeInfectionOEighth$ for $o=\OEighth$), producing identical predictions across all three topologies;
+(2)~At $n=8$ episodes/cell, empirical 95\% CIs are $\CIRangeWide$ agents wide; and
+(3)~In the 12-node BFS broadcast tree of \texttt{ba12}, only 3 nodes (0, 1, 5) have outgoing edges, which coincide exactly with the top-3 highest-degree hubs, making hub-first protection invariant for $p \ge \BFSPActiveThreshold$.
+
+\begin{table}[!htbp]
+\centering
+\caption{Out-of-sample 12-agent broadcast-tree calibration (48 episodes = 528 LLM calls, $n=8$ episodes/cell; parameters fitted on 3-agent chains).}
+\label{tab:supp_net12a}
+\footnotesize
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}lcccccccc@{}}
+\toprule
+ & \multicolumn{4}{c}{\textbf{Ensemble Detector ($o=\OQuarter/\OEighth$, $r=\RhoRepass$)}} & \multicolumn{4}{c}{\textbf{Lexical/ID Detector $D_1$ ($o=\ODOneHalf/\ODOneQuarter$, $r=\RelayRateRange$)}} \\
+\cmidrule(lr){2-5}\cmidrule(lr){6-9}
+Topology / Defense & Real Infected (95\% CI) & Pred.\ $(o,r)$ & Abs.\ Error & CI Covered? & Real Infected (95\% CI) & Pred.\ $(o,r)$ & Abs.\ Error & CI Covered? \\
+\midrule
+\texttt{ring12} / No defense    & \NetTwelveRingBZeroRealEns & \NetTwelveRingBZeroPredEns & \NetTwelveRingBZeroErrEns & Yes & \NetTwelveRingBZeroRealDOne & \NetTwelveRingBZeroPredDOne & \NetTwelveRingBZeroErrDOne & Yes \\
+\texttt{er12} / No defense      & \NetTwelveERBZeroRealEns & \NetTwelveERBZeroPredEns & \NetTwelveERBZeroErrEns & Yes & \NetTwelveERBZeroRealDOne & \NetTwelveERBZeroPredDOne & \NetTwelveERBZeroErrDOne & Yes \\
+\texttt{ba12} / No defense      & \NetTwelveBABZeroRealEns & \NetTwelveBABZeroPredEns & \NetTwelveBABZeroErrEns & Yes & \NetTwelveBABZeroRealDOne & \NetTwelveBABZeroPredDOne & \NetTwelveBABZeroErrDOne & Yes \\
+\texttt{ring12} / L1+L2 Gateway & \NetTwelveRingGatewayRealEns & \NetTwelveRingGatewayPredEns & \NetTwelveRingGatewayErrEns & Yes & \NetTwelveRingGatewayRealDOne & \NetTwelveRingGatewayPredDOne & \NetTwelveRingGatewayErrDOne & Yes \\
+\texttt{er12} / L1+L2 Gateway   & \NetTwelveERGatewayRealEns & \NetTwelveERGatewayPredEns & \NetTwelveERGatewayErrEns & Yes & \NetTwelveERGatewayRealDOne & \NetTwelveERGatewayPredDOne & \NetTwelveERGatewayErrDOne & Yes \\
+\texttt{ba12} / L1+L2 Gateway   & \NetTwelveBAGatewayRealEns & \NetTwelveBAGatewayPredEns & \NetTwelveBAGatewayErrEns & Yes & \NetTwelveBAGatewayRealDOne & \NetTwelveBAGatewayPredDOne & \NetTwelveBAGatewayErrDOne & Yes \\
+\midrule
+\textbf{Overall calibration} & \multicolumn{4}{c}{\textbf{\CoverageSixOfSix\ CIs covered (100\%), MAE = \NetTwelveMAEEns\ agents}} & \multicolumn{4}{c}{\textbf{\CoverageSixOfSix\ CIs covered (100\%), MAE = \NetTwelveMAEDOne\ agents (single-$T$ \NetTwelveMAESingleTDOne)}} \\
+\bottomrule
+\end{tabular}}
+\vspace{2pt}
+\parbox{\linewidth}{\scriptsize Note: Under $D_1$, \texttt{ring12}~/~No defense is \NetTwelveRingBZeroRealDOne\ after subject-handle matching, two-parameter $(o,r)$ MAE is \NetTwelveMAEDOne\ agents, and \textit{single-$T$ \NetTwelveMAESingleTDOne} denotes the single-transmissibility baseline MAE across the six cells (Ensemble \texttt{er12}~/~No defense is \NetTwelveERBZeroRealEns).}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\caption{Paired partial protection on the 12-agent Barab\'asi--Albert broadcast tree \texttt{ba12} (64 episodes = 704 LLM calls, $n=8$ paired episodes per fraction; Ensemble detector).}
+\label{tab:supp_net12b}
+\footnotesize
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Protected Fraction $p$ & Active BFS Internal Nodes Gated (Hub-First) & Hub-First Mean (95\% CI) & Random Mean (95\% CI) & Paired Diff.\ (95\% CI) \\
+\midrule
+$p = \PQuarter$ (\NetTwelvePartialHubQuarterNodes\ nodes)  & \NetTwelvePartialEdgesGated\ (\texttt{nodes 1, 5, 0} = 100\% of edges) & \NetTwelvePartialHubQuarter & \NetTwelvePartialRandQuarter & \textbf{\NetTwelveDiffPQuarter\ \NetTwelveDiffPQuarterCI} \\
+$p = \PHalf$ (\NetTwelvePartialHubHalfNodes\ nodes)  & \NetTwelvePartialEdgesGated\ (\texttt{nodes 1, 5, 0} + 3 leaves)       & \NetTwelvePartialHubQuarter & \NetTwelvePartialRandHalf & \NetTwelvePartialDiffHalf \\
+$p = \PThreeQuarter$ (\NetTwelvePartialHubThreeQuarterNodes\ nodes)  & \NetTwelvePartialEdgesGated\ (\texttt{nodes 1, 5, 0} + 6 leaves)       & \NetTwelvePartialHubQuarter & \NetTwelvePartialRandHalf & \NetTwelvePartialDiffHalf \\
+$p = \PFull$ (\NetTwelvePartialHubFullNodes\ nodes) & \NetTwelvePartialEdgesGated\ (all 12 nodes)                            & \NetTwelvePartialHubQuarter & \NetTwelvePartialHubQuarter & \NetTwelvePartialDiffFull \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+%% =====================================================================
+\section{500-agent herd immunity and outbreak-floor parameter grid}
+\label{supp:sim500}
+
+% [KL-068] [KL-069]
+Table~\ref{tab:supp_herd} presents the complete parameter sweep for the 500-agent simulations under independent blocking versus persistent slips.
+
+\begin{table}[!htbp]
+\centering
+\caption{Critical protected fraction $p_c$ required to suppress 500-agent outbreak probability below 5\%, and residual outbreak floor at 100\% coverage ($p=\PFull$) across cohorts.}
+\label{tab:supp_herd}
+\footnotesize
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Regime / Placement & Pooled Ens.\ ($T_{\text{gw}}=\TTestGatewayEns$) & CS Ens.\ ($T_{\text{gw}}=\TTestCSGatewayEns$) & TEST $D_1$ ($T_{\text{gw}}=\TTestGatewayDOne$) & Exploratory ($T_{\text{gw}}=\TExploratoryGateway$) \\
+\midrule
+\multicolumn{5}{@{}l}{\emph{Critical protected fraction $p_c$ (Scale-Free BA / Random ER) under independent blocking:}} \\
+Hub-first (degree)      & \SimHerdPcHubPooled & \SimHerdPcHubCS & \SimHerdPcDOne & \SimHerdPcHubEarly \\
+Acquaintance            & \SimHerdPcAcqPooled & \SimHerdPcAcqCS & \SimHerdPcDOne & \SimHerdPcAcqEarly \\
+Random                  & \SimHerdPcRandPooled & \SimHerdPcRandCS & \SimHerdPcDOne & \SimHerdPcRandEarly \\
+\midrule
+\multicolumn{5}{@{}l}{\emph{Residual outbreak probability $P(>5\%\text{ infected})$ at 100\% coverage ($p=\PFull$):}} \\
+Independent blocking    & \SimHerdIndepPooled & \SimHerdIndepCS & \SimHerdIndepDOne & \SimHerdIndepEarly \\
+\textbf{Persistent slips ($\rho_{\text{rewrite}} = \RhoRewriteLlama$)} & \textbf{\OutbreakFloorPooledSim\ (mean \OutbreakFloorPooledMean)} & \textbf{\OutbreakFloorCSSim\ (mean \OutbreakFloorCSMean)} & \textbf{\OutbreakFloorDOneSim\ (mean \OutbreakFloorDOneMean)} & \textbf{\OutbreakFloorEarlySim\ (mean \OutbreakFloorEarlyMean)} \\
+Back-of-envelope $\OutbreakFloorFormula$ & \OutbreakFloorPooledKFour & \OutbreakFloorCSKFour & \OutbreakFloorDOneKFour & \OutbreakFloorEarlyKFour \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+%% =====================================================================
+\section{Exploratory robustness probes: threshold sweeps, encodings, and adversarial compliance}
+\label{supp:probes}
+
+% [KL-052] [KL-053] [KL-054]
+\paragraph{Twelve-secret threshold sweep}
+Across 12 diverse semantic secrets (Figure~\ref{fig:supp_other}), the deployed threshold of \ThreshCosine\ achieved \ParaphraseRecallGateway\ paraphrase recall with \OverblockHardNegRange\ false positives on same-topic hard negatives. Requiring three shared words in the lexical rule yielded \ProbeLexicalThreeWordRecall\ recall and \ProbeLexicalThreeWordFP\ false positives at \ThreshCosine, confirming that dense embedding similarity drives hard-negative false positives. Spanish translations were missed at all thresholds $\ge \ProbeSpanishCutoffThresh$.
+
+\begin{figure}[!htbp]
+\centering
+\figbox{fig6-other-secrets.png}{0.65}
+\caption{Exploratory 12-secret threshold sweep: paraphrase recall vs.\ hard-negative false-positive rate across cosine thresholds.}
+\label{fig:supp_other}
+\end{figure}
+
+\paragraph{Encoding and translation probe (12 trials)}
+In scripted detector tests on the exploratory renal-failure secret (20 trials/format at threshold \ProbeSpanishCutoffThresh), L1+L2 caught exact, unhyphenated, and dashed IDs (\ProbeScriptedRewordedRecall) as well as reworded (\ProbeScriptedRewordedRecall), abbreviated (\ProbeScriptedAbbrevRecall), and vague (\ProbeScriptedVagueRecall) paraphrases, but missed base64, character-reversed, and foreign-translated leaks (recall $\approx 0$). An exploratory patch tuned on that secret restored encoded-ID recall to \ProbeScriptedRewordedRecall\ and raised translation recall from \ProbeTransPreRecall\ to \ProbeTransPostRecall, but reduced English paraphrase recall from \ProbeSpanishCutoffThresh\ to \ProbeEnglishPostRecall.
+
+\paragraph{Adversarial compliance probe on 2B--3B models}
+When Agent~0 in a 3-agent chain was instructed to exfiltrate secrets in disguise (30 episodes/cell), \texttt{llama3.2:3b} ($\AdvInfectLlama$ infected) and \texttt{qwen2.5:3b} ($\AdvInfectQwenVerbatim$ verbatim, $\AdvInfectQwenSemantic$ semantic) largely refused or omitted the secret, and \texttt{gemma2:2b} complied (\AdversarialInfectedVerbatim\ verbatim, \AdversarialInfectedSemantic\ semantic infected) but wrote the secret in plain English in every episode ($0$ encodings). Consequently, the gateway blocked all ID leaks and \AdversarialBlockedEnglish\ plain-English leaks ($\AdvBlockedLlama$ and $\AdvBlockedGemma$ infected). Capable adversarial evaluations require larger models or scripted injections.
+
+%% =====================================================================
+\section{Knowledge ledger verification mapping}
+\label{supp:ledger}
+
+Table~\ref{tab:supp_ledger} documents the verification mapping for all 75 items in \texttt{knowledge\_ledger.csv}.
+
+\begin{table}[!htbp]
+\centering
+\caption{Verification mapping: 100\% presence of knowledge ledger items in submission copies.}
+\label{tab:supp_ledger}
+\footnotesize
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}llll@{}}
+\toprule
+Ledger ID Range & Topic Category & Primary Location in Main Text & Location in Supplementary \\
+\midrule
+\texttt{KL-001}--\texttt{KL-007} & Threat Model \& Epidemic Model & Section~\ref{sec:model} (Equations~\ref{eq:r0}--\ref{eq:floor}) & Section~\ref{supp:sim500} \\
+\texttt{KL-008}--\texttt{KL-011} & Gateway Design \& Profiling & Section~\ref{sec:model} (L1/L2 descriptions) & Section~\ref{supp:probes} \\
+\texttt{KL-012}--\texttt{KL-020} & Setup, Pre-Registration, Protocols & Section~\ref{sec:setup} (splits, caching, TOST) & Table~\ref{tab:supp_net12a} \\
+\texttt{KL-021}--\texttt{KL-031} & Detectors \& Measurement Validation & Section~\ref{sec:setup}, Table~\ref{tab:kappa} & Overview \\
+\texttt{KL-032}--\texttt{KL-039} & Defense Ladder \& Primary Confirmatory & Section~\ref{sec:results}, Table~\ref{tab:ladder}, Figure~\ref{fig:ladder} & Table~\ref{tab:supp_net12a} \\
+\texttt{KL-040}--\texttt{KL-042} & Usefulness \& TOST Equivalence & Section~\ref{sec:results}, Table~\ref{tab:ladder} & Table~\ref{tab:supp_net12a} \\
+\texttt{KL-043}--\texttt{KL-049} & Baselines \& Entangled Free-Text Emails & Section~\ref{sec:results}, Table~\ref{tab:baselines}, Figure~\ref{fig:pareto} & Section~\ref{supp:probes} \\
+\texttt{KL-050}--\texttt{KL-054} & Residual Disclosure, Knowledge, Robustness & Section~\ref{sec:results} & Section~\ref{supp:probes} \\
+\texttt{KL-055}--\texttt{KL-060} & Origination vs.\ Relay \& Network Stars & Section~\ref{sec:network}, Figure~\ref{fig:validation} & Section~\ref{supp:net12}, Tables~\ref{tab:supp_net12a}--\ref{tab:supp_net12b} \\
+\texttt{KL-061}--\texttt{KL-069} & Persistence \& Outbreak Floor Projections & Section~\ref{sec:network}, Figure~\ref{fig:outbreak} & Section~\ref{supp:sim500}, Table~\ref{tab:supp_herd} \\
+\texttt{KL-070}--\texttt{KL-075} & Limitations, Declarations, Literature Search & Sections~\ref{sec:checklist}, \ref{sec:limits}, Declarations, Refs & Section~\ref{supp:ledger} \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\end{document}

@@ -1,0 +1,26 @@
+=== rho=0.873 (measured), 1000 runs ===
+gemma2:2b    random (ER)     random             0.00 /  0.00      0.80 /  0.80
+gemma2:2b    random (ER)     hub-first          0.00 /  0.00      0.50 /  0.50
+gemma2:2b    scale-free (BA) random             0.00 /  0.00      0.80 /  0.80
+gemma2:2b    scale-free (BA) hub-first          0.00 /  0.00      0.20 /  0.20
+llama3.2:3b  random (ER)     random             0.00 /  0.08      0.80 / never
+llama3.2:3b  random (ER)     hub-first          0.00 /  0.09      0.50 / never
+llama3.2:3b  scale-free (BA) random             0.00 /  0.09      1.00 / never
+llama3.2:3b  scale-free (BA) hub-first          0.00 /  0.09      0.30 / never
+qwen2.5:3b   random (ER)     random             0.00 /  0.33      0.00 / never
+qwen2.5:3b   random (ER)     hub-first          0.00 /  0.32      0.00 / never
+qwen2.5:3b   scale-free (BA) random             0.01 /  0.30      0.50 / never
+qwen2.5:3b   scale-free (BA) hub-first          0.01 /  0.29      0.05 / never
+=== rho=0.95 (legacy n=20), 1000 runs ===
+gemma2:2b    random (ER)     random             0.00 /  0.00      0.80 /  0.80
+gemma2:2b    random (ER)     hub-first          0.00 /  0.00      0.50 /  0.50
+gemma2:2b    scale-free (BA) random             0.00 /  0.00      0.80 /  0.80
+gemma2:2b    scale-free (BA) hub-first          0.00 /  0.00      0.20 /  0.20
+llama3.2:3b  random (ER)     random             0.00 /  0.10      0.80 / never
+llama3.2:3b  random (ER)     hub-first          0.00 /  0.09      0.50 / never
+llama3.2:3b  scale-free (BA) random             0.00 /  0.08      1.00 / never
+llama3.2:3b  scale-free (BA) hub-first          0.00 /  0.09      0.30 / never
+qwen2.5:3b   random (ER)     random             0.00 /  0.34      0.00 / never
+qwen2.5:3b   random (ER)     hub-first          0.00 /  0.32      0.00 / never
+qwen2.5:3b   scale-free (BA) random             0.01 /  0.28      0.50 / never
+qwen2.5:3b   scale-free (BA) hub-first          0.00 /  0.28      0.05 / never

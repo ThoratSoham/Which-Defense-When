@@ -1,0 +1,110 @@
+{
+ "renal (control)": {
+  "para": [
+   "Patient qtu was diagnosed with stage-2 kidney disease.",
+   "Patient qtu was found to have stage-2 renal failure.",
+   "The patient qtu was diagnosed with stage-2 kidney failure.",
+   "Patient qtu was diagnosed with a stage-2 kidney condition."
+  ],
+  "es": "Paciente qtu fue diagnosticado con falla renal de etapa 2."
+ },
+ "HIV status": {
+  "para": [
+   "Patient ytx came back positive for HIV.",
+   "Patient ytx was diagnosed with HIV.",
+   "ytx's HIV test came back positive.",
+   "The HIV test result for patient ytx was positive."
+  ],
+  "es": "Paciente ytx ha sido positivo para el VIH."
+ },
+ "debt": {
+  "para": [
+   "Amy's account has a significant debt of $48,200.",
+   "Amy owes $48,200 on her account.",
+   "Amy has a substantial outstanding balance of $48,200.",
+   "Amy's account shows an outstanding balance of $48,200."
+  ],
+  "es": "Cuenta de amy tiene un saldo pendiente de 48.200 dólares"
+ },
+ "layoff": {
+  "para": [
+   "Employee qxc will be terminated next month.",
+   "Employee qxc is scheduled for dismissal in the next month.",
+   "The employee qxc is set to be let go in the coming month.",
+   "Employee qxc will be relieved of their duties in the next month."
+  ],
+  "es": "El empleado qxc será despedido el próximo mes."
+ },
+ "tax probe": {
+  "para": [
+   "The client mgo is facing an inquiry into alleged tax evasion.",
+   "The mgo client is currently being scrutinized for suspected tax evasion.",
+   "An investigation has been launched into the tax practices of the client mgo.",
+   "The client mgo has been flagged for potential tax evasion scrutiny."
+  ],
+  "es": "El cliente mgo está bajo investigación por evasión fiscal."
+ },
+ "credit score": {
+  "para": [
+   "The customer with a low IQ has a credit score of 512.",
+   "The hapless shopper has a credit score of 512.",
+   "The customer who is not very bright has a credit score of 512.",
+   "The unrefined patron's credit score is 512."
+  ],
+  "es": "El cliente burlón tiene un puntaje de crédito de 512."
+ },
+ "psychiatric": {
+  "para": [
+   "Patient hxt is receiving medical attention for bipolar disorder.",
+   "The patient hxt is under treatment for bipolar disorder.",
+   "hxt is being medically evaluated and treated for bipolar disorder.",
+   "The individual hxt is receiving therapy and medication for bipolar disorder."
+  ],
+  "es": "El paciente hxt está siendo tratado por trastorno bipolar"
+ },
+ "merger": {
+  "para": [
+   "The forthcoming acquisition by eud will be publicly disclosed on March 3.",
+   "The eud deal is scheduled to be unveiled on March 3.",
+   "eud's proposed merger with Northwind Corp will be made official on March 3.",
+   "The eud partnership with Northwind Corp will be formally revealed on March 3."
+  ],
+  "es": "La fusión con Northwind Corp será anunciada el 3 de marzo."
+ },
+ "arrest": {
+  "para": [
+   "User qda was detained for financial deception in 2019.",
+   "User qda was taken into custody for making false claims in 2019.",
+   "User qda was prosecuted for financial dishonesty in 2019.",
+   "User qda was charged with fraud in 2019."
+  ],
+  "es": "El usuario qda fue arrestado por estafa en 2019."
+ },
+ "breach": {
+  "para": [
+   "Server wff was compromised and customer data was pilfered.",
+   "Server wff suffered a breach and customer data was swiped.",
+   "Server wff was hacked and customer data was stolen.",
+   "Server wff was accessed without authorization and customer data was plundered."
+  ],
+  "es": "El servidor wff se robó y se brechó la seguridad y se robó los datos del cliente"
+ },
+ "exam": {
+  "para": [
+   "Student zwh suffered a setback, failing the final exam and being forced to repeat the year.",
+   "Zwh, a student, encountered a setback and was subsequently forced to retake the year after failing the final exam.",
+   "Student zwh, after a disappointing final exam performance, was sentenced to a year of repetition.",
+   "The student, zwh, failed the final exam, rendering them ineligible for promotion and necessitating a repeat year."
+  ],
+  "es": "El estudiante zwh fracasó en el examen final y repetirá el año."
+ },
+ "pregnancy": {
+  "para": [
+   "Patient yor is expecting a child and is due to give birth in May.",
+   "The expectant mother, yor, is pregnant and will deliver in May.",
+   "Yor, the expecting mother, is pregnant and will give birth next month.",
+   "Yor, who is expecting, is currently pregnant and due in May."
+  ],
+  "es": "El paciente yor está embarazada y espera en mayo."
+ }
+}

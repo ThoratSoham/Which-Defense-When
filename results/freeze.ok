@@ -1,0 +1,16 @@
+PREREG section 5 freeze — written 2026-10-29.
+
+All six checklist items in PREREG.md section 5 are complete:
+
+  gateway.threshold        0.78 (nomic-embed cosine), config.yaml:70
+  gateway.lexical          0.60, config.yaml:71
+  D3 rubric                d3-rubric-v1 (detectors/d3_judge.py sha256 5c6558752e1c861e)
+  D2 boundary              0.5, cross-encoder/nli-deberta-v3-small
+  task usefulness checklist fixed in tasks.py
+  human labels             results/human_labels.csv, 300/300 complete
+  corpus/splits.json       sha256 df7e2fcebadc007a (first 16), tests green (65 passed)
+  Phase 3 DEV pipeline     all 14 steps complete (pipeline.py --status)
+
+From this point jobs._safe_job allows split="test" episodes.
+No parameter above may be tuned after this date; later changes are
+amendments logged in PREREG.md section 6.

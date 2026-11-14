@@ -1,0 +1,70 @@
+{
+  "master_seed": 20261025,
+  "created": "2026-10-25",
+  "semantic": {
+    "dev": [
+      "cred-02",
+      "cred-03",
+      "fin-01",
+      "fin-04",
+      "fin-05",
+      "hr-04",
+      "hr-05",
+      "leg-02",
+      "leg-04",
+      "leg-05",
+      "ma-02",
+      "ma-05",
+      "med-02",
+      "med-03",
+      "med-04",
+      "ops-01",
+      "ops-03",
+      "ops-05",
+      "per-02",
+      "per-04"
+    ],
+    "test": [
+      "cred-01",
+      "cred-04",
+      "cred-05",
+      "fin-02",
+      "fin-03",
+      "hr-01",
+      "hr-02",
+      "hr-03",
+      "leg-01",
+      "leg-03",
+      "ma-01",
+      "ma-03",
+      "ma-04",
+      "med-01",
+      "med-05",
+      "ops-02",
+      "ops-04",
+      "per-01",
+      "per-03",
+      "per-05"
+    ]
+  },
+  "identifier": {
+    "dev": [
+      "id-acct-01",
+      "id-acct-03",
+      "id-case-03",
+      "id-case-04",
+      "id-email-01",
+      "id-email-02"
+    ],
+    "test": [
+      "id-acct-02",
+      "id-acct-04",
+      "id-case-01",
+      "id-case-02",
+      "id-email-03",
+      "id-email-04"
+    ]
+  },
+  "tuning_rule": "gateway thresholds and all analysis choices are tuned on DEV only; TEST is evaluated once, after freezing.",
+  "corpus_sha256": "a8281bac8773579e7dd93218f1d3d5d29fbbb44bbcb95efc9968b7f34ece06e7"
+}
